@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:lifefit/widgets/bottom_bar.dart';
 import 'package:lifefit/const/colors.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,7 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: PRIMARY_COLOR,
         title: Padding(
           padding: EdgeInsets.only(left: 9),
-          child: Text("라이프핏",
+          /*
+          child: const Icon(
+              Image.asset('assets/icons/.png'),
+              size: 20,
+            ),
+           */
+          child: const Text("라이프핏",
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.w500,
@@ -36,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Builder(
               builder: (context) {
                 return IconButton(
-                  icon: Icon(Icons.list,
+                  icon: const Icon(Icons.list,
                     size: 35,
                   ),
                   onPressed: (){
@@ -61,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: Text("내 정보",
+                    child: const Text("내 정보",
                       //textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.black , fontSize: 20),
                     ),
@@ -86,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 1.0,
                               ),
                             ),
-                            child: Text("라이프핏 개인 프로필",
+                            child: const Text("라이프핏 개인 프로필",
                               style: TextStyle(
                                 fontSize: 15.0,
                                 color: PRIMARY_TEXT_COLOR,
@@ -107,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ) ,
             ),
             ListTile(
-              leading: Text("라이프핏",
+              leading: const Text("라이프핏",
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -115,18 +122,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text("홈"),
+              leading: const Icon(Icons.home),
+              title: const Text("홈"),
               onTap: (){},
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text("설정"),
+              leading: const Icon(Icons.settings),
+              title: const Text("설정"),
               onTap: (){},
             ),
             ListTile(
-              leading: Icon(Icons.question_answer),
-              title: Text("질문"),
+              leading: const Icon(Icons.question_answer),
+              title: const Text("질문"),
               onTap: (){},
             ),
           ],
@@ -150,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     RichText(
-                        text: TextSpan(
+                        text: const TextSpan(
                             text: "안녕하세요 ",
                             style: TextStyle(
                               letterSpacing: 1.0,
@@ -196,14 +203,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("일일 챌린지",
+                      const Text("일일 챌린지",
                         style: TextStyle(
                           fontSize: 15.0,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 5.0,),
-                      Text("10000 걸음 걷기",
+                      const Text("10000 걸음 걷기",
                         style: TextStyle(
                           fontSize: 12.0,
                           fontWeight: FontWeight.w500,
@@ -237,14 +244,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text( "건강 정보/기사",
+                        const Text( "건강 정보/기사",
                           style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Icon(Icons.local_fire_department,
-                          color: Colors.deepOrange,
+                        const Icon(Icons.newspaper,
+                          color: Colors.green,
                           size: 20.0,
                         ),
                       ],
@@ -279,13 +286,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text( "미세먼지/날씨",
+                        const Text( "미세먼지/날씨",
                           style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Icon(Icons.cloud,
+                        const Icon(Icons.cloud,
                           color: Colors.purpleAccent,
                           size: 20.0,
                         ),
@@ -321,13 +328,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text( "수면시간",
+                        const Text( "수면시간",
                           style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Icon(Icons.dark_mode,
+                        const Icon(Icons.dark_mode,
                           color: Colors.yellow,
                           size: 20.0,
                         )
@@ -362,13 +369,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text( "물",
+                        const Text( "물",
                           style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Icon(Icons.water_drop,
+                        const Icon(Icons.water_drop,
                           color: Colors.blue,
                           size: 20.0,
                         )
@@ -382,7 +389,6 @@ class _HomeScreenState extends State<HomeScreen> {
           // 물
         ],
       ),
-
       // 하단 바
       bottomNavigationBar: MainBottomNavigationBar(),
     );
