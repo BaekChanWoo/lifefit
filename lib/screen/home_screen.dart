@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:lifefit/widgets/bottom_bar.dart';
 import 'package:lifefit/const/colors.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,31 +20,26 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: PRIMARY_COLOR,
         title: Padding(
-          padding: EdgeInsets.only(left: 9),
+          padding: EdgeInsets.only(left: 9 , top: 5),
+          child: Image.asset('assets/img/lifefit.png',
+          fit: BoxFit.contain,
+          width: 40,
+          height: 40,
+          ),
           /*
-          child: const ImageIcon(
-            AssetImage('assets/img/lifefit.png'),
-            size: 35,
-            color: Colors.green,
-              ),
-           */
           child: const Text("라이프핏",
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.w500,
             ),
-          ),
+          ),*/
         ),
         actions: [
-          /*CircleAvatar(
-                radius: 17,
-                backgroundColor: PRIMARY_COLOR,
-              ),*/
           Builder(
               builder: (context) {
                 return IconButton(
                   icon: const Icon(Icons.list,
-                    size: 35,
+                    size: 40,
                   ),
                   onPressed: (){
                     print("클릭됨");

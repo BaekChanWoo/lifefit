@@ -25,7 +25,6 @@ class _MainBottomNavigationBarState extends State<MainBottomNavigationBar> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
