@@ -23,10 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Padding(
           padding: EdgeInsets.only(left: 9),
           /*
-          child: const Icon(
-              Image.asset('assets/icons/.png'),
-              size: 20,
-            ),
+          child: const ImageIcon(
+            AssetImage('assets/img/lifefit.png'),
+            size: 35,
+            color: Colors.green,
+              ),
            */
           child: const Text("라이프핏",
             style: TextStyle(
