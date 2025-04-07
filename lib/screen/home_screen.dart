@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: PRIMARY_COLOR,
         title: Padding(
-          padding: EdgeInsets.only(left: 9 , top: 5),
+          padding: EdgeInsets.only(left: 9 ),
           child: Image.asset('assets/img/lifefit.png',
           fit: BoxFit.contain,
           width: 40,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
+import 'package:lifefit/screen/sleep.dart';
 
 // 계속 반복되는 하단바
 class MainBottomNavigationBar extends StatefulWidget {
@@ -12,17 +13,21 @@ class MainBottomNavigationBar extends StatefulWidget {
 class _MainBottomNavigationBarState extends State<MainBottomNavigationBar> {
   int _selectedIndex = 0; // 현재 선택된 탭의 인덱스
 
-  /*
+
   // 화면 목록
   final List<Widget> _screens = [
-    // 나중에 만들 페이지 목록
+    //  페이지 목록
+    SleepScreen()
   ];
-  */
+
 
   void _onItemTapped(int index){
     setState(() {
       _selectedIndex = index;
     });
+    
+    Navigator.push(context, MaterialPageRoute(builder: (context) => _screens[index]),
+    );
   }
 
   @override
