@@ -6,6 +6,7 @@ import 'package:lifefit/const/colors.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -14,6 +15,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark); // 상태바 검은색
+
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -50,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // 상다 바
+      // 상단 바
       endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -178,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // 안녕하세요 백찬우님
+          // 안녕하세요 SKHU님
           Positioned(
               top: 80,
               child: Container(
