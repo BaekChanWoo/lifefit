@@ -29,6 +29,9 @@ class _FeedState extends State<Feed> {
                   CategoryButton(title: '다이어트',),
                   SizedBox(width: 12,),
                   CategoryButton(title: '러닝',),
+                  SizedBox(width: 12,),
+                  CategoryButton(title: '필라테스',),
+                  
                 ],
               ),
             )
