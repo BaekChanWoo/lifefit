@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 import '../const/colors.dart';
-import '../widgets/bottom_bar.dart';
+
 
 class SleepScreen extends StatefulWidget {
   const SleepScreen({Key? key}) : super(key: key);
@@ -85,7 +85,7 @@ class _SleepScreenState extends State<SleepScreen> {
           ),
         ],
       ),
-        bottomNavigationBar: MainBottomNavigationBar()
+
     );
   }
 }
