@@ -43,10 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _isContainerPage = false; // 탭(하단 바) 전환 시 컨테이너 페이지 상태 해제
+      _isContainerPage = false;    // 탭(하단 바) 전환 시 컨테이너 페이지 상태 해제
       _pageController.animateToPage(
           index,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut, // 부드러운 전환 곡선
       );
       if (index == 0) { // 홈 택 클릭시
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // 중첩 Navigator의 pop 이벤트를 감지하는 Observer
 class CustomNavigatorObserver extends NavigatorObserver {
-  final VoidCallback onPopToHome; // 상태 변경 대신 콜백 사용
+  final VoidCallback onPopToHome; // 콜백 사용
 
   CustomNavigatorObserver(this.onPopToHome);
 
@@ -222,7 +222,7 @@ class CustomNavigatorObserver extends NavigatorObserver {
   void didPop(Route route, Route? previous) {
     // 세부 페이지에서 홈으로 돌아올 때 콜백 호출
     if (route.settings.name != 'home' && previous != null && previous.settings.name == 'home') {
-      onPopToHome(); // setState 대신 콜백 호출
+      onPopToHome(); // 조건이 참일 때 호출
     }
   }
 }
@@ -230,7 +230,7 @@ class CustomNavigatorObserver extends NavigatorObserver {
 // 홈 화면 내 중첩 내비게이션을 관리
 class HomeContentWithNavigation extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey; // Navigator 키 추가
-  final VoidCallback onPopToHome; // 뒤로 가기 시 호출될 콜백 추가
+  final VoidCallback onPopToHome;               // 뒤로 가기 시 호출될 콜백 추가
 
   const HomeContentWithNavigation({
     super.key,
@@ -245,7 +245,7 @@ class HomeContentWithNavigation extends StatelessWidget {
         key: navigatorKey,
         initialRoute: 'home',
         observers: [CustomNavigatorObserver(onPopToHome)], // 뒤로 가기 감지용 Observer 추가
-        onGenerateRoute: (RouteSettings settings) { // 라우트 이름에 따라 페이지를 동적으로 생성
+        onGenerateRoute: (RouteSettings settings) {        // 라우트 이름에 따라 페이지를 동적으로 생성
         WidgetBuilder builder;
         switch (settings.name) {
             case 'home':
