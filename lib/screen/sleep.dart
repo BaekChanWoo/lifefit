@@ -55,7 +55,7 @@ class _SleepScreenState extends State<SleepScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
-        backgroundColor: PRIMARY_COLOR,
+        backgroundColor: const Color(0xFFFFFFFF),
         title: const Text('라이프핏', style: TextStyle(color: Colors.black)),
         actions: const [
           Padding(
