@@ -7,6 +7,7 @@ import 'package:lifefit/component/community/feed.dart';
 // 커뮤니티 메인 페이지
 class Community extends StatefulWidget {
 
+
   const Community({super.key});
 
   @override

@@ -5,6 +5,7 @@ import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/screen/sleep.dart';
 import 'package:lifefit/screen/calendar.dart';
 import 'package:lifefit/screen/community.dart';
+import 'package:lifefit/screen/meet_up.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;               // 현재 선택된 하단 내비게이션 탭의 인덱스
@@ -32,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
           navigatorKey: _homeNavigatorKey,
           onPopToHome: _handlePopToHome, // 콜백 추가
       ), // 키 전달
-      const Center(child: Text("번개 화면"),),
+      const MeetUpScreen(),
       const Calendar(),
       const Community(),
       const Center(child: Text("노래 화면"),),
