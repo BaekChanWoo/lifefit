@@ -4,21 +4,50 @@ import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/main_mypage.dart';
 import 'package:lifefit/component/community/feed.dart';
 
+// 커뮤니티 메인 페이지
 class Community extends StatefulWidget {
+
   const Community({super.key});
 
   @override
   State<Community> createState() => _CommunityState();
 }
 
-class _CommunityState extends State<Community> {
+class _CommunityState extends State<Community> with SingleTickerProviderStateMixin{
+  late TabController _tabController;
+  bool _showFab = true;
+
+  @override
+  void initState(){
+    super.initState();
+
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.animation!.addListener((){
+      final value = _tabController.animation!.value;
+      final show = value < 0.5; // 0번 탭에 가까우면 보여주기(0.0 피드 , 1.0 마이페이지)
+
+      if( show != _showFab) {
+        setState(() { // 탭 전환시 상태 갱신
+          _showFab = show;
+        });
+      }
+    });
+  }
+  @override
+  void dispose(){
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 2, // 탭 개수
-      child: Scaffold(
+    return  Scaffold(
+        floatingActionButton: _showFab ?FloatingActionButton(
+          backgroundColor: PRIMARY_COLOR,
+          onPressed: (){},
+          child: Icon(Icons.add),
+        ) : null,
         appBar: AppBar(
           title: Row(children: [
             const Text(
@@ -37,6 +66,7 @@ class _CommunityState extends State<Community> {
             ),
           ],
           bottom: TabBar(
+            controller: _tabController,
             indicatorColor: PRIMARY_COLOR,
             indicatorWeight: 3.0,
             isScrollable: false,
@@ -48,12 +78,13 @@ class _CommunityState extends State<Community> {
           ),
         ),
         body: TabBarView(
+            controller: _tabController,
             children: [
               Feed(),
               MainMyPage(),
             ],
         ),
-      ),
+
     );
   }
 

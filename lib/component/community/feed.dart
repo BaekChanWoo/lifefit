@@ -1,5 +1,6 @@
 import 'package:lifefit/component/community/feed_category_button.dart';
 import 'package:flutter/material.dart';
+import 'package:lifefit/component/community/feed_list_item.dart';
 
 // 피드 페이지
 class Feed extends StatefulWidget {
@@ -31,10 +32,25 @@ class _FeedState extends State<Feed> {
                   CategoryButton(title: '러닝',),
                   SizedBox(width: 12,),
                   CategoryButton(title: '필라테스',),
-                  
+                  SizedBox(width: 12,),
+                  CategoryButton(title: '필라테스',),
+                  SizedBox(width: 12,),
+                  CategoryButton(title: '필라테스',),
                 ],
               ),
-            )
+            ),
+            const SizedBox(height: 10,),
+            Expanded(
+                child: ListView(
+                  children: [
+                    FeedListItem(),
+                    FeedListItem(),
+                    FeedListItem(),
+                    FeedListItem(),
+                    FeedListItem(),
+                  ],
+                )
+            ),
           ],
         ),
       ),

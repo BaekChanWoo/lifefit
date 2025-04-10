@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _isContainerPage = false;    // 탭(하단 바) 전환 시 컨테이너 페이지 상태 해제
       _pageController.animateToPage(
           index,
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(microseconds: 300),
           curve: Curves.easeInOut, // 부드러운 전환 곡선
       );
       if (index == 0) { // 홈 택 클릭시
