@@ -23,11 +23,12 @@ class PostList extends StatelessWidget {
           final post = posts[index];
 
           return Card(
-            shape: RoundedRectangleBorder(
+            shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            elevation: 3,
-            margin: const EdgeInsets.symmetric(vertical: 8),
+            elevation: 0,
+            margin: const EdgeInsets.symmetric(vertical: 5),
+            color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -36,7 +37,7 @@ class PostList extends StatelessWidget {
                   Text(
                     post.title,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
