@@ -17,7 +17,6 @@ class _HealthtopicState extends State<Healthtopic> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back_ios),
         title: Center(
           child: Text(
             '건강토픽',
