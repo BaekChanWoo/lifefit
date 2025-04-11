@@ -30,7 +30,8 @@ class _MyPageState extends State<MyPage> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Text("헬스랑 러닝을 좋아해요!",
+            const SizedBox(height: 2.0,),
+            Text("헬스랑 러닝을 좋아하며 같이 운동 원해요!!",
               style: TextStyle(
                 fontSize: 12.0,
                 color: Colors.grey[600],
@@ -38,7 +39,7 @@ class _MyPageState extends State<MyPage> {
             ),
           ],
         )
-
+        
       ],
     );
   }

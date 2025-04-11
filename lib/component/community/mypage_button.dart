@@ -12,7 +12,8 @@ class MyPageButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 40,
+        //width: 20,
+        height: 35,
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -24,7 +25,7 @@ class MyPageButton extends StatelessWidget {
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.w400 , fontSize: 18),
+            style: const TextStyle(fontWeight: FontWeight.w400 , fontSize: 13),
           ),
         ),
       ),

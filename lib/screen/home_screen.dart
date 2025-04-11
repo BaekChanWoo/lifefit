@@ -321,7 +321,7 @@ class _HomeContentState extends State<HomeContent> {
                           ),
                           children: [
                             TextSpan(
-                                text: "백찬우님",
+                                text: "SKHU님",
                                 style: TextStyle(
                                   letterSpacing: 2.0,
                                   fontSize: 20,

@@ -111,7 +111,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
   }
   String? contentValidator(String? val){ // 내용 필드 검증 함수
     if(val == null || val.length == 0){
-      return "값을 입력해주세요";
+      return "내용을 입력해주세요";
     }
     return null;
   }
