@@ -52,15 +52,15 @@ class FeedListItem extends StatelessWidget {
                               Text('서울 노원구',
                                 style: TextStyle(color: Colors.grey),
                               ),
-                              Text(' 3분전',
+                              Text('  3분전',
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ],
                           ),
-                          /*
+                          const SizedBox(height: 30.0,),
                           Text('백찬우',
                             style: TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),
-                          ),*/
+                          ),
                         ],
                       ),
                   ),
@@ -75,14 +75,6 @@ class FeedListItem extends StatelessWidget {
               // 기타
             ],
           ),
-            Positioned(
-                left: 111,
-                bottom: 0,
-                child: Text('백찬우',
-                  style: TextStyle(
-                      fontSize: 16 , fontWeight: FontWeight.bold),
-                ),
-            ),
             Positioned(
               right: 10,
               bottom: 0,
