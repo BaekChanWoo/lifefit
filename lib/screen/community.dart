@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:lifefit/const/colors.dart';
@@ -88,6 +90,8 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
 
     );
   }
+
+
 
 }
 

@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:lifefit/component/community/feed_show.dart';
 
 // 이미지 크기
 const double _imageSize = 100;
 
 // 피드(게시물) 리스트 아이템 목록
 class FeedListItem extends StatelessWidget {
-  const FeedListItem({super.key});
+  final Map item;
+  const FeedListItem(this.item , {super.key});
 
 
   @override
   Widget build(BuildContext context) {
 
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => FeedShow(item:item))
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Stack(
@@ -43,7 +48,8 @@ class FeedListItem extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("요가는 이렇게!!",
+                          Text(
+                          item['title'], // 제목
                           overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 16),
                           ),
@@ -58,7 +64,8 @@ class FeedListItem extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 30.0,),
-                          Text('백찬우',
+                          Text(
+                            item['name'],
                             style: TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),
                           ),
                         ],
