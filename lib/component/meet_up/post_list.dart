@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/model/meetup_model.dart';
+import 'apply_button.dart';
+import 'apply_sheet.dart';
 
-/// 모집글 목록을 보여주는 위젯
-class PostList extends StatelessWidget {
-  final List<Post> posts;           //게시물 목록
-  final VoidCallback onMorePressed; //More 버튼 클릭 시 실행
-  final bool hasMore;               //보여줄 항목이 있는가
+/// 게시글 리스트를 출력
+class PostList extends StatefulWidget {
+  final List<Post> posts;             // 현재 게시글
+  final VoidCallback onMorePressed;   // More 버튼 클릭 시 호출
+  final bool hasMore;                 // 추가 글 있는지
 
   const PostList({
     Key? key,
@@ -15,12 +17,18 @@ class PostList extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<PostList> createState() => _PostListState();
+}
+
+class _PostListState extends State<PostList> {
+  @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: posts.length + (hasMore ? 1 : 0), //More 버튼 포함 여부
+      itemCount: widget.posts.length + (widget.hasMore ? 1 : 0),
+
       itemBuilder: (context, index) {
-        if (index < posts.length) {
-          final post = posts[index];
+        if (index < widget.posts.length) {
+          final post = widget.posts[index]; // 현재 게시글
 
           return Card(
             shape: ContinuousRectangleBorder(
@@ -30,10 +38,11 @@ class PostList extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 5),
             color: Colors.white,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 제목 표시
                   Text(
                     post.title,
                     style: const TextStyle(
@@ -41,17 +50,54 @@ class PostList extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
+
+                  const SizedBox(height: 5),
+
+                  // 설명 표시
                   Text(post.description),
+
+                  const SizedBox(height: 12),
+
+                  // 인원 수 신청 버튼 나란히 배치
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // 정원 표시
+                      Text(
+                        '정원: ${post.currentPeople}명 / ${post.maxPeople}명',
+                      ),
+
+                      // 신청 버튼
+                      ApplyButton(
+                        isApplied: post.currentPeople >= post.maxPeople,
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            ),
+                            builder: (_) => ApplySheet(
+                              post: post,
+                              onApplied: () {
+                                // 시트에서 인원이 증가했을 때 화면 갱신
+                                setState(() {});
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           );
         } else {
-          // 마지막: More 버튼
+          // 게시글 끝났을 때 More 버튼 출력
           return Center(
             child: TextButton(
-              onPressed: onMorePressed,
+              onPressed: widget.onMorePressed,
               child: const Text(
                 'More +',
                 style: TextStyle(
