@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
+import 'package:sleek_circular_slider/sleek_circular_slider.dart'; // 패키지 임포트
+
 
 import '../const/colors.dart';
 import '../widgets/bottom_bar.dart';
@@ -31,8 +33,8 @@ class _SleepScreenState extends State<SleepScreen> {
 
   //화면에 나타낼 날짜 요일
   void updateDate(){
-    dateText = DateFormat('d MMMM yyyy', 'en_US').format(dateOfNow); //날짜 형식
-    dayText = DateFormat('EEE', 'en_US').format(dateOfNow); //요일 형식
+    dateText = DateFormat('y년 M월 d일', 'ko_KR').format(dateOfNow); //날짜 형식
+    dayText = DateFormat('E', 'ko_KR').format(dateOfNow); //요일 형식
     selectedDay = dateOfNow.weekday % 7;
   }
   //이전 날짜 화살표
@@ -79,12 +81,12 @@ class _SleepScreenState extends State<SleepScreen> {
                 children: [
                   Text(
                     dateText,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 18),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     dayText,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24),
                   ),
                 ],
               ),
@@ -99,19 +101,47 @@ class _SleepScreenState extends State<SleepScreen> {
           SizedBox(
             width: 250,
             height: 250,
-            child: CustomPaint(
-              painter: SleepCirclePainter(sleepHours: sleepHours),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.nightlight_round, color: Colors.green),
-                    Text("${sleepHours.toStringAsFixed(1)}",
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-
-                  ],
+            child: SleekCircularSlider(
+              min: 0,
+              max: 12,
+              initialValue: sleepHours,
+              appearance: CircularSliderAppearance(
+                angleRange: 360,
+                startAngle: 270,
+                size: 250,
+                customWidths: CustomSliderWidths(
+                  trackWidth: 16,
+                  progressBarWidth: 20,
+                  handlerSize: 6,  //슬라이더 핸들 크기
+                ),
+                customColors: CustomSliderColors(
+                  trackColor: Colors.grey.shade300,
+                  progressBarColor: PRIMARY_COLOR,
+                  dotColor: Colors.white, //슬라이더 핸들 색깔
+                ),
+                infoProperties: InfoProperties(
+                  bottomLabelStyle: TextStyle(fontSize: 16, color: Colors.grey),
+                  mainLabelStyle: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  modifier: (value) {
+                    int hour = value.floor();
+                    int minute = ((value - hour) * 60).round();
+                    return '$hour시간 ${minute.toString().padLeft(2, '0')}분';
+                  },
                 ),
               ),
+              onChange: (value) {
+                setState(() {
+                  sleepHours = value;
+                });
+              },
+              onChangeEnd: (value) {
+                setState(() {
+                  // 0시간으로 실수로 놓을 경우 → 자동으로 12시간 처리
+                  if (value < 0.5) {
+                    sleepHours = 12.0;
+                  }
+                });
+              },
             ),
           ),
 
@@ -180,7 +210,7 @@ class DayBox extends StatelessWidget {
     );
   }
 }
-// 수면 그래프 그리는 커스텀 페인터
+// 수면 그래프
 class SleepCirclePainter extends CustomPainter {
   final double sleepHours;
 

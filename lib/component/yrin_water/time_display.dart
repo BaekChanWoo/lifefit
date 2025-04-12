@@ -1,30 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:lifefit/const/colors.dart';
 
-class TimeDisplay extends StatelessWidget {
-  final TextEditingController controller;
-
-  const TimeDisplay({super.key, required this.controller});
+class TimeDisplay extends StatefulWidget {
+  const TimeDisplay({super.key});
 
 
   @override
+  _TimeDisplayState createState() => _TimeDisplayState();
+}
+
+class _TimeDisplayState extends State<TimeDisplay> {
+  late DateTime _dateTime; // 현재 날짜
+  String _formattedDate = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _updateDate();
+  }
+
+  //한국 시각 기준
+  void _updateDate() {
+    setState(() {
+      final now = DateTime.now().toUtc().add(const Duration(hours: 9));
+      _dateTime = now;
+      _formattedDate = DateFormat('yyyy-MM-dd').format(_dateTime);
+    });
+  }
+
+  //현재 날짜 화면
+  @override
   Widget build(BuildContext context) {
-    return Container( // TextField 대신 Container 사용
-      decoration: BoxDecoration( // 상자 모양 설정
-        border: Border.all(
-          color: Colors.grey, // 테두리 색상
-          width: 1.0, // 테두리 두께
+    return Positioned(
+      left: 20, top: 400,
+      child: Container(
+        width: 100,
+        height: 35,
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Color (0xFF99FF99),
+          borderRadius: BorderRadius.circular(10),
         ),
-        borderRadius: BorderRadius.circular(5.0), // 테두리 모서리 둥글게
-        color: Colors.white, // 배경색
-      ),
-      padding: const EdgeInsets.all(8.0), // 내부 여백
-      child: Text( // Text 위젯으로 텍스트 표시
-        controller.text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
+        child: Center(
+          child: Text(
+            _formattedDate,
+            style: const TextStyle
+              (fontSize: 14,
+                fontFamily: 'Padauk',
+                color: Colors.black,
+                fontWeight: FontWeight.w400),
+          ),
+        )
       ),
     );
   }

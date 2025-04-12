@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 
-void main() { // WaterHome 호출
-  runApp(const WaterHome());
-}
+class WaterIntake extends StatefulWidget {
+  final int waterAmount;
+  final Function(int) onAmountChanged;
 
-class WaterHome extends StatefulWidget {
-  const WaterHome({super.key});
+  const WaterIntake({
+    super.key,
+    required this.waterAmount,
+    required this.onAmountChanged, // 이름 변경
+  });
+
 
   @override
-  State<WaterHome> createState() => _WaterHomeState();
+  State<WaterIntake> createState() => _WaterIntakeState();
 }
 
-class _WaterHomeState extends State<WaterHome> {
-  int waterAmount = 0;
+class _WaterIntakeState extends State<WaterIntake> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: const Color(0xFFB9B9B9), // 전체 배경색 회색
 
         appBar: AppBar(backgroundColor: const Color(0xFFB9B9B9),
@@ -60,8 +62,8 @@ class _WaterHomeState extends State<WaterHome> {
                             alignment: Alignment.topCenter,
                             child: Image.asset(
                               'assets/img/cup.png',
-                              width:115,
-                              height: 115,
+                              width:110,
+                              height: 110,
                               fit: BoxFit.contain,),
                           ),
                         ),
@@ -77,8 +79,8 @@ class _WaterHomeState extends State<WaterHome> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    if (waterAmount + 250<= 2000){
-                                      waterAmount += 250;
+                                    if (widget.waterAmount + 250<= 2000){
+                                      widget.onAmountChanged(widget.waterAmount + 250) ;
                                     }
                                   });
                                 },
@@ -135,7 +137,8 @@ class _WaterHomeState extends State<WaterHome> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(right: 20, top: 0),
-                                    child: Text('$waterAmount',
+                                    child: Text(
+                                      '${widget.waterAmount}',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 18,
@@ -182,7 +185,6 @@ class _WaterHomeState extends State<WaterHome> {
             )
           ],
         ),
-      ),
     );
   }
 }

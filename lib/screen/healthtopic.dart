@@ -27,7 +27,7 @@ class _HealthtopicState extends State<Healthtopic> {
         actions: [
           IconButton(icon: Icon(Icons.menu), onPressed: () {}), // 메뉴...
         ],
-      ),
+      ), // 상단 GNB
 
 
       body: SingleChildScrollView(
@@ -35,8 +35,6 @@ class _HealthtopicState extends State<Healthtopic> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-
             // 최 상단 이미지 및 텍스트
             Stack(
               alignment: Alignment.center,
@@ -49,23 +47,28 @@ class _HealthtopicState extends State<Healthtopic> {
                 ),
                 Image.asset(test1Image,
                     width: double.infinity, fit: BoxFit.cover),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    '오늘 저녁은 뭘 먹지? 맛있고 건강하게 즐기는 특별한 레시피',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomLeft, // 텍스트 좌측 하단정렬
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          '오늘 저녁은 뭘 먹지? 맛있고 건강하게 즐기는 특별한 레시피',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                  ],
+                )
               ],
             ),
             SizedBox(height: 48.0),
-
-
             // 실시간 토픽 섹션
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -74,7 +77,7 @@ class _HealthtopicState extends State<Healthtopic> {
                       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-                height: 500.0,
+                height: 424.0,
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     itemCount: 4, // 예시 아이템 수
@@ -101,7 +104,7 @@ class _HealthtopicState extends State<Healthtopic> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('피클·오이지 즐겨 먹었는데…뜻밖의 연구 결과에 ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ',
+                                      Text('피클·오이지 즐겨 먹었는데…뜻밖의 연구 결과에',
                                           style: TextStyle(fontSize: 15.0,
                                               fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,
                                           maxLines: 2),
@@ -115,7 +118,6 @@ class _HealthtopicState extends State<Healthtopic> {
                           );
                     })),
             SizedBox(height: 48.0),
-
             // 식사 추천 섹션
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -124,7 +126,7 @@ class _HealthtopicState extends State<Healthtopic> {
                       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-                height: 300.0,
+                height: 250.0,
                 child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: 5, // 예시 아이템 수
@@ -146,14 +148,15 @@ class _HealthtopicState extends State<Healthtopic> {
                                   fit: BoxFit.cover),
                               ),
                               SizedBox(height: 8.0),
-                              Text('상큼한 샐러드 레시피', textAlign: TextAlign.center),
+                              Text('상큼한 샐러드 레시피', textAlign: TextAlign.left),
+                              SizedBox(height: 8.0),
+                              Text('XXX레시피')
                             ],
                           ),
                         ),
                       );
                     })),
             SizedBox(height: 48.0),
-
             // 영상 섹션
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -162,7 +165,7 @@ class _HealthtopicState extends State<Healthtopic> {
                       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 290.0,
+              height: 260.0,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: 5, // 예시 아이템 수
@@ -198,7 +201,7 @@ class _HealthtopicState extends State<Healthtopic> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('\'저탄고지\' 다이어트 효과 있을까? 제대로 알고 시작하세요sssssssssssssssssssssssssssssssssssssssss',
+                                Text('\'저탄고지\' 다이어트 효과 있을까? 제대로 알고 시작하세요',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),overflow: TextOverflow.ellipsis,
                                     maxLines: 2),
@@ -215,7 +218,6 @@ class _HealthtopicState extends State<Healthtopic> {
               ),
             ),
             SizedBox(height: 48.0),
-
             // 전문가 칼럼 섹션
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -224,7 +226,7 @@ class _HealthtopicState extends State<Healthtopic> {
                       TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-                height: 300.0,
+                height: 280.0,
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     itemCount: 2, // 예시 아이템 수
