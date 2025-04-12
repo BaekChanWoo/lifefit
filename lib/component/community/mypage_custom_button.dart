@@ -14,12 +14,12 @@ class Buttons extends StatelessWidget {
         children: [
           Expanded(
               //flex: 4,
-              child: MyPageButton(onTap:(){} ,label: '프로필 수정'),
+              child: MyPageButton(onTap:(){} ,label: '프로필 관리'),
           ),
           const SizedBox(width: 20.0,),
           Expanded(
             //flex: 4,
-            child: MyPageButton(onTap:(){} ,label: '프로필 공유'),
+            child: MyPageButton(onTap:(){} ,label: '프로필 노출'),
           ),
         ],
       ),

@@ -5,6 +5,7 @@ import 'package:lifefit/const/colors.dart';
 class TimeDisplay extends StatefulWidget {
   const TimeDisplay({super.key});
 
+
   @override
   _TimeDisplayState createState() => _TimeDisplayState();
 }

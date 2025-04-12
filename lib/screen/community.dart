@@ -55,7 +55,7 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
               '백찬우',
               style: TextStyle(fontSize: 25 , fontWeight: FontWeight.w500),
             ),
-            Icon(Icons.keyboard_arrow_down, size: 25,),
+            //Icon(Icons.keyboard_arrow_down, size: 25,),
           ],
           ),
           actions: [

@@ -10,6 +10,7 @@ class Feed extends StatefulWidget {
   State<Feed> createState() => _FeedState();
 }
 
+// 러닝, 헬스, 요가, 필라테스, 싸이클, 클라이밍, 농구
 class _FeedState extends State<Feed> {
   @override
   Widget build(BuildContext context) {
@@ -27,15 +28,15 @@ class _FeedState extends State<Feed> {
                   SizedBox(width: 12,),
                   CategoryButton(title: '헬스',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '다이어트',),
+                  CategoryButton(title: '클라이밍',),
                   SizedBox(width: 12,),
                   CategoryButton(title: '러닝',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '필라테스',),
+                  CategoryButton(title: '싸이클',),
                   SizedBox(width: 12,),
                   CategoryButton(title: '필라테스',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '필라테스',),
+                  CategoryButton(title: '농구',),
                 ],
               ),
             ),

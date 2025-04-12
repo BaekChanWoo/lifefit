@@ -53,7 +53,7 @@ class MainBottomNavigationBar extends StatelessWidget {
                 icon: Icon(
                     Icons.calendar_month
                 ) ,
-                label: "만남",
+                label: "캘린더",
               ),
               BottomNavigationBarItem(
                 icon: Icon(

@@ -14,25 +14,42 @@ class MeetUpScreen extends StatefulWidget {
 
 class _MeetUpScreenState extends State<MeetUpScreen> {
   // 카테고리 목록
-  final List<String> categories = ['러닝', '클라이밍', '헬스', '사이클', '요가'];
+  final List<String> categories = ['러닝', '헬스', '요가', '필라테스', '사이클', '클라이밍', '농구' ];
 
-  //카테고리 현재값
+  // 현재 선택된 카테고리
   String selectedCategory = '러닝';
-  //임시 데이터
-  final List<Post> _allPosts = List.generate(
-    10,
-        (index) => Post(
-      title: '함께 운동해요',
-      description: '오전 7시 서울시 서초구',
-      category: ['러닝', '클라이밍', '헬스', '사이클', '요가'][index % 5],
-    ),
-  );
 
-  int _visiblePostCount = 3; //3개 게시글
+  // 각 카테고리에 대해 4개의 모집글을 자동 생성
+  final List<Post> _allPosts = [
+    // 러닝 카테고리 4개 생성
+    ...List.generate(4, (index) => Post(
+      title: '러닝 모임 함께해요',
+      description: '아침 러닝, 초보자 환영!',
+      category: '러닝',
+      location: '한강',
+      dateTime: '2025.04.11.Fri. AM 07:30',
+      currentPeople: 3,
+      maxPeople: 5,
+    )),
+
+    // 클라이밍 카테고리 4개 생성
+    ...List.generate(4, (index) => Post(
+      title: '헬스 초보 환영',
+      description: '온수역 헬스장에서 같이 운동해요',
+      category: '헬스',
+      location: '온수역 헬스장',
+      dateTime: '2025.04.11.Fri. AM 07:30',
+      currentPeople: 2,
+      maxPeople: 4,
+    )),
+  ];
+
+
+  int _visiblePostCount = 3; // 처음에 보이는 게시글 수
 
   @override
   Widget build(BuildContext context) {
-    // 선택된 카테고리 게시물 필터링
+    // 선택된 카테고리에 해당하는 게시물만 필터링
     final filteredPosts = _allPosts
         .where((post) => post.category == selectedCategory)
         .take(_visiblePostCount)
@@ -46,7 +63,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
-        backgroundColor: PRIMARY_COLOR,
+        backgroundColor: const Color(0xFFFFFFFF),
         title: const Text('라이프핏', style: TextStyle(color: Colors.black)),
         actions: const [
           Padding(
@@ -65,11 +82,12 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
               selectedCategory: selectedCategory,
               onCategorySelected: (category) {
                 setState(() {
-                  selectedCategory = category; // 선택 시 상태 갱신
+                  selectedCategory = category;
+                  _visiblePostCount = 3; // 카테고리 바꿀 때도 초기화
                 });
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // 모집 카드 리스트
             Expanded(
