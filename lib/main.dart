@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/screen/home_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:get/get.dart';
 
 
 void main() async {
@@ -9,7 +10,7 @@ void main() async {
 
   await initializeDateFormatting(); // intl 패키지 초기화
   runApp(
-    MaterialApp(
+    GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "LifeFit",
       theme: ThemeData(

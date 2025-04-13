@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lifefit/component/community/feed_show.dart';
 
 // 이미지 크기
@@ -15,8 +16,7 @@ class FeedListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => FeedShow(item:item))
-        );
+        Get.to(() => FeedShow(item: item));
       },
       child: Padding(
         padding: const EdgeInsets.all(12.0),

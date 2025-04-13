@@ -1,7 +1,7 @@
-import 'dart:math';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:lifefit/component/community/controller/feed_controller.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/main_mypage.dart';
 import 'package:lifefit/component/community/feed.dart';
@@ -17,6 +17,7 @@ class Community extends StatefulWidget {
 }
 
 class _CommunityState extends State<Community> with SingleTickerProviderStateMixin{
+  final FeedController feedController = Get.put(FeedController());
   late TabController _tabController;
   bool _showFab = true;
 
@@ -48,7 +49,7 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
     return  Scaffold(
         floatingActionButton: _showFab ?FloatingActionButton(
           backgroundColor: PRIMARY_COLOR,
-          onPressed: (){},
+          onPressed: feedController.addDate,
           child: Icon(Icons.add),
         ) : null,
         appBar: AppBar(

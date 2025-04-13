@@ -3,7 +3,8 @@ import 'package:lifefit/component/calendar/custom_text_field.dart';
 import 'package:lifefit/const/colors.dart';
 
 class ScheduleBottomSheet extends StatefulWidget {
-  const ScheduleBottomSheet({super.key});
+  final DateTime selectedDate; // 선택된 날짜 상위 위젯에서 입력받기
+  const ScheduleBottomSheet({super.key , required this.selectedDate});
 
   @override
   State<ScheduleBottomSheet> createState() => _ScheduleBottomSheetState();

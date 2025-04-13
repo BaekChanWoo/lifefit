@@ -29,7 +29,9 @@ class _CalendarState extends State<Calendar> {
             showModalBottomSheet(
                 context: context,
                 isDismissible: true,
-                builder: (_) => ScheduleBottomSheet(),
+                builder: (_) => ScheduleBottomSheet(
+                  selectedDate: selectedDate, // 선택된 날짜 넘겨주기
+                ),
               isScrollControlled: true,
             );
           },
@@ -40,10 +42,11 @@ class _CalendarState extends State<Calendar> {
             children: [
               MainCalendar(
                 selectedDate: selectedDate,
-                onDaySelected: onDaySelected, // 날짜가 선택됐을 때 실행할 함수
-              ),
+                onDaySelected: (selectedDate , focusedDate) =>
+                  onDaySelected(selectedDate, focusedDate, context),
+                ),
               SizedBox(height: 10.0,),
-              TodatBanner(
+              TodayBanner(
                   selectedDate: selectedDate, count: 2
               ),
               SizedBox(height: 10.0,),
@@ -59,7 +62,11 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
-  void onDaySelected(DateTime selectedDate , DateTime focusedDate){
+  void onDaySelected(
+      DateTime selectedDate ,
+      DateTime focusedDate,
+      BuildContext context,
+      ){
     setState(() {
       this.selectedDate = selectedDate;
     });

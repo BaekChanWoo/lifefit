@@ -1,6 +1,9 @@
+import 'package:lifefit/component/community/controller/feed_controller.dart';
 import 'package:lifefit/component/community/feed_category_button.dart';
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/community/feed_list_item.dart';
+import 'package:get/get.dart';
+
 
 // 피드 페이지
 class Feed extends StatefulWidget {
@@ -13,33 +16,8 @@ class Feed extends StatefulWidget {
 
 // 러닝, 헬스, 요가, 필라테스, 싸이클, 클라이밍, 농구
 class _FeedState extends State<Feed> {
-  List<Map<String , dynamic>> feedList = [
-    { 'id': 1,
-      'title': '러닝은 무조건 1시간',
-      'content' : '러닝은 최소 1시간 이상해요 효과가 보입니다',
-      'name' : '백찬우',
-    },
-    { 'id': 2,
-      'title': '필라테스는 이렇게',
-      'content' : '필라테스는 이렇게 해야 합니다',
-      'name' : '차예빈',
-    },
-    { 'id': 3,
-      'title': '농구 레이업',
-      'content' : '이때 점프해야 잘 들어갑니다',
-      'name' : '조성준',
-    },
-    { 'id': 4,
-      'title': '헬스는 이렇게',
-      'content' : '근력운동 전에는 유산소를 꼭 해야합니다.',
-      'name' : '이예린',
-    },
-    { 'id': 5,
-      'title': '필라테스는 열심히',
-      'content' : '필라테스 전에는 몸풀기를 꼭 해야합니다.',
-      'name' : '이예린',
-    },
-  ];
+  final FeedController feedController = Get.put(FeedController()); // 인스턴스 생성
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,31 +32,33 @@ class _FeedState extends State<Feed> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: const [
-                  CategoryButton(title: '요가',),
+                  CategoryButton(icon:Icons.self_improvement , title: '요가',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '헬스',),
+                  CategoryButton(icon:Icons.fitness_center, title: '헬스',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '클라이밍',),
+                  CategoryButton(icon:Icons.terrain , title: '클라이밍',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '러닝',),
+                  CategoryButton(icon:Icons.directions_run, title: '러닝',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '싸이클',),
+                  CategoryButton(icon:Icons.directions_bike , title: '싸이클',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '필라테스',),
+                  CategoryButton(icon:Icons.accessibility_new , title: '필라테스',),
                   SizedBox(width: 12,),
-                  CategoryButton(title: '농구',),
+                  CategoryButton(icon:Icons.sports_basketball , title: '농구',),
                 ],
               ),
             ),
             const SizedBox(height: 10,),
             // 피드 리스트 목록
             Expanded(
-                child: ListView.builder(
-                  itemCount: feedList.length,
-                  itemBuilder: (context , index){
-                    final item = feedList[index];
-                    return FeedListItem(item);
-                  },
+                child: Obx( // feedList가 변경될 때마다 관련 위젯이 자동으로 업데이트
+                  () => ListView.builder(
+                      itemCount: feedController.feedList.length,
+                      itemBuilder: (context , index){
+                        final item = feedController.feedList[index];
+                        return FeedListItem(item);
+                      },
+                    )
                 )
             ),
           ],

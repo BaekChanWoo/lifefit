@@ -14,7 +14,7 @@ class Buttons extends StatelessWidget {
         children: [
           Expanded(
               //flex: 4,
-              child: MyPageButton(onTap:(){} ,label: '프로필 관리'),
+              child: MyPageButton(onTap:(){} ,label: '프로필 수정'),
           ),
           const SizedBox(width: 20.0,),
           Expanded(

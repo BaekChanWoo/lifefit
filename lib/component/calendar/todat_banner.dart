@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 
-class TodatBanner extends StatelessWidget {
+class TodayBanner extends StatelessWidget {
   //const TodatBanner({super.key});
   final DateTime selectedDate; // 선택된 날짜
   final int count; // 일정 개수
 
-  const TodatBanner({
+  const TodayBanner({
     required this.selectedDate,
     required this.count,
-    Key? key,
-}) : super(key: key);
+    super.key,
+});
 
   @override
   Widget build(BuildContext context) {
