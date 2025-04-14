@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:lifefit/const/colors.dart';
+
+void main() {
+  runApp(const MusicHome());
+}
+
+class MusicHome extends StatefulWidget {
+  const MusicHome({super.key});
+
+  @override
+  _MusicHomeState createState() => _MusicHomeState();
+}
+
+class _MusicHomeState extends State<MusicHome> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+
+      home : Scaffold(
+          backgroundColor: Colors.white,
+
+          appBar: AppBar(
+            backgroundColor:  PRIMARY_COLOR,
+
+            //이전페이지 이동 아이콘
+            leading: IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+
+            title: const Padding(
+              padding: EdgeInsets.only(left: 0),
+              child:
+              Text('운동 플레이리스트',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontFamily: 'padauk',
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ), // 왼쪽 여백 추가,
+            ),
+          ),
+
+          body: Column(
+            children: [
+              const SizedBox(height: 28),
+              Container(
+                  margin: const EdgeInsets.only(left: 20),
+                  padding: const EdgeInsets.only(left: 8),
+                  width: 290, // 상자 너비 설정
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF4E3DC),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+
+                  child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          '오늘의 운동 노래 추천을 감상해 보세요!',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(width: 5,),
+
+                        Image.asset('assets/img/music.png',
+                          width: 27,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
+
+                        const SizedBox(width: 0,),
+
+                        Image.asset('assets/img/fire.png',
+                          width: 27,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
+                      ]
+                  )
+              )
+            ],
+          )
+      ),
+    );
+  }
+}
