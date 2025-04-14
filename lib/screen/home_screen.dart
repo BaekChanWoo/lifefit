@@ -9,6 +9,7 @@ import 'package:lifefit/screen/meet_up.dart';
 import 'package:lifefit/screen/healthtopic.dart';
 import 'package:lifefit/screen/weather.dart';
 import 'package:lifefit/screen/water.dart';
+import 'package:lifefit/screen/pedometer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -261,7 +262,7 @@ class HomeContentWithNavigation extends StatelessWidget {
               );
               break;
             case 'daily_challenge':
-              builder = (BuildContext _) => const SleepScreen();
+              builder = (BuildContext _) => const Pedometer();
               break;
             case 'health_info':
               builder = (BuildContext _) => const Healthtopic();
@@ -343,7 +344,10 @@ class _HomeContentState extends State<HomeContent> {
         Positioned(
             top: 80,
             child: GestureDetector(
-              onTap: (){},
+              onTap: (){
+                widget.onContainerTapped();
+                Navigator.of(context).pushNamed('daily_challenge');
+              },
               child: Container(
                 height: 120,
                 width: MediaQuery.of(context).size.width-60,
