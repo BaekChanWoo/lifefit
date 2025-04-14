@@ -35,23 +35,23 @@ class _TimeDisplayState extends State<TimeDisplay> {
     return Positioned(
       left: 20, top: 400,
       child: Container(
-        width: 100,
-        height: 35,
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: Color (0xFF99FF99),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            _formattedDate,
-            style: const TextStyle
-              (fontSize: 14,
-                fontFamily: 'Padauk',
-                color: Colors.black,
-                fontWeight: FontWeight.w400),
+          width: 100,
+          height: 35,
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Color (0xFF99FF99),
+            borderRadius: BorderRadius.circular(10),
           ),
-        )
+          child: Center(
+            child: Text(
+              _formattedDate,
+              style: const TextStyle
+                (fontSize: 14,
+                  fontFamily: 'Padauk',
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400),
+            ),
+          )
       ),
     );
   }
