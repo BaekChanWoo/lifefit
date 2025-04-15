@@ -4,12 +4,6 @@ import 'package:lifefit/component/yrin_water/time_display.dart';
 import 'package:lifefit/component/yrin_water/water_intake.dart';
 import 'package:lifefit/component/yrin_water/water_graph.dart';
 
-
-
-void main() { // WaterHome 호출
-  runApp(const WaterHome());
-}
-
 class WaterHome extends StatefulWidget {
   const WaterHome({super.key});
 
