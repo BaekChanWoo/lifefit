@@ -63,8 +63,9 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
-        title: const Text('라이프핏', style: TextStyle(color: Colors.black)),
+        title: const Text('번개', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
