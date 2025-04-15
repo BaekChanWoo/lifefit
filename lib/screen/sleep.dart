@@ -240,7 +240,7 @@ class DayBox extends StatelessWidget {
           label,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 15,
             color: Colors.black,
           ),
         ),
