@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/component/community/controller/feed_controller.dart';
+import 'package:lifefit/controller/feed_controller.dart';
 import 'package:get/get.dart';
+import 'package:lifefit/model/feed_model.dart';
 
 class FeedShow extends StatefulWidget {
-  final Map item;
+  final FeedModel item;
   const FeedShow({super.key, required this.item});
 
   @override
@@ -18,11 +19,12 @@ class _FeedEditState extends State<FeedShow> {
 
   void _submit() {
     // 로컬 상태 대신 FeedController를 사용하여 상태 업데이트.
-    final updatedItem = {
-      ...widget.item,
-      'title': titleController!.text,
-      'name': nameController!.text,
-    };
+    final updatedItem = FeedModel.parse({
+      'id' : widget.item.id,
+      'title' : widget.item.title,
+      'content' : widget.item.content,
+      'name' : widget.item.name,
+    });
     // FeedController의 updateData를 호출하여 전역 상태를 업데이트.
     feedController.updateData(updatedItem);
     // 데이터 업데이트 후 이전 화면으로 돌아갑니다.
@@ -32,8 +34,8 @@ class _FeedEditState extends State<FeedShow> {
   @override
   void initState() {
     super.initState();
-    titleController = TextEditingController(text: widget.item['title']);
-    nameController = TextEditingController(text: widget.item['name']);
+    titleController = TextEditingController(text: widget.item.title);
+    nameController = TextEditingController(text: widget.item.name);
   }
 
   @override

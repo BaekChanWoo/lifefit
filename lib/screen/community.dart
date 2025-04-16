@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:lifefit/component/community/controller/feed_controller.dart';
+import 'package:lifefit/component/community/feed_create.dart';
+import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/main_mypage.dart';
 import 'package:lifefit/component/community/feed.dart';
@@ -20,6 +21,7 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
   final FeedController feedController = Get.put(FeedController());
   late TabController _tabController;
   bool _showFab = true;
+
 
   @override
   void initState(){
@@ -47,11 +49,18 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
 
     return  Scaffold(
-        floatingActionButton: _showFab ?FloatingActionButton(
+        floatingActionButton: _showFab ? FloatingActionButton.extended(
           backgroundColor: PRIMARY_COLOR,
-          onPressed: feedController.addDate,
-          child: Icon(Icons.add),
+          onPressed: (){Get.to(() => const FeedCreate());
+            },
+          icon: Icon(Icons.add ,
+            color: Colors.black,
+          ),
+          label: Text("글쓰기",
+            style: TextStyle(fontSize: 15.0 , color: Colors.black),
+          ),
         ) : null,
+
         appBar: AppBar(
           title: Row(children: [
             const Text(

@@ -1,4 +1,4 @@
-import 'package:lifefit/component/community/controller/feed_controller.dart';
+import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/component/community/feed_category_button.dart';
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/community/feed_list_item.dart';
@@ -16,8 +16,27 @@ class Feed extends StatefulWidget {
 
 // 러닝, 헬스, 요가, 필라테스, 싸이클, 클라이밍, 농구
 class _FeedState extends State<Feed> {
+  int _currentPage = 1;
   final FeedController feedController = Get.put(FeedController()); // 인스턴스 생성
 
+  @override
+  void initState(){
+    super.initState();
+    //feedController.feedIndex(_currentPage);
+  }
+  bool _onNotification(ScrollNotification scrollInfo) {
+    if (scrollInfo is ScrollEndNotification &&
+        scrollInfo.metrics.extentAfter == 0) {
+      //feedController.feedIndex(page: ++_currentPage);
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> _onRefresh() async {
+    _currentPage = 1;
+    //await feedController.feedIndex();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +69,24 @@ class _FeedState extends State<Feed> {
             ),
             const SizedBox(height: 10,),
             // 피드 리스트 목록
+            // feedList가 변경될 때마다 관련 위젯이 자동으로 업데이트
             Expanded(
-                child: Obx( // feedList가 변경될 때마다 관련 위젯이 자동으로 업데이트
-                  () => ListView.builder(
-                      itemCount: feedController.feedList.length,
-                      itemBuilder: (context , index){
-                        final item = feedController.feedList[index];
-                        return FeedListItem(item);
-                      },
-                    )
-                )
-            ),
-          ],
+              child: Obx(() => NotificationListener<ScrollNotification>(
+                      onNotification: _onNotification,
+                      child: RefreshIndicator(
+                        onRefresh: _onRefresh,
+                        child: ListView.builder(
+                          itemCount: feedController.feedList.length,
+                          itemBuilder: (context, index) {
+                            final item = feedController.feedList[index];
+                          return FeedListItem(item);
+                           },
+                        ),
+                       ),
+               ),
+              ),
+             )
+            ],
         ),
       ),
     );
