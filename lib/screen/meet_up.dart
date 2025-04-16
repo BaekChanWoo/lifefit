@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../component/meet_up/category_select.dart';
+import '../component/meet_up/create_post.dart';
 import '../component/meet_up/post_list.dart';
 import '../const/colors.dart';
 import '../model/meetup_model.dart';
@@ -63,8 +64,9 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
-        title: const Text('라이프핏', style: TextStyle(color: Colors.black)),
+        title: const Text('번개', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
@@ -104,6 +106,23 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: PRIMARY_COLOR,
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          final newPost = await showDialog(
+            context: context,
+            builder: (context) => const CreatePost(),
+          );
+
+          if (newPost != null && newPost is Post) {
+            setState(() {
+              _allPosts.add(newPost);
+            });
+          }
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat, //왼쪽 하단으로 위치시킴
     );
   }
 }
