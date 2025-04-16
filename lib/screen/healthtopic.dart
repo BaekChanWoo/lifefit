@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/const/colors.dart';
 
 
 class Healthtopic extends StatefulWidget {
@@ -121,10 +120,10 @@ class _HealthtopicState extends State<Healthtopic> {
                       shape: BoxShape.circle,
                       color: curruntPage == i
                           ? Colors.blue
-                          : Colors.grey.withOpacity(0.5),
+                          : Colors.grey.withValues(alpha: 0.5),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.12),
+                          color: Colors.black.withValues(alpha: 0.12),
                           blurRadius: 4,
                           spreadRadius: 1,
                         ),
