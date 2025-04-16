@@ -172,7 +172,7 @@ class _SleepScreenState extends State<SleepScreen> {
             }),
           ),
 
-          const SizedBox(height: 30),
+          const SizedBox(height: 25),
 
           //막대그래프
           SizedBox(
