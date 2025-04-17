@@ -78,10 +78,15 @@ flutter:
   assets:
     - assets/img/
 
+#  fonts:
+#    - family: parisienne
+#      fonts:
+#        - asset: assets/font/Parisienne-Regular.ttf
   fonts:
-    - family: parisienne
+    - family: NanumSqureRound
       fonts:
-        - asset: assets/font/Parisienne-Regular.ttf
+        - asset: assets/font/NanumSquareRoundR.ttf
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
