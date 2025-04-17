@@ -72,14 +72,48 @@ class _WeatherState extends State<Weather> {
                   ),
                   SizedBox(height: 20),
 
-                  // 미세먼지 정보 섹션
+                  // 미세먼지/날씨 정보 섹션
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Column(
                         children: [
                           Image.asset(
                             weathertest1Image,
+                            width: 60.0,
+                            height: 60.0,
+                            fit: BoxFit.contain,
+                          ),
+                          SizedBox(
+                            height: 2,
+                          ),
+                          Text('미세먼지',style: TextStyle(
+                              fontSize: 15)),
+                          Text('500㎍/m³',style: TextStyle(
+                              fontSize: 15)),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Image.asset(
+                            weathertest1Image,
+                            width: 60.0,
+                            height: 60.0,
+                            fit: BoxFit.contain,
+                          ),
+                          SizedBox(
+                            height: 2,
+                          ),
+                          Text('초미세먼지',style: TextStyle(
+                              fontSize: 15)),
+                          Text('500㎍/m³',style: TextStyle(
+                              fontSize: 15)),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Image.asset(
+                            weathertest2Image,
                             width: 50.0,
                             height: 50.0,
                             fit: BoxFit.contain,
@@ -87,35 +121,10 @@ class _WeatherState extends State<Weather> {
                           SizedBox(
                             height: 2,
                           ),
-                          Text('미세먼지: 500'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Image.asset(
-                            weathertest1Image,
-                            width: 46.0,
-                            height: 46.0,
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          Text('초미세먼지: 500'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Image.asset(
-                            weathertest2Image,
-                            width: 46.0,
-                            height: 46.0,
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          Text('맑음/20도'),
+                          Text('맑음/20도',style: TextStyle(
+                              fontSize: 15), ),
+                          Text('20%',style: TextStyle(
+                              fontSize: 15), ),
                         ],
                       ),
                     ],
@@ -123,16 +132,32 @@ class _WeatherState extends State<Weather> {
                   SizedBox(height: 20),
 
                   // 시간별 날씨
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text('시간별 날씨',
+                        style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                  ),
                   _buildWeatherTimeRow(),
-
                   SizedBox(height: 20),
 
-                  // 일별 날씨
+                  // 주간 날씨
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text('주간 날씨',
+                        style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                  ),
                   _buildWeatherDayRow(),
-
                   SizedBox(height: 20),
 
                   // 대기 정보
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text('대기 상태',
+                        style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                  ),
                   _buildAirInfoRow(),
                 ],
               ),
@@ -202,7 +227,7 @@ class _WeatherState extends State<Weather> {
     ];
 
     return SizedBox(
-      height: 112,
+      height: 120,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: weatherDatatime.length,
@@ -212,12 +237,14 @@ class _WeatherState extends State<Weather> {
             // 각 아이템 간 간격 설정
             child: Column(
               children: [
+                Text(weatherDatatime[index]['time']!),
+                SizedBox(height: 6.0),
                 Image.asset(
                   weatherDatatime[index]['image']!,
                   width: 46,
                   height: 46,
                 ),
-                Text(weatherDatatime[index]['time']!),
+                SizedBox(height: 6.0),
                 Text(weatherDatatime[index]['temperature']!),
                 Text(weatherDatatime[index]['precipitation']!),
               ],
@@ -293,6 +320,7 @@ class _WeatherState extends State<Weather> {
                   width: 46, // 이미지 너비 설정
                   height: 46, // 이미지 높이 설정
                 ),
+                SizedBox(height: 6.0),
                 Text(weatherDataday[index]['day']!),
                 Text(weatherDataday[index]['temperature']!),
               ],
@@ -337,6 +365,7 @@ class _WeatherState extends State<Weather> {
                   width: 46, // 이미지 너비 설정
                   height: 46, // 이미지 높이 설정
                 ),
+                SizedBox(height: 6.0),
                 Text(AirInfo[index]['air']!),
                 Text(AirInfo[index]['condition']!),
               ],

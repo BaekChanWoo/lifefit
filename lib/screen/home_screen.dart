@@ -10,7 +10,11 @@ import 'package:lifefit/screen/healthtopic.dart';
 import 'package:lifefit/screen/weather.dart';
 import 'package:lifefit/screen/water.dart';
 import 'package:lifefit/screen/pedometer.dart';
+import 'package:get/get.dart';
+import 'package:lifefit/screen/my/mypage.dart';
 
+
+// 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -120,58 +124,43 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: PRIMARY_COLOR,
+            Theme(
+              data: Theme.of(context).copyWith(
+                iconTheme: IconThemeData(color: Colors.black),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: const Text("내 정보",
-                      //textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black , fontSize: 20),
+              child: UserAccountsDrawerHeader(
+                  accountName: Text('백찬우',
+                    style: TextStyle(
+                        color: Colors.black ,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 10.0,),
-                  Row(
+                  accountEmail: null,
+                onDetailsPressed: () {},
+                arrowColor: Colors.black,
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: AssetImage('assets/img/mypageimg.jpg'),
+                ),
+                otherAccountsPictures: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: SERVE_COLOR,
-                        radius: 30.0,
+                      Icon(Icons.access_time , color: Colors.black, size: 23,),
+                      Text('4시간전 ',
+                        style: TextStyle(fontSize: 10 , color: Colors.black),
                       ),
-                      const SizedBox(width: 20.0,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(3.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3.0),
-                              border: Border.all(
-                                color: Colors.green,
-                                width: 1.0,
-                              ),
-                            ),
-                            child: const Text("라이프핏 개인 프로필",
-                              style: TextStyle(
-                                fontSize: 15.0,
-                                color: PRIMARY_TEXT_COLOR,
-                              ),
-                            ),
-                          ),
-                          Text("백찬우",
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      )
                     ],
-                  ),
+                  )
                 ],
-              ) ,
+                decoration: BoxDecoration(
+                  color: PRIMARY_COLOR,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.0),
+                    bottomRight: Radius.circular(20.0),
+                  )
+                ),
+              ),
             ),
             ListTile(
               leading: const Text("라이프핏",
@@ -184,7 +173,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.home),
               title: const Text("홈"),
-              onTap: (){},
+              onTap: (){
+                Navigator.of(context).pop();
+              },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
@@ -192,15 +183,16 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: (){},
             ),
             ListTile(
-              leading: const Icon(Icons.question_answer),
-              title: const Text("질문"),
-              onTap: (){},
+              leading: const Icon(Icons.person),
+              title: const Text("프로필"),
+              onTap: (){
+                Get.to(() => MyPage());
+              },
             ),
           ],
         ),
       ),
       // 오른쪽 상단 메뉴 아이콘
-
       // 본문: 탭에 따라 표시되는 화면
       body:  PageView(
         controller: _pageController,

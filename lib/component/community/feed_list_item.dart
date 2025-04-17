@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/component/community/feed_show.dart';
+import 'package:lifefit/model/feed_model.dart';
+
 
 // 이미지 크기
 const double _imageSize = 100;
 
 // 피드(게시물) 리스트 아이템 목록
 class FeedListItem extends StatelessWidget {
-  final Map item;
-  const FeedListItem(this.item , {super.key});
+  final FeedModel data;
+  const FeedListItem(this.data , {super.key});
 
 
   @override
@@ -16,7 +18,7 @@ class FeedListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.to(() => FeedShow(item: item));
+        Get.to(() => FeedShow(item: data));
       },
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -49,7 +51,7 @@ class FeedListItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                          item['title'], // 제목
+                          data.title, // 제목
                           overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 16),
                           ),
@@ -65,7 +67,7 @@ class FeedListItem extends StatelessWidget {
                           ),
                           const SizedBox(height: 30.0,),
                           Text(
-                            item['name'],
+                            data.name,
                             style: TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),
                           ),
                         ],
