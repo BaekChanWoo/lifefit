@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 
-void main() {
-  runApp(const MusicHome());
-}
-
-class MusicHome extends StatefulWidget {
-  const MusicHome({super.key});
+class MusicTop extends StatefulWidget {
+  const MusicTop({super.key});
 
   @override
-  _MusicHomeState createState() => _MusicHomeState();
+  State <MusicTop> createState() => _MusicTopState();
 }
 
-class _MusicHomeState extends State<MusicHome> {
+class _MusicTopState extends State<MusicTop> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -62,7 +58,7 @@ class _MusicHomeState extends State<MusicHome> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
-                          '오늘의 운동 노래 추천을 감상해 보세요!',
+                          '오늘의 추천 플레이리스트를 감상해 보세요!',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,

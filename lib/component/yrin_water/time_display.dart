@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lifefit/const/colors.dart';
+
 
 class TimeDisplay extends StatefulWidget {
   const TimeDisplay({super.key});
 
 
   @override
-  _TimeDisplayState createState() => _TimeDisplayState();
+  State <TimeDisplay> createState() => _TimeDisplayState();
 }
 
 class _TimeDisplayState extends State<TimeDisplay> {

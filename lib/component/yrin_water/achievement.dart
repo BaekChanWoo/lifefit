@@ -7,7 +7,7 @@ class Achievement extends StatefulWidget {
 
   //창 표시 여부
   @override
-  _AchievementState createState() => _AchievementState();
+  State<Achievement> createState() => _AchievementState();
 }
 
 class _AchievementState extends State<Achievement> {
