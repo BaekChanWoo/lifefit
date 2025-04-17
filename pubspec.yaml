@@ -83,7 +83,7 @@ flutter:
 #      fonts:
 #        - asset: assets/font/Parisienne-Regular.ttf
   fonts:
-    - family: NanumSqureRound
+    - family: NanumSquareRound
       fonts:
         - asset: assets/font/NanumSquareRoundR.ttf
 
