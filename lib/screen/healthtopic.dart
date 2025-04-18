@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:async';
 
 class Healthtopic extends StatefulWidget {
   const Healthtopic({super.key});
@@ -13,22 +13,59 @@ class _HealthtopicState extends State<Healthtopic> {
   final String test1Image = 'assets/img/test1.png';
   final String test2Image = 'assets/img/test2.png';
 
-  // 최상단 이미지 슬라이더/인디케이터
-  final List<int> pages = List.generate(4, (index) => index);
-  final PageController controller = PageController(initialPage: 0);
-  int curruntPage = 0;
-  final List<String> pageimgs = [ // 이미지 테스트
+  // 최상단 이미지 슬라이더/인디케이터 요소
+  final List<int> pages = List.generate(4, (index) => index); //카드 인덱스
+  final PageController controller =
+      PageController(initialPage: 0); //카드 페이지 컨트롤러
+  int curruntPage = 0; // 카드 페이지 정수
+
+  // 이미지 테스트
+  final List<String> pageimgs = [
     'assets/image1.jpg',
     'assets/image2.jpg',
     'assets/image3.jpg',
     'assets/image4.jpg',
   ];
-  final List<String> pageTexts = [ //텍스트 테스트
+  //텍스트 테스트
+  final List<String> pageTexts = [
     '첫 번째 페이지 텍스트',
     '두 번째 페이지 텍스트 내용',
     '세 번째 페이지의 아주 긴 텍스트입니다. 이 텍스트는 컨테이너 너비에 맞춰 자동으로 줄바꿈될 것입니다.',
     '네 번째 페이지 짧은 텍스트',
   ];
+
+  @override // 카드 슬라이더 타이머
+  void initState() {
+    super.initState();
+    Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      //타이머
+      if (controller.hasClients && controller.page != null) {
+        // PageController가 PageView에 연결되어 있고, 페이지 정보가 있는 경우에만 실행
+        if (controller.page! < pageimgs.length - 1) {
+          // 현재 페이지가 마지막 페이지보다 이전 페이지인 경우
+          controller.nextPage(
+            // 다음 페이지 이동
+            duration: Duration(milliseconds: 350), // 애니메이션 지속 시간
+            curve: Curves.easeIn,
+          );
+        } else {
+          // 현재 페이지가 마지막 페이지인 경우
+          controller.animateToPage(
+            // 첫 번째 페이지 이동
+            0,
+            duration: Duration(milliseconds: 350), // 첫 페이지로 이동하는시간
+            curve: Curves.easeIn,
+          );
+        }
+      }
+    });
+  }
+
+  @override // 미사용시 컨트롤러 리소스해제
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +89,6 @@ class _HealthtopicState extends State<Healthtopic> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             //최상단 이미지 슬라이드 뉴스
             Container(
               width: double.infinity,
@@ -67,10 +103,12 @@ class _HealthtopicState extends State<Healthtopic> {
                   });
                 },
                 itemBuilder: (context, index) {
-                  return Padding( // 카드 주변에 약간의 간격을 주기 위해 Padding 추가
-                    padding: const EdgeInsets.symmetric( vertical: 6.0),
+                  return Padding(
+                    // 카드 주변에 약간의 간격을 주기 위해 Padding 추가
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
                     child: Card(
-                      shape: RoundedRectangleBorder( // 카드 모서리 둥글게 설정
+                      shape: RoundedRectangleBorder(
+                        // 카드 모서리 둥글게 설정
                         borderRadius: BorderRadius.circular(16.0),
                       ),
                       elevation: 4.0, // 그림자 효과
@@ -80,7 +118,7 @@ class _HealthtopicState extends State<Healthtopic> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(16.0),
                             child: Image.asset(
-                              pageimgs[index],
+                              pageimgs[index], // 해당 페이지(인덱스)의 이미지
                               width: double.infinity,
                               height: double.infinity,
                               fit: BoxFit.cover,
@@ -91,7 +129,7 @@ class _HealthtopicState extends State<Healthtopic> {
                             bottom: 16,
                             right: 16,
                             child: Text(
-                              pageTexts[index], // 해당 페이지의 텍스트를 가져옵니다.
+                              pageTexts[index], // 해당 페이지(인덱스)의 텍스트
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 16.0,
@@ -111,7 +149,9 @@ class _HealthtopicState extends State<Healthtopic> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (num i = 0; i < pageimgs.length; i++) // pageimgs의 길이에 맞춰 인디케이터 생성
+                for (num i = 0;
+                    i < pageimgs.length;
+                    i++) // pageimgs의 길이에 맞춰 인디케이터 생성
                   Container(
                     margin: EdgeInsets.all(3),
                     width: 10,
