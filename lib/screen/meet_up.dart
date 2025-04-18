@@ -108,7 +108,9 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: PRIMARY_COLOR,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add ,
+        color: Colors.black,
+      ),
         onPressed: () async {
           final newPost = await showDialog(
             context: context,
