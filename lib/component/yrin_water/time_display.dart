@@ -33,7 +33,7 @@ class _TimeDisplayState extends State<TimeDisplay> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 20, top: 400,
+      left: 20, top: 370,
       child: Container(
           width: 100,
           height: 35,

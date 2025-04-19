@@ -13,7 +13,7 @@ class WaterHome extends StatefulWidget {
 
 class _WaterHomeState extends State<WaterHome> {
   int waterAmount = 0;
-  final List<double> count = [1750, 500, 250, 250, 750, 2000, 250];
+  final List<double> count = [0,0 ,0,0 ,0 ,0 ,0 ];
 
   void handleWaterAmountChanged(int newAmount) {
     setState(() {
@@ -23,8 +23,8 @@ class _WaterHomeState extends State<WaterHome> {
 //물 섭취 UI 구성 Scaffold 위젯
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(  //MaterialApp
-      home: Scaffold(
+    return
+      Scaffold(
         body: Stack(
           children: [
             WaterIntake(
@@ -34,16 +34,19 @@ class _WaterHomeState extends State<WaterHome> {
 
             //현재 시간
             TimeDisplay(),
-            Positioned(
-                bottom: 87,
-                left: 20,
-                right: 20,
-                height: 188,
-                child: WaterGraph(count: count)) ,
-            Achievement(waterAmount: waterAmount),// 그래프 위젯 추가
+
+            SizedBox(width: 20,),
+
+            Positioned(       //물 그래프(water_graph) 위치
+              bottom: 30,
+              left: 20,
+              right: 20,
+              height: 188,
+              child: WaterGraph(count: count),
+            ),
+            Achievement(waterAmount: waterAmount),    //달성 위젯
           ],
         ),
-      ),
     );
   }
 }

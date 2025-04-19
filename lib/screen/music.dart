@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/yrin_music/music_top.dart';
+import 'package:lifefit/component/yrin_music/category_images.dart';
 import 'package:lifefit/component/yrin_music/change_category.dart';
-import '';
 
 void main() {
   runApp(const Music());
@@ -28,43 +28,42 @@ class _MusicState extends State< Music> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: Stack(
-          children: [
-            MusicTop(),
-            Positioned(
-              top: 50,
-              left: 10,
-              child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: 255,
-                  child: ChangeCategory(
-                      categories: categories,
-                      onCategoryTap: onCategoryTap,
-                      selectedCategory: selectedCategory
-                  )
+     home:  Scaffold(
+      body: Stack(
+        children: [
+          MusicTop(),
+          Positioned(
+            top: 160,
+            left: 10,
+            right: 10,
+            child: ChangeCategory( // CategorySelector 위젯 추가
+              categories: categories,
+              onCategoryTap: onCategoryTap,
+              selectedCategory: selectedCategory,
+            ),
+          ),
+
+          Positioned(
+            top: 210, //assets/img/musicno.png 배치
+            left: 20,
+            right: 20,
+            bottom: 10,
+            child: selectedCategory == null
+                ? Center(
+              child: Transform.translate(
+                offset: const Offset(0, -30),
+                child: Image.asset(
+                'assets/img/musicno.png',
+                width: 200,
+                height: 200,
               ),
             ),
-            Positioned(
-              top: 305, // ChangeCategory의 높이 + top 값
-              left: 10,
-              right: 10,
-              bottom: 10, // 원하는 bottom값
-              child: selectedCategory == null
-                  ? Center(
-                child: Image.asset(
-                  'assets/img/musicno.png',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.contain,
-                ),
-              )
-                  : CategoryImages(selectedCategory: selectedCategory),
-            ),
-          ],
-        ),
+            )
+                : CategoryImages(selectedCategory: selectedCategory),
+          ),
+        ],
       ),
-
+      ),
     );
   }
 }

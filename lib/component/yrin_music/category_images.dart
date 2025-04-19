@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lifefit/component/yrin_music/music_page.dart';
+import 'package:get/get.dart';
 
 class CategoryImages extends StatelessWidget {
   final String? selectedCategory;
@@ -11,15 +13,64 @@ class CategoryImages extends StatelessWidget {
     }
 
 
-//이미지 서버 업로드 시 삭제 코드
+    // 카테고리 이미지 경로
     switch (category) {
       case '요가':
-        return [ // 요가 케이스에 return 문 추가
+        return [
           'assets/img/balance.png',
           'assets/img/flexible.png',
           'assets/img/meditation.png',
           'assets/img/respiration.png',
         ];
+      case '클라이밍':
+        return [
+          'assets/img/climb.png',
+          'assets/img/climbing_break.png',
+          'assets/img/climbing_stretching.png',
+          'assets/img/climbing_together.png',
+
+        ];
+      case '사이클':
+        return [
+          'assets/img/cysling.png',
+          'assets/img/cycling_wind.png',
+          'assets/img/cycling_rest.png',
+          'assets/img/cycling_race.png',
+          // 사이클
+        ];
+      case '농구':
+        return [
+          'assets/img/basketball cheerleading.png',
+          'assets/img/basketball_dunk.png',
+          'assets/img/basketball_pass.png',
+          'assets/img/basketball_victory.png',
+          // 농구
+        ];
+      case '러닝':
+        return [
+          'assets/img/run.png',
+          'assets/img/run_rest.png',
+          'assets/img/run_stretching.png',
+          'assets/img/run_together.png',
+          // 러닝
+        ];
+      case '헬스':
+        return [
+          'assets/img/health_lower.png',
+          'assets/img/health_pt.png',
+          'assets/img/health_run.png',
+          'assets/img/health_up.png',
+          // 헬스
+        ];
+      case '필라테스':
+        return [
+          'assets/img/pilates.png',
+          'assets/img/pilates_alignment.png',
+          'assets/img/pilates_ball.png',
+          'assets/img/pilates_focus.png',
+          //필라테스
+        ];
+
       default:
         return []; // 해당하는 카테고리가 없을 경우 빈 리스트 반환
     }
@@ -28,30 +79,42 @@ class CategoryImages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imagePaths = getImagePaths(selectedCategory);
+    final  displayedImagePaths = imagePaths.take(4).toList();
 
-      return GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        // 스크롤 비활성화
-        shrinkWrap: true,
-        // GridView 크기
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 30, // 수평 간격
-          mainAxisSpacing: 30,
-          childAspectRatio: 1,// 수직 간격
-        ),
-        itemCount: imagePaths.length,
-        itemBuilder: (context, index) {
-          return SizedBox(
-              width: 50,
-              height: 50,
-              child: Image.asset(
-                imagePaths[index],
-                fit: BoxFit.cover,
+    return GetMaterialApp( // GetMaterialApp으로 감싸기
+        debugShowCheckedModeBanner: false,
+        home: Column(
+      children: [
+        Expanded(
+          child: GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 25,
+            mainAxisSpacing: 20,
+            children:  displayedImagePaths.map((path) {
+              return GestureDetector(
+                  onTap: () {
+                    Get.to(() => MusicPage(categoryImages: path));
+                  },
+                  child:  ClipRRect( // 둥근 모서리를 적용할 위젯으로 감싸기
+                    borderRadius: BorderRadius.circular(10.0), // 원하는 둥근 정도 값
+                    child: SizedBox(
+                    width: 18, // 원하는 넓이 값으로 변경
+                    height: 15, // 원하는 높이 값으로 변경
+                    child: Image.asset(
+                    path,
+                    fit: BoxFit.cover,
+                ),
+              ),
+                   )
+              );
+            }).toList(),
           ),
-          );
-        },
-      );
+        ),
+        const SizedBox(height: 50), // 아래쪽 여유 공간 (원하는 크기로 조정)
+      ],
+        )
+    );
 
   }
 }

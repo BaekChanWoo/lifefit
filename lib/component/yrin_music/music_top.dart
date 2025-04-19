@@ -17,15 +17,8 @@ class _MusicTopState extends State<MusicTop> {
           backgroundColor: Colors.white,
 
           appBar: AppBar(
+            centerTitle: true,
             backgroundColor:  PRIMARY_COLOR,
-
-            //이전페이지 이동 아이콘
-            leading: IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
 
             title: const Padding(
               padding: EdgeInsets.only(left: 0),
@@ -45,10 +38,10 @@ class _MusicTopState extends State<MusicTop> {
             children: [
               const SizedBox(height: 28),
               Container(
-                  margin: const EdgeInsets.only(left: 20),
+                  margin: const EdgeInsets.only(left: 25),
                   padding: const EdgeInsets.only(left: 8),
                   width: 290, // 상자 너비 설정
-                  height: 30,
+                  height: 36,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF4E3DC),
                     borderRadius: BorderRadius.circular(10),
@@ -68,7 +61,7 @@ class _MusicTopState extends State<MusicTop> {
                         const SizedBox(width: 5,),
 
                         Image.asset('assets/img/music.png',
-                          width: 27,
+                          width: 15,
                           height: 20,
                           fit: BoxFit.contain,
                         ),
@@ -76,7 +69,7 @@ class _MusicTopState extends State<MusicTop> {
                         const SizedBox(width: 0,),
 
                         Image.asset('assets/img/fire.png',
-                          width: 27,
+                          width: 15,
                           height: 20,
                           fit: BoxFit.contain,
                         ),

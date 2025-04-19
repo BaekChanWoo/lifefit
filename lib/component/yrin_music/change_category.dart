@@ -1,71 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/component/yrin_music/category_images.dart';
 
-class ChangeCategory extends StatefulWidget {
-
+class ChangeCategory extends StatelessWidget {
   final List<String> categories;
-  final Function(String) onCategoryTap;
   final String? selectedCategory;
+  final Function(String) onCategoryTap;
+  final TextStyle? textStyle; // 기존 텍스트 스타일 파라미터 활용
 
-
-    const ChangeCategory({
+  const ChangeCategory({
     super.key,
     required this.categories,
     required this.onCategoryTap,
-      this.selectedCategory,
+    this.selectedCategory,
+    this.textStyle, // 텍스트 스타일 파라미터 유지
   });
 
   @override
-  State <ChangeCategory> createState() => _ChangeCategoryState();
-}
-
-class _ChangeCategoryState extends State<ChangeCategory> {
-  @override
   Widget build(BuildContext context) {
-    return Column(
-        children: [SingleChildScrollView(
+    return SizedBox(
+      height: 50,
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
-      child: Row(
-        children: widget.categories.map((category) {
-          final isSelected = category == widget.selectedCategory;
-          return GestureDetector(
-            onTap: () => widget.onCategoryTap(category),
-            child: Container( //제스처 ontap
-              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
-              margin: const EdgeInsets.symmetric(horizontal: 6.0),
-              decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF99FF99) : Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(category,
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: ' '//폰트 수정
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final bool isSelected = selectedCategory == category;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: GestureDetector(
+              onTap: () => onCategoryTap(category),
+              child: Chip(
+                avatar: Icon(
+                  _getIconForCategory(category), // 카테고리에 맞는 아이콘 표시
+                  color: Colors.black87,
+                ),
+                label: Text(
+                  category,
+                  style: textStyle,
+                ),
+                backgroundColor: isSelected ? Color(0xFF99FF99) : Colors.grey[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
                 ),
               ),
             ),
           );
-        }).toList(), // toList() 추가
+        },
       ),
-    ),
-          Flexible(
-            child: CategoryImages(selectedCategory: widget.selectedCategory),
-          ),
-        ],
     );
   }
 }
 
-
-
-/* //url 이미지 서버 저장 후 사용 가능
-    Expanded(
-      child: widget.selectedCategory == null
-          ? Image.asset(
-        'assets/img/musicno.png', // 초기 이미지
-        fit: BoxFit.cover,
-      )
-          : CategoryImages(category: widget.selectedCategory!),
-    );
-    */
+IconData _getIconForCategory(String category) {
+  switch (category) {
+    case '요가':
+      return Icons.self_improvement;
+    case '클라이밍':
+      return Icons.terrain;
+    case '사이클':
+      return Icons.directions_bike;
+    case '농구':
+      return Icons.sports_basketball;
+    case '러닝':
+      return Icons.directions_run;
+    case '헬스':
+      return Icons.fitness_center;
+    case '필라테스':
+      return Icons.accessibility_new;
+    default:
+      return Icons.category; // 기본 아이콘
+  }
+}

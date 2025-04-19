@@ -47,7 +47,7 @@ class WaterGraph extends StatelessWidget {
       sun: count[6],
     ).barData;
 
-    return Container(
+    return Container( //그래프 모양
       width: 300, // 상자 넓이 설정
       height: 250, // 상자 높이 설정
       decoration: BoxDecoration(
