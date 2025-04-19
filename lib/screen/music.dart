@@ -27,8 +27,8 @@ class _MusicState extends State< Music> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-     home:  Scaffold(
+    return
+     Scaffold(
       body: Stack(
         children: [
           MusicTop(),
@@ -63,8 +63,7 @@ class _MusicState extends State< Music> {
           ),
         ],
       ),
-      ),
-    );
+      );
   }
 }
 
