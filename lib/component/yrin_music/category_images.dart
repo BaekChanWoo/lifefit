@@ -96,11 +96,11 @@ class CategoryImages extends StatelessWidget {
                   onTap: () {
                     Get.to(() => MusicPage(categoryImages: path));
                   },
-                  child:  ClipRRect( // 둥근 모서리를 적용할 위젯으로 감싸기
-                    borderRadius: BorderRadius.circular(10.0), // 원하는 둥근 정도 값
+                  child:  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
                     child: SizedBox(
-                    width: 18, // 원하는 넓이 값으로 변경
-                    height: 15, // 원하는 높이 값으로 변경
+                    width: 18,
+                    height: 15,
                     child: Image.asset(
                     path,
                     fit: BoxFit.cover,
@@ -111,7 +111,7 @@ class CategoryImages extends StatelessWidget {
             }).toList(),
           ),
         ),
-        const SizedBox(height: 50), // 아래쪽 여유 공간 (원하는 크기로 조정)
+        const SizedBox(height: 50), //
       ],
         )
     );

@@ -16,7 +16,7 @@ class _MusicTopState extends State<MusicTop> {
       home : Scaffold(
           backgroundColor: Colors.white,
 
-          appBar: AppBar(
+          appBar: AppBar(  //음악플리 수정 필요 뒤로가기
             centerTitle: true,
             backgroundColor:  PRIMARY_COLOR,
 

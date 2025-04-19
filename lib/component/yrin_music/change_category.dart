@@ -67,6 +67,6 @@ IconData _getIconForCategory(String category) {
     case '필라테스':
       return Icons.accessibility_new;
     default:
-      return Icons.category; // 기본 아이콘
+      return Icons.category;
   }
 }
