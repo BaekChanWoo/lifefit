@@ -4,17 +4,17 @@ class ChangeCategory extends StatelessWidget {
   final List<String> categories;
   final String? selectedCategory;
   final Function(String) onCategoryTap;
-  final TextStyle? textStyle; // 기존 텍스트 스타일 파라미터 활용
+  final TextStyle? textStyle;
 
   const ChangeCategory({
     super.key,
     required this.categories,
     required this.onCategoryTap,
     this.selectedCategory,
-    this.textStyle, // 텍스트 스타일 파라미터 유지
+    this.textStyle, //
   });
 
-  @override
+  @override  //카테고리
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50,
@@ -30,7 +30,7 @@ class ChangeCategory extends StatelessWidget {
               onTap: () => onCategoryTap(category),
               child: Chip(
                 avatar: Icon(
-                  _getIconForCategory(category), // 카테고리에 맞는 아이콘 표시
+                  _getIconForCategory(category),
                   color: Colors.black87,
                 ),
                 label: Text(
