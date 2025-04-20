@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/calendar/custom_text_field.dart';
 import 'package:lifefit/const/colors.dart';
+import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ScheduleBottomSheet extends StatefulWidget {
   final DateTime selectedDate; // 선택된 날짜 상위 위젯에서 입력받기
@@ -92,6 +94,10 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
   void onSavePressed() {
     if(formKey.currentState!.validate()){
       formKey.currentState!.save(); // 폼 저장
+
+      // 스케쥴 모델 생성하기
+
+      // 스케쥴 모델 파이어스토어에 삽입하기
     }
   }
   String? timeValidator(String? val){ // 시간 필드 검증 함수

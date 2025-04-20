@@ -16,7 +16,7 @@ class Feed extends StatefulWidget {
 
 // 러닝, 헬스, 요가, 필라테스, 싸이클, 클라이밍, 농구
 class _FeedState extends State<Feed> {
-  int _currentPage = 1;
+  //int _currentPage = 1;
   final FeedController feedController = Get.put(FeedController()); // 인스턴스 생성
 
   @override
@@ -34,7 +34,7 @@ class _FeedState extends State<Feed> {
   }
 
   Future<void> _onRefresh() async {
-    _currentPage = 1;
+    //_currentPage = 1;
     //await feedController.feedIndex();
   }
 

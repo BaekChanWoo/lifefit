@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/screen/home_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:lifefit/firebase_options.dart';
 import 'package:lifefit/screen/auth/intro.dart';
+
 //import 'package:lifefit/controller/feed_controller.dart';
 
 
@@ -10,7 +13,11 @@ void main() async {
   // 플러터 프레임워크가 준비될 때까지 대기
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initializeDateFormatting(); // intl 패키지 초기화
+  // 파이어베이스 프로젝트 설정 함수
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   //Get.put(FeedController());
   runApp(
     GetMaterialApp(
@@ -36,7 +43,7 @@ void main() async {
       //home: Intro(),
       home: HomeScreen(),
       //home: Calendar(),
-
     ),
   );
 }
+

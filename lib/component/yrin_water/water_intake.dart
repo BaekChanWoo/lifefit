@@ -25,7 +25,6 @@ class _WaterIntakeState extends State<WaterIntake> {
       appBar: AppBar(backgroundColor: const Color(0xFFDDDDDD),
           title: Container(
             padding: EdgeInsets.all( 10 ),
-
             child:
             Text('물 섭취량',
               style: TextStyle(

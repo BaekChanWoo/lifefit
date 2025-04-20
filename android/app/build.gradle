@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
@@ -9,7 +12,8 @@ android {
     namespace = "com.example.lifefit"
     compileSdk = 35 //compileSdk = flutter.compileSdkVersion , , 호환성 문제 때문에 올림
     buildToolsVersion "35.0.0"
-    ndkVersion = flutter.ndkVersion
+    //ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // 추가 또는 수정
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -59,3 +63,6 @@ subprojects {
         }
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
+

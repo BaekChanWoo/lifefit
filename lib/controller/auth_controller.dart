@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:lifefit/provider/auth_provider.dart';
-import 'package:flutter/material.dart';
-import 'dart:developer';
+
 
 class AuthController extends GetxController {
   final AuthProvider authProvider = AuthProvider();

@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:lifefit/controller/feed_controller.dart';
 
 
-
 // 마이페이지
 class MainMyPage extends StatefulWidget {
   const MainMyPage({super.key});

@@ -47,6 +47,8 @@ class _FeedCreateState extends State<FeedCreate> {
                       children: [
                         // 이미지 업로드
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end, // 하단 정렬
                                children: [
                                 Container(
                                    width:100,
@@ -62,6 +64,27 @@ class _FeedCreateState extends State<FeedCreate> {
                                      size: 25.0,
                                    ),
                                 ),
+                                 Row(
+                                   children: [
+                                     Icon(Icons.add,
+                                       color: PRIMARY_COLOR,
+                                       size: 25.0,
+                                     ),
+                                     const SizedBox(width: 2.0,),
+                                     GestureDetector(
+                                     onTap: (){
+
+                                     },
+                                     child: Text('운동 종류',
+                                     style: TextStyle(
+                                       color: PRIMARY_COLOR,
+                                       fontSize: 18.0,
+                                       fontWeight: FontWeight.w500
+                                     ),
+                                     ),
+                                   ),
+                                    ],
+                                 )
                              ],
                             ),
                             const SizedBox(height: 16,),
@@ -94,7 +117,7 @@ class _FeedCreateState extends State<FeedCreate> {
                       child: ElevatedButton(
                           onPressed: _submit,
                           child: const Text('공유하기'
-                          ,style: TextStyle(color: Colors.black),
+                          ,style: TextStyle(color: Colors.white),
                           ),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(

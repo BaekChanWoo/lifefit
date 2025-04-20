@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 
+
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;               // 현재 선택된 하단 내비게이션 탭의 인덱스
   bool _isContainerPage = false;        // 홈 화면 내 세부 페이지 진입 여부( 예: SleepScreen)
@@ -210,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+
 // 중첩 Navigator의 pop 이벤트를 감지하는 Observer
 class CustomNavigatorObserver extends NavigatorObserver {
   final VoidCallback onPopToHome; // 콜백 사용
@@ -276,6 +278,7 @@ class HomeContentWithNavigation extends StatelessWidget {
     );
   }
 }
+
 
 // 컨테이너 5개는 다 세부페이지
 class HomeContent extends StatefulWidget {
