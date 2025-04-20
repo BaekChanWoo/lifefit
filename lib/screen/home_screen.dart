@@ -12,6 +12,7 @@ import 'package:lifefit/screen/water.dart';
 import 'package:lifefit/screen/pedometer.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/screen/my/mypage.dart';
+import 'package:lifefit/screen/music.dart';
 
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
@@ -46,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const MeetUpScreen(),
       const Calendar(),
       const Community(),
-      const Center(child: Text("노래 화면"),),
+      const Music(),
     ];
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/widgets/forms/label_textfield.dart';
+import 'package:lifefit/component/community/feed_drop_down.dart';
 
 // 피드 생성 화면
 class FeedCreate extends StatefulWidget {
@@ -64,26 +65,9 @@ class _FeedCreateState extends State<FeedCreate> {
                                      size: 25.0,
                                    ),
                                 ),
-                                 Row(
-                                   children: [
-                                     Icon(Icons.add,
-                                       color: PRIMARY_COLOR,
-                                       size: 25.0,
-                                     ),
-                                     const SizedBox(width: 2.0,),
-                                     GestureDetector(
-                                     onTap: (){
-
-                                     },
-                                     child: Text('운동 종류',
-                                     style: TextStyle(
-                                       color: PRIMARY_COLOR,
-                                       fontSize: 18.0,
-                                       fontWeight: FontWeight.w500
-                                     ),
-                                     ),
-                                   ),
-                                    ],
+                                 SizedBox(
+                                   width: 133,
+                                   child: FeedDropDown(),
                                  )
                              ],
                             ),
