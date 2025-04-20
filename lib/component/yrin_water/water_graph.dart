@@ -4,7 +4,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:lifefit/const/colors.dart';
 
 class WaterGraphScreen extends StatelessWidget {
-  final List<double> count = [1750, 500, 250, 250, 750, 2000, 250]; // 예시 데이터
+  final List<double> count = [1750, 500, 250, 250, 750, 2000, 250]; // 예시 데이터 //state 수정
+  WaterGraphScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,7 @@ class WaterGraph extends StatelessWidget {
       sun: count[6],
     ).barData;
 
-    return Container(
+    return Container( //그래프 모양
       width: 300, // 상자 넓이 설정
       height: 250, // 상자 높이 설정
       decoration: BoxDecoration(
@@ -118,10 +119,10 @@ class WaterGraph extends StatelessWidget {
     );
 
 
-    if (meta != null && meta.axisSide != null) {
+    if (meta.axisSide != null) {  //유지보수 위해 수정 필요
       return SideTitleWidget(meta: meta, child: text);
     } else {
-      // meta 또는 meta.axisSide가 null인 경우 처리
+      //  meta.axisSide가 null인 경우 처리
       return const SizedBox.shrink(); // 빈 SizedBox 반환 또는 다른 위젯 반환
     }
   }

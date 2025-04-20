@@ -43,7 +43,7 @@ class _WaterIntakeState extends State<WaterIntake> {
             children: [
               Container(
                   width: 400,
-                  height: 280,
+                  height: 250,
 
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), //수정필요
                   margin: const EdgeInsets.all(20),
@@ -61,8 +61,8 @@ class _WaterIntakeState extends State<WaterIntake> {
                           alignment: Alignment.topCenter,
                           child: Image.asset(
                             'assets/img/cup.png',
-                            width:110,
-                            height: 110,
+                            width:95,
+                            height: 95,
                             fit: BoxFit.contain,),
                         ),
                       ),
@@ -84,14 +84,14 @@ class _WaterIntakeState extends State<WaterIntake> {
                                 });
                               },
                               child: Image.asset('assets/img/plus_button.png',
-                                width: 27,
-                                height: 27,
+                                width: 25,
+                                height: 25,
                                 fit: BoxFit.contain,
                               ),
                             ),
 
 
-                            SizedBox(width: 20),
+                            SizedBox(width: 15),
 
                             Text(
                                 '250 mL',
@@ -105,7 +105,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                         ),
                       ),
 
-                      SizedBox(height: 15,),
+                      SizedBox(height: 13,),
 
                       Padding(
                         padding: const  EdgeInsets.only(left: 50),
@@ -134,7 +134,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                                     color: const Color(0xFFF5F3F3),
                                   ),
                                 ),
-                                Padding(
+                                Padding(  // 물 누적 값
                                   padding: const EdgeInsets.only(right: 20, top: 0),
                                   child: Text(
                                     '${widget.waterAmount}',

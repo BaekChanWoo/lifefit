@@ -61,13 +61,13 @@ class _WeatherState extends State<Weather> {
             // 상단 메인 카드
             Card(
               elevation: 4.0, // 그림자 깊이
-              shadowColor: Colors.grey.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
+              shadowColor: Colors.greenAccent.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
               shape: RoundedRectangleBorder( // 카드 모양 설정 (선택 사항)
                 borderRadius: BorderRadius.circular(10.0),
               ),
               color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -99,7 +99,8 @@ class _WeatherState extends State<Weather> {
                                 fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
-                          Text('쾌적한 야외 활동을 즐기세요.'),
+                          Text('쾌적한 야외 활동을 즐기세요.', style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -107,18 +108,33 @@ class _WeatherState extends State<Weather> {
 
                     // 미세먼지/날씨 정보 섹션
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         for (var data in dustInfoList)
-                          _buildInfoColumn(
-                              data['image']!, data['air']!, data['condition']!,
-                              60),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 패딩 조절
+                              child: _buildInfoColumn(
+                                data['image']!,
+                                data['air']!,
+                                data['condition']!,
+                                60,
+                              ),
+                            ),
+                          ),
                         for (var data in weatherInfoList)
-                          _buildInfoColumn(
-                              data['image']!, data['air']!, data['condition']!,
-                              50),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 패딩 조절
+                              child: _buildInfoColumn(
+                                data['image']!,
+                                data['air']!,
+                                data['condition']!,
+                                50,
+                              ),
+                            ),
+                          ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -128,7 +144,7 @@ class _WeatherState extends State<Weather> {
             // 하단 추가 정보 카드
             Card(
               elevation: 4.0, // 그림자 깊이
-              shadowColor: Colors.grey.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
+              shadowColor: Colors.greenAccent.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
               shape: RoundedRectangleBorder( // 카드 모양 설정 (선택 사항)
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -262,6 +278,7 @@ class _WeatherState extends State<Weather> {
       {
         'time': '8시',
         'temperature': '6/-3도',
+        'precipitation': '20%',
         'image': 'assets/img/weathertest2.png'
       },
     ];
@@ -353,13 +370,14 @@ class _WeatherState extends State<Weather> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(
               children: [
+                Text(weatherDataday[index]['day']!),
+                const SizedBox(height: 6.0),
                 Image.asset(
                   weatherDataday[index]['image']!,
                   width: 46,
                   height: 46,
                 ),
                 const SizedBox(height: 6.0),
-                Text(weatherDataday[index]['day']!),
                 Text(weatherDataday[index]['temperature']!),
               ],
             ),

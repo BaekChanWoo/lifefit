@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 
-void main() {
-  runApp(const MusicHome());
-}
-
-class MusicHome extends StatefulWidget {
-  const MusicHome({super.key});
+class MusicTop extends StatefulWidget {
+  const MusicTop({super.key});
 
   @override
-  _MusicHomeState createState() => _MusicHomeState();
+  State <MusicTop> createState() => _MusicTopState();
 }
 
-class _MusicHomeState extends State<MusicHome> {
+class _MusicTopState extends State<MusicTop> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,16 +16,9 @@ class _MusicHomeState extends State<MusicHome> {
       home : Scaffold(
           backgroundColor: Colors.white,
 
-          appBar: AppBar(
+          appBar: AppBar(  //음악플리 수정 필요 뒤로가기
+            centerTitle: true,
             backgroundColor:  PRIMARY_COLOR,
-
-            //이전페이지 이동 아이콘
-            leading: IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
 
             title: const Padding(
               padding: EdgeInsets.only(left: 0),
@@ -49,10 +38,10 @@ class _MusicHomeState extends State<MusicHome> {
             children: [
               const SizedBox(height: 28),
               Container(
-                  margin: const EdgeInsets.only(left: 20),
+                  margin: const EdgeInsets.only(left: 25),
                   padding: const EdgeInsets.only(left: 8),
                   width: 290, // 상자 너비 설정
-                  height: 30,
+                  height: 36,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF4E3DC),
                     borderRadius: BorderRadius.circular(10),
@@ -62,7 +51,7 @@ class _MusicHomeState extends State<MusicHome> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
-                          '오늘의 운동 노래 추천을 감상해 보세요!',
+                          '오늘의 추천 플레이리스트를 감상해 보세요!',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -72,7 +61,7 @@ class _MusicHomeState extends State<MusicHome> {
                         const SizedBox(width: 5,),
 
                         Image.asset('assets/img/music.png',
-                          width: 27,
+                          width: 15,
                           height: 20,
                           fit: BoxFit.contain,
                         ),
@@ -80,7 +69,7 @@ class _MusicHomeState extends State<MusicHome> {
                         const SizedBox(width: 0,),
 
                         Image.asset('assets/img/fire.png',
-                          width: 27,
+                          width: 15,
                           height: 20,
                           fit: BoxFit.contain,
                         ),
