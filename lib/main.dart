@@ -8,7 +8,6 @@ import 'package:intl/date_symbol_data_local.dart';
 
 
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
   await initializeDateFormatting('ko_KR', null); // 한국어 로케일 초기화
