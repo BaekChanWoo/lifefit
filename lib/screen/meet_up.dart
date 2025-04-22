@@ -31,6 +31,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
       dateTime: '2025.04.11.Fri. AM 07:30',
       currentPeople: 3,
       maxPeople: 5,
+      isMine: true,
     )),
 
     // 클라이밍 카테고리 4개 생성
@@ -42,9 +43,9 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
       dateTime: '2025.04.11.Fri. AM 07:30',
       currentPeople: 2,
       maxPeople: 4,
+      isMine: true,
     )),
   ];
-
 
   int _visiblePostCount = 3; // 처음에 보이는 게시글 수
 
