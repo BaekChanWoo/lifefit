@@ -8,6 +8,9 @@ class Post {
   int currentPeople;// 현재 인원
   int maxPeople;  // 최대 인원
 
+  final bool isMine; // 내가 작성한 글인지 확인
+  List<String> applicants;
+
   Post({
     required this.title,
     required this.description,
@@ -16,5 +19,7 @@ class Post {
     required this.dateTime,
     required this.currentPeople,
     required this.maxPeople,
+    this.isMine=false,
+    this.applicants = const [],
   });
 }

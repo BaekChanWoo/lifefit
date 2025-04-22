@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/model/meetup_model.dart';
 
-/// 신청 바텀시트: 함께 운동하기 버튼을 누르면 currentPeople 증가
+//신청 시트 함께 운동하기 버튼을 누르면 신청자 수 증가
 class ApplySheet extends StatelessWidget {
   final Post post;             // 선택한 게시글
   final VoidCallback onApplied; // 인원 증가 -> setState 처리 콜백
@@ -26,7 +26,7 @@ class ApplySheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 카테고리명
-          Text('🏃 ${post.category}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Text('${post.category}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           // 위치
           Text(post.location, style: const TextStyle(fontSize: 16)),
