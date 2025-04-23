@@ -318,6 +318,7 @@ class _CreatePostState extends State<CreatePost> {
                 currentPeople: widget.existingPost?.currentPeople ?? 1,
                 maxPeople: maxPeople,
                 isMine: true,
+                applicants: [],
               );
 
               Navigator.pop(context, newPost);

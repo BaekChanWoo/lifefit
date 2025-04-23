@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/model/meetup_model.dart';
 
-//신청 시트 함께 운동하기 버튼을 누르면 신청자 수 증가
+// 신청 시트: 함께 운동하기 or 신청 취소
 class ApplySheet extends StatelessWidget {
   final Post post;             // 선택한 게시글
-  final VoidCallback onApplied; // 인원 증가 -> setState 처리 콜백
+  final VoidCallback onApplied; // 인원 변경 -> setState 처리 콜백
 
   const ApplySheet({
     Key? key,
@@ -15,6 +15,9 @@ class ApplySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String currentUser = '차예빈'; //현재 사용자 이름 하드코딩
+    final bool isApplied = post.applicants.contains(currentUser); // 신청 여부 확인
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
@@ -25,46 +28,48 @@ class ApplySheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 카테고리명
           Text('${post.category}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          // 위치
           Text(post.location, style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 4),
-
-          // 날짜,시간
           Text(post.dateTime, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           const SizedBox(height: 20),
-          // 정원
           Text(
-              '현재 인원: ${post.currentPeople}명 / ${post.maxPeople}명',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),),
-
-
+            '현재 인원: ${post.currentPeople}명 / ${post.maxPeople}명',
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+          ),
           const SizedBox(height: 20),
 
-          // 함께 운동하기 버튼 (신청 버튼)
+          // 신청, 신청 취소 버튼
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // 정원 초과가 아닐 때만 인원 증가
-                if (post.currentPeople < post.maxPeople) {
-                  post.currentPeople += 1;
-                  onApplied(); // 외부 setState() 호출
+                if (isApplied) {
+                  //신청 취소 처리
+                  post.applicants.remove(currentUser);
+                  post.currentPeople--;
+                } else {
+                  //신청 처리
+                  if (post.currentPeople < post.maxPeople) {
+                    post.applicants.add(currentUser);
+                    post.currentPeople++;
+                  }
                 }
-                Navigator.pop(context); // 바텀시트 닫기
+
+                onApplied(); //상태 업데이트
+                Navigator.pop(context); // 시트 닫기
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: PRIMARY_COLOR,
+                backgroundColor: isApplied ? Colors.red : PRIMARY_COLOR,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                '함께 운동하기',
-                style: TextStyle(
+              child: Text(
+                isApplied ? '신청 취소' : '함께 운동하기',
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,

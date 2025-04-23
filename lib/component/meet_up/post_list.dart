@@ -25,11 +25,16 @@ class PostList extends StatefulWidget {
 class _PostListState extends State<PostList> {
   @override
   Widget build(BuildContext context) {
+    // 최신 글을 위로 정렬
+    final sortedPosts = List<Post>.from(widget.posts)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+
     return ListView.builder(
-      itemCount: widget.posts.length + (widget.hasMore ? 1 : 0),
+      itemCount: sortedPosts.length + (widget.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index < widget.posts.length) {
-          final post = widget.posts[index]; // 현재 게시글
+        if (index < sortedPosts.length) {
+          final post = sortedPosts[index]; // 현재 게시글
 
           return Card(
             shape: ContinuousRectangleBorder(
@@ -85,7 +90,8 @@ class _PostListState extends State<PostList> {
 
                           // 신청 버튼
                           ApplyButton(
-                            isApplied: post.currentPeople >= post.maxPeople,
+                            isApplied: post.applicants.contains('차예빈'),
+                            //isApplied: post.currentPeople >= post.maxPeople,
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
