@@ -11,9 +11,7 @@ class MusicTop extends StatefulWidget {
 class _MusicTopState extends State<MusicTop> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-
-      home : Scaffold(
+    return Scaffold(
           backgroundColor: Colors.white,
 
           appBar: AppBar(  //음악플리 수정 필요 뒤로가기
@@ -78,7 +76,6 @@ class _MusicTopState extends State<MusicTop> {
               )
             ],
           )
-      ),
-    );
+      );
   }
 }

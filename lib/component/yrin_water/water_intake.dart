@@ -22,19 +22,24 @@ class _WaterIntakeState extends State<WaterIntake> {
     return Scaffold(
       backgroundColor: const Color(0xFFDDDDDD), // 전체 배경색 회색
 
-      appBar: AppBar(backgroundColor: const Color(0xFFDDDDDD),
-          title: Container(
-            padding: EdgeInsets.all( 10 ),
-            child:
-            Text('물 섭취량',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 28,
-                fontFamily: 'Padauk',
-                fontWeight: FontWeight.w700,),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFDDDDDD),
+        title: Container(
+          padding: EdgeInsets.all(10),
+          child: Text(
+            '물 섭취량',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontFamily: 'Padauk',
+              fontWeight: FontWeight.w500,
             ),
-          )
+          ),
+        ),
+        centerTitle: true,
       ),
+
+      // 물 바디
       body: Stack(
         children: [
           Column(
