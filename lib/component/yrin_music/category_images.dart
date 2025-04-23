@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/yrin_music/music_page.dart';
-import 'package:get/get.dart';
 
 class CategoryImages extends StatelessWidget {
   final String? selectedCategory;
@@ -81,9 +80,7 @@ class CategoryImages extends StatelessWidget {
     final imagePaths = getImagePaths(selectedCategory);
     final  displayedImagePaths = imagePaths.take(4).toList();
 
-    return GetMaterialApp( // GetMaterialApp으로 감싸기
-        debugShowCheckedModeBanner: false,
-        home: Column(
+    return Column(
       children: [
         Expanded(
           child: GridView.count(
@@ -91,10 +88,27 @@ class CategoryImages extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 25,
             mainAxisSpacing: 20,
-            children:  displayedImagePaths.map((path) {
+            children: displayedImagePaths.map((path) {
               return GestureDetector(
                   onTap: () {
-                    Get.to(() => MusicPage(categoryImages: path));
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) => MusicPage(categoryImages: path),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(0.0, 1.0);
+                          const end = Offset.zero;
+                          const curve = Curves.ease;
+
+                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
                   },
                   child:  ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
@@ -113,8 +127,7 @@ class CategoryImages extends StatelessWidget {
         ),
         const SizedBox(height: 50), //
       ],
-        )
-    );
+        );
 
   }
 }
