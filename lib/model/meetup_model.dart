@@ -2,11 +2,15 @@
 class Post {
   final String title; // 제목
   final String description; // 설명
-  final String category;  // 운동 카테고리
+  final String category; // 운동 카테고리
   final String location; // 운동 장소
   final String dateTime; // 날짜 및 시간
   int currentPeople;// 현재 인원
   int maxPeople;  // 최대 인원
+
+  final bool isMine; // 내가 작성한 글인지 확인
+  List<String> applicants; // 신청자 목록
+  final DateTime createdAt; // 생성 시간
 
   Post({
     required this.title,
@@ -16,5 +20,8 @@ class Post {
     required this.dateTime,
     required this.currentPeople,
     required this.maxPeople,
-  });
+    this.isMine=false,
+    this.applicants = const [],
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 }

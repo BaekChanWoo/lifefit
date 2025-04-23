@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:lifefit/firebase_options.dart';
 import 'package:lifefit/screen/auth/intro.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 
 
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
+  await initializeDateFormatting('ko_KR', null); // 한국어 로케일 초기화
   // 플러터 프레임워크가 준비될 때까지 대기
   WidgetsFlutterBinding.ensureInitialized();
 
