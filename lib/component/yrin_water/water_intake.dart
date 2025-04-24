@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lifefit/component/yrin_water/water_reset.dart';
 
 class WaterIntake extends StatefulWidget {
-  final int waterAmount;
+  final int initialWaterAmount;
   final Function(int) onAmountChanged;
 
   const WaterIntake({
     super.key,
-    required this.waterAmount,
-    required this.onAmountChanged, // 이름 변경
+    required this.initialWaterAmount,
+    required this.onAmountChanged,
   });
 
 
@@ -16,6 +17,26 @@ class WaterIntake extends StatefulWidget {
 }
 
 class _WaterIntakeState extends State<WaterIntake> {
+  int _currentWaterAmount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentWaterAmount = widget.initialWaterAmount; // 초기값 설정
+    // 앱 시작 시 자정 여부 확인 및 초기화, 저장된 값 로딩
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WaterResetService.scheduleDailyReset(setState, _updateWaterAmount);
+    });
+  }
+
+  // 로컬 waterAmount 상태를 업데이트하고 저장하는 함수
+  void _updateWaterAmount(int newAmount) {
+    setState(() {
+      _currentWaterAmount = newAmount; // 현재 물의 양 업데이트
+      widget.onAmountChanged(newAmount); // 부모 위젯의 상태 업데이트
+    });
+    WaterResetService.saveWaterAmount(newAmount); // 영구 저장
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +51,7 @@ class _WaterIntakeState extends State<WaterIntake> {
             '물 섭취량',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 24,
+              fontSize: 22,
               fontFamily: 'Padauk',
               fontWeight: FontWeight.w500,
             ),
@@ -82,11 +103,9 @@ class _WaterIntakeState extends State<WaterIntake> {
                             //플러스 버튼 이벤트
                             GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  if (widget.waterAmount + 250<= 2000){
-                                    widget.onAmountChanged(widget.waterAmount + 250) ;
-                                  }
-                                });
+                                WaterResetService.incrementWaterAmount(
+                                    _currentWaterAmount, 250, _updateWaterAmount);
+
                               },
                               child: Image.asset('assets/img/plus_button.png',
                                 width: 25,
@@ -142,7 +161,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                                 Padding(  // 물 누적 값
                                   padding: const EdgeInsets.only(right: 20, top: 0),
                                   child: Text(
-                                    '${widget.waterAmount}',
+                                    '$_currentWaterAmount',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 18,
