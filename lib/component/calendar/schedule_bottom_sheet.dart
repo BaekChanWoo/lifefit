@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/calendar/custom_text_field.dart';
 import 'package:lifefit/const/colors.dart';
+import 'package:lifefit/model/schedule_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -72,7 +73,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton( // 저장 버튼
-                      onPressed: onSavePressed,
+                      onPressed: () => onSavePressed(context),
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -91,13 +92,28 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     );
   }
 
-  void onSavePressed() {
+  void onSavePressed(BuildContext context) async{
     if(formKey.currentState!.validate()){
       formKey.currentState!.save(); // 폼 저장
 
       // 스케쥴 모델 생성하기
+      final schedule = ScheduleModel(
+          id: Uuid().v4() , // Uuid() 고유한 ID를 생성(중복 X ) , FireSotre 문서 ID를 직접 생성할 때
+          content: content!,
+          date: widget.selectedDate,
+          startTime: startTime!,
+          endTime: endTime!,
+      );
 
       // 스케쥴 모델 파이어스토어에 삽입하기
+      await FirebaseFirestore.instance
+            .collection(
+            'schedule', // 가져오고 싶은 컬렉션 이름
+      )
+      .doc(schedule.id) // 저장하고 싶은 문서의 ID
+      .set(schedule.toJson()); // 저장하고 싶은 데이터
+
+      Navigator.of(context).pop();
     }
   }
   String? timeValidator(String? val){ // 시간 필드 검증 함수
@@ -117,7 +133,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     return null;
   }
   String? contentValidator(String? val){ // 내용 필드 검증 함수
-    if(val == null || val.length == 0){
+    if(val == null || val.isEmpty){ // val.length == 0
       return "내용을 입력해주세요";
     }
     return null;

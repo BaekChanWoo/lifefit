@@ -5,20 +5,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:lifefit/firebase_options.dart';
 import 'package:lifefit/screen/auth/intro.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:lifefit/repository/schedule_repository.dart';
 
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
-  await initializeDateFormatting('ko_KR', null); // 한국어 로케일 초기화
-  // 플러터 프레임워크가 준비될 때까지 대기
-  WidgetsFlutterBinding.ensureInitialized();
-
   // 파이어베이스 프로젝트 설정 함수
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // 플러터 프레임워크가 준비될 때까지 대기
+  //await initializeDateFormatting('ko_KR', null); // 한국어 로케일 초기화
+  await initializeDateFormatting();
 
 
   //Get.put(FeedController());

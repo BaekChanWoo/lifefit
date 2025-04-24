@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "455481203847",
+    "project_id": "lifefit-b95d9",
+    "storage_bucket": "lifefit-b95d9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455481203847:android:c6b5dd3f0caf224f3cec22",
+        "android_client_info": {
+          "package_name": "com.example.lifefit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDccNizUr89Lsc-nb9XH37yopbjDxc3RtI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
