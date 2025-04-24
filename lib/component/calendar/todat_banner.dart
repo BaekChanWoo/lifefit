@@ -28,9 +28,7 @@ class TodayBanner extends StatelessWidget {
             Text( // 년 월 일 형태로 표시
               '${selectedDate.year}년 ${selectedDate.month}월 ${selectedDate.day}일',
               style: textStyle,
-            ),
-            Row(
-              children: [
+                ),
                 Text( // 일정 개수
                   '$count개',
                   style: textStyle,
@@ -47,8 +45,6 @@ class TodayBanner extends StatelessWidget {
                     size: 16.0,
                   ),
                 ),*/
-              ],
-            )
           ],
         ),
       ),
