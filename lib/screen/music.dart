@@ -3,10 +3,6 @@ import 'package:lifefit/component/yrin_music/music_top.dart';
 import 'package:lifefit/component/yrin_music/category_images.dart';
 import 'package:lifefit/component/yrin_music/change_category.dart';
 
-void main() {
-  runApp(const Music());
-}
-
 class Music extends StatefulWidget {
   const  Music({super.key});
 
@@ -34,7 +30,7 @@ class _MusicState extends State< Music> {
           MusicTop(),
           Positioned(
             top: 160,
-            left: 10,
+            left: 13,
             right: 10,
             child: ChangeCategory( // CategorySelector 위젯 추가
               categories: categories,
