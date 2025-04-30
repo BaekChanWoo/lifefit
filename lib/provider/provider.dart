@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 class Provider extends GetConnect{
 
+
   // 기본 서버 주소 설정과 HTTP 헤더 설정등의 초기화 작업 수행
   @override
   void onInit(){
@@ -11,7 +12,7 @@ class Provider extends GetConnect{
     // httpClient.baseUrl = 'http://localhost:3000';
     // 실제 디바이스용: httpClient.baseUrl = 'http://192.168.x.x:3000';
     //httpClient.baseUrl = 'http://10.0.2.2:3000'; // 에뮬레이터용
-    httpClient.baseUrl = kDebugMode ? 'http://10.0.2.2:3000' : 'http://your-server-ip:3000';
+    httpClient.baseUrl = kDebugMode ? 'http://10.0.2.2:3000' : 'http://192.168.10.127:3000';
     httpClient.addRequestModifier<void>((request){    // Authorization 헤더 추가
       request.headers['Accept'] = 'application/json'; // JSON 형식의 데이터 처리 가능
 
