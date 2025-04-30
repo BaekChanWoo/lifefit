@@ -23,7 +23,7 @@ class SleepModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'date': date.toIso8601String(),
+    'date': date,
     'sleepHours': sleepHours,
     'userId': userId,
   };
@@ -60,6 +60,7 @@ class _SleepScreenState extends State<SleepScreen> {
     dateText = DateFormat('y년 M월 d일', 'ko_KR').format(dateOfNow);
     dayText = DateFormat('E', 'ko_KR').format(dateOfNow);
     selectedDay = dateOfNow.weekday % 7; // 요일을 0~6 인덱스로 바꿈
+    loadSleepDataForSelectedDay();
   }
 
   //이전 날짜로 이동
@@ -77,20 +78,71 @@ class _SleepScreenState extends State<SleepScreen> {
       updateDate();
     });
   }
+
+  Future<void> loadSleepDataForSelectedDay() async {
+    final String userId = 'guest'; // 로그인 시 대체
+
+    final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('sleep')
+        .where('userId', isEqualTo: userId)
+        .where('date', isEqualTo: onlyDate)
+        .get();
+
+
+    if (snapshot.docs.isNotEmpty) {
+      final data = snapshot.docs.first.data();
+      double loadedHours = data['sleepHours'];
+      setState(() {
+        sleepHours = loadedHours;
+        sleepData[selectedDay] = loadedHours;
+      });
+    } else {
+      setState(() {
+        sleepHours = 0;
+        sleepData[selectedDay] = 0;
+      });
+    }
+  }
+
+
   //Firebase에 수면 데이터 저장
   Future<void> saveSleepData() async {
-    final sleepModel = SleepModel(
-      id: Uuid().v4(),  //랜덤으로 id 생성
-      date: dateOfNow,
-      sleepHours: sleepHours,
-      userId: 'guest', // 임시 사용자 id
-    );
+    final String userId = 'guest';
 
-    await FirebaseFirestore.instance  //파이어베이스 클라우드 연결
-        .collection('sleep')   //sleep 컬ㄹ랙션
-        .doc(sleepModel.id)  //
-        .set(sleepModel.toJson());  //데이터 쓰기
+
+    final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
+    final query = await FirebaseFirestore.instance
+        .collection('sleep')
+        .where('userId', isEqualTo: userId)
+        .where('date', isEqualTo: onlyDate)
+        .get();
+
+    if (query.docs.isNotEmpty) {
+      // 기존 문서 업데이트
+      await FirebaseFirestore.instance
+          .collection('sleep')
+          .doc(query.docs.first.id)
+          .update({'sleepHours': sleepHours});
+    } else {
+      final newModel = SleepModel(
+        id: Uuid().v4(),
+        date: onlyDate,
+        sleepHours: sleepHours,
+        userId: userId,
+      );
+      await FirebaseFirestore.instance
+          .collection('sleep')
+          .doc(newModel.id)
+          .set(newModel.toJson());
+    }
+
+    setState(() {
+      sleepData[selectedDay] = sleepHours;
+    });
   }
+
 
   //CupertinoPicker
   void _showCupertinoPicker() {
@@ -133,10 +185,10 @@ class _SleepScreenState extends State<SleepScreen> {
                         scrollController: FixedExtentScrollController(initialItem: initialMinute),
                         itemExtent: 32.0,
                         onSelectedItemChanged: (int value) {
-                          selectedMinute = value;
+                          selectedMinute = value * 5;
                         },
-                        children: List<Widget>.generate(60, (int index) {
-                          return Center(child: Text('$index 분'));
+                        children: List<Widget>.generate(12, (int index) {
+                          return Center(child: Text('${index * 5 }분'));
                         }),
                       ),
                     ),
@@ -144,17 +196,22 @@ class _SleepScreenState extends State<SleepScreen> {
                 ),
               ),
               //선택 완료 버튼
+              // 확인 버튼
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   double selected = selectedHour + selectedMinute / 60.0;
                   setState(() {
                     sleepHours = selected;
                     sleepData[selectedDay] = selected;
                   });
+                  await saveSleepData(); // 저장도 같이 진행
                   Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('수면 데이터가 저장되었습니다')),
+                  );
                 },
-                child: const Text('확인'),
-              )
+                child: const Text('확인', style: TextStyle(fontSize: 16)),
+              ),
             ],
           ),
         );
@@ -170,12 +227,6 @@ class _SleepScreenState extends State<SleepScreen> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
         title: const Text('수면시간', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            onPressed: saveSleepData, // 저장 버튼 추가
-            icon: const Icon(Icons.save, color: Colors.black),
-          )
-        ],
       ),
       body: Column(
         children: [
@@ -245,18 +296,27 @@ class _SleepScreenState extends State<SleepScreen> {
                 ),
               ),
               //중앙 시간 텍스트, 클릭 시 다이얼 호출
-              GestureDetector(
-                onTap: _showCupertinoPicker,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.access_time, color: Colors.grey),
-                    Text(
-                      '${sleepHours.floor()}시간 ${((sleepHours - sleepHours.floor()) * 60).round()}분',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 현재 수면 시간 표시
+                  GestureDetector(
+                    onTap: _showCupertinoPicker, // 클릭 시 다이얼 띄우기
+                    child: Column(
+                      children: [
+                        const Icon(Icons.access_time, color: Colors.grey),
+                        Text(
+                          '${sleepHours.floor()}시간 ${((sleepHours - sleepHours.floor()) * 60).round()}분',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 10), // 텍스트와 버튼 간격
+
+
+                ],
               ),
             ],
           ),
