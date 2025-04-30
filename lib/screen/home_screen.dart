@@ -13,6 +13,9 @@ import 'package:lifefit/screen/pedometer.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/screen/my/mypage.dart';
 import 'package:lifefit/screen/music.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+
+import 'package:lifefit/controller/auth_controller.dart';
 
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
@@ -90,6 +93,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 인증 상태 감지
+    // authStateChanges().listen으로 로그아웃 감시 -> /intro로 리다이렉트
+    firebase_auth.FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user == null) {
+        Get.offAllNamed('/intro');
+      }
+    });
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark); // 상태바 검은색
 
     return Scaffold(
@@ -189,6 +199,71 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text("프로필"),
               onTap: (){
                 Get.to(() => MyPage());
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout_outlined),
+              title: const Text("로그아웃"),
+              onTap: () {
+                Get.defaultDialog(
+                  title: '로그아웃',
+                  titleStyle:  const TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.bold
+                  ),
+                  content: Text('정말 로그아웃하시겠습니까?',
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                  ),
+                    textAlign: TextAlign.center,
+                  ),
+                  backgroundColor: Colors.white,
+                  radius: 10.0,
+                  /*
+                  onConfirm: () async {
+                    final AuthController authController = Get.find<AuthController>();
+                    await authController.logout();
+                    Get.back();
+                  },
+                  onCancel: () => Get.back(),
+                   */
+                  confirm: ElevatedButton(
+                    onPressed: () async {
+                      final AuthController authController = Get.find<AuthController>();
+                      await authController.logout();
+                      Get.back();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: PRIMARY_COLOR,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+                    ),
+                    child: const Text(
+                      '로그아웃',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  cancel: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: PRIMARY_COLOR,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: const Text(
+                      '취소',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ],

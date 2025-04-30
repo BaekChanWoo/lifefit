@@ -1,19 +1,25 @@
 import 'package:get/get.dart';
 import 'package:lifefit/provider/auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'dart:developer';
+import 'package:lifefit/shared/global.dart';
+
 
 
 class AuthController extends GetxController {
-  final AuthProvider authProvider = AuthProvider();
+  final authProvider = Get.put(AuthProvider()); // lifefit의 AuthProvider 참조
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth
+      .instance; // 별칭 사용
 
   // 아이디 유효성 검사
-  String? validateId(String id) {
-    if (id.isEmpty) {
+  String? validateId(String uid) {
+    if (uid.isEmpty) {
       return '아이디를 입력해주세요';
     }
-    if (id.length < 4) {
+    if (uid.length < 4) {
       return '아이디는 4자 이상이어야 합니다';
     }
-    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(id)) {
+    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(uid)) {
       return '아이디는 영문자와 숫자만 사용할 수 있습니다';
     }
     return null;
@@ -49,12 +55,12 @@ class AuthController extends GetxController {
   }
 
   // 로그인 처리
-  Future<bool> login(String id, String password) async {
+  Future<bool> login(String uid, String password) async {
     try {
       // 아이디 유효성 검사
-      String? idError = validateId(id);
-      if (idError != null) {
-        Get.snackbar('오류', idError, snackPosition: SnackPosition.TOP);
+      String? uidError = validateId(uid);
+      if (uidError != null) {
+        Get.snackbar('오류', uidError, snackPosition: SnackPosition.TOP);
         return false;
       }
 
@@ -65,10 +71,28 @@ class AuthController extends GetxController {
         return false;
       }
 
-      // 서버 요청 시뮬레이션
-      // 유효성 통과 시 1초 대기
-      await Future.delayed(const Duration(seconds: 1)); //
-      return true; // 성공 가정
+      // 서버 요청
+      Map body = await authProvider.login(uid, password);
+      if (body['result'] == 'ok') {
+        if (body['custom_token'] == null || body['custom_token'].isEmpty) {
+          Get.snackbar(
+              '오류', '커스텀 토큰이 누락되었습니다', snackPosition: SnackPosition.TOP);
+          return false;
+        }
+        String customToken = body['custom_token'];
+        log("token : $customToken");
+
+        // Firebase Authentication에 로그인
+        await _auth.signInWithCustomToken(customToken);
+        await Global.updateAccessToken(); // 토큰 캐싱
+        log("Firebase ID Token: ${Global.accessToken}");
+        Get.offAllNamed('/'); // 홈 화면으로 이동
+        return true;
+      } else {
+        Get.snackbar('오류', body['message'] ?? '로그인에 실패했습니다',
+            snackPosition: SnackPosition.TOP);
+        return false;
+      }
     } catch (e) {
       Get.snackbar('오류', '로그인 중 오류가 발생했습니다', snackPosition: SnackPosition.TOP);
       return false;
@@ -76,12 +100,13 @@ class AuthController extends GetxController {
   }
 
   // 회원가입 처리
-  Future<bool> register(String id, String password, String name, int? profile) async {
+  Future<bool> register(String uid, String password, String name,
+      int? profile) async {
     try {
       // 아이디 유효성 검사
-      String? idError = validateId(id);
-      if (idError != null) {
-        Get.snackbar('오류', idError, snackPosition: SnackPosition.TOP);
+      String? uidError = validateId(uid);
+      if (uidError != null) {
+        Get.snackbar('오류', uidError, snackPosition: SnackPosition.TOP);
         return false;
       }
 
@@ -100,19 +125,106 @@ class AuthController extends GetxController {
       }
 
       // 서버에 회원가입 요청
-      Map body = await authProvider.register(id, password, name, profile);
+      Map body = await authProvider.register(uid, password, name, profile);
       if (body['result'] == 'ok') {
-        return true; // 회원가입 성공
-      }
+        if (body['custom_token'] == null || body['custom_token'].isEmpty) {
+          Get.snackbar(
+              '오류', '커스텀 토큰이 누락되었습니다', snackPosition: SnackPosition.TOP);
+          return false;
+        }
+        String customToken = body['custom_token'];
+        log("token : $customToken");
 
-      // 서버에서 반환한 에러 메시지 표시
-      // 유효성 통과 시 authProvider.register 호출하여 서버에 요청
-      Get.snackbar('회원가입 에러', body['message'] ?? '회원가입에 실패했습니다',
-          snackPosition: SnackPosition.BOTTOM);
-      return false;
+        // Firebase Authentication에 로그인
+        // Firebase Authentication에 로그인 (재시도 포함)
+        int maxRetries = 2;
+        int retryCount = 0;
+        while (retryCount < maxRetries) {
+          try {
+            await _auth.signInWithCustomToken(customToken);
+            log("signInWithCustomToken 성공");
+            break;
+          } catch (e) {
+            retryCount++;
+            log("signInWithCustomToken 시도 $retryCount 실패: $e");
+            if (retryCount == maxRetries ||
+                !e.toString().contains('network-request-failed')) {
+              String errorMessage = 'Firebase 인증 오류';
+              if (e.toString().contains('invalid-custom-token')) {
+                errorMessage = '유효하지 않은 인증 토큰입니다';
+              } else if (e.toString().contains('network-request-failed')) {
+                errorMessage = '네트워크 연결을 확인해주세요';
+              } else if (e.toString().contains('too-many-requests')) {
+                errorMessage = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요';
+              }
+              Get.snackbar(
+                  '오류', errorMessage, snackPosition: SnackPosition.TOP);
+              return false;
+            }
+            await Future.delayed(Duration(seconds: 1)); // 재시도 전 대기
+          }
+        }
+
+        // 인증 상태 확인
+        await Future.delayed(Duration(seconds: 1));
+        if (_auth.currentUser == null) {
+          log("Firebase user is null after signInWithCustomToken");
+          Get.snackbar(
+              '오류', 'Firebase 사용자 인증 실패', snackPosition: SnackPosition.TOP);
+          return false;
+        }
+        log("Firebase user UID: ${_auth.currentUser!.uid}");
+
+        // 토큰 캐싱
+        try {
+          await Global.updateAccessToken();
+          log("Firebase ID Token: ${Global.accessToken}");
+          if (Global.accessToken == null) {
+            log("Access token is null after updateAccessToken");
+            Get.snackbar('오류', 'ID 토큰 획득 실패', snackPosition: SnackPosition.TOP);
+            return false;
+          }
+        } catch (e) {
+          log("updateAccessToken 오류: $e");
+          Get.snackbar('오류', '토큰 캐싱 오류: $e', snackPosition: SnackPosition.TOP);
+          return false;
+        }
+
+        log("Navigating to home screen");
+        Get.offAllNamed('/'); // 홈 화면으로 이동
+        return true;
+      } else {
+        Get.snackbar('회원가입 에러', body['message'] ?? '회원가입에 실패했습니다',
+            snackPosition: SnackPosition.BOTTOM);
+        return false;
+      }
     } catch (e) {
-      Get.snackbar('오류', '회원가입 중 오류가 발생했습니다', snackPosition: SnackPosition.TOP);
-      // 예외 발생 시 에러 메시지
+      log("회원가입 전체 오류: $e");
+      Get.snackbar(
+          '오류', '회원가입 중 오류가 발생했습니다: $e', snackPosition: SnackPosition.TOP);
+      return false;
+    }
+  }
+
+  // 로그아웃 처리
+  Future<bool> logout() async {
+    try {
+      // Firebase 로그아웃
+      await _auth.signOut();
+      log('Firebase signOut 성공');
+
+      // 토큰 초기화
+      Global.clearAccessToken();
+      log('Access token cleared');
+
+      // 로그인 화면으로 리다이렉트
+      Get.offAllNamed('/intro'); // 또는 '/login'
+
+      Get.snackbar('로그아웃', '성공적으로 로그아웃되었습니다', snackPosition: SnackPosition.TOP);
+      return true;
+    } catch (e) {
+      log('로그아웃 오류: $e');
+      Get.snackbar('오류', '로그아웃 중 오류가 발생했습니다: $e', snackPosition: SnackPosition.TOP);
       return false;
     }
   }

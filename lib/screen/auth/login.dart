@@ -16,15 +16,23 @@ class _LoginState extends State<Login> {
   final authController = Get.put(AuthController());
   final _idController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   _submit() async { // 로그인 기능
+    if (_isLoading) return; // 이미 로그인 중이면 중복 요청 방지
+    setState(() {
+      _isLoading = true; // 로딩 시작
+    });
     bool result = await authController.login(
       _idController.text,
       _passwordController.text,
     );
-    if(result){
-      Get.offAll(() => const HomeScreen()); // 스택 다 제거후 화면 전환
+    if (result) {
+      Get.offAll(() => const HomeScreen()); // 스택 다 제거 후 화면 전환
     }
+    setState(() {
+      _isLoading = false; // 로딩 종료
+    });
   }
 
 
@@ -61,7 +69,9 @@ class _LoginState extends State<Login> {
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
-              child: const Text('로그인'),
+              child: _isLoading
+              ? const CircularProgressIndicator(color: Colors.white,)
+              : const Text('로그인'),
           ),
         ],
       ),

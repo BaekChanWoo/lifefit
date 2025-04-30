@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../model/news_model.dart';
 
 class Healthtopic extends StatefulWidget {
   const Healthtopic({super.key});
@@ -9,6 +12,8 @@ class Healthtopic extends StatefulWidget {
 }
 
 class _HealthtopicState extends State<Healthtopic> {
+  List<Photo> _photos = [];
+
   // 뉴스 테스트 이미지 에셋 경로
   final String test1Image = 'assets/img/test1.png';
   final String test2Image = 'assets/img/test2.png';
@@ -18,9 +23,10 @@ class _HealthtopicState extends State<Healthtopic> {
   final PageController controller = PageController(initialPage: 0); //카드 페이지 컨트롤러
   int curruntPage = 0; // 카드 페이지 정수
 
-  @override // 카드 슬라이더 타이머
+  @override // 카드 슬라이더 타이머, json 가져오기
   void initState() {
     super.initState();
+
     Timer.periodic(Duration(seconds: 7), (Timer timer) {
       //타이머
       if (controller.hasClients && controller.page != null) {
@@ -43,6 +49,21 @@ class _HealthtopicState extends State<Healthtopic> {
         }
       }
     });
+
+    _fetchData(); // 데이터 가져오기
+  }
+
+  // 데이터 가져오기
+  Future<void> _fetchData() async {
+    try {
+      final photos = await _fetchPhotos();
+      setState(() {
+        _photos = photos;
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+      // 에러 처리
+    }
   }
 
   @override // 미사용시 컨트롤러 리소스해제
@@ -155,7 +176,7 @@ class _HealthtopicState extends State<Healthtopic> {
   // 공통 위젯 생성 함수 정의
   Widget _buildContentCard(Map<String, dynamic> data, String contentType) {
     switch (contentType) {
-      case 'realTimeTopic': // 실시간 토픽 섹션
+      case 'realTimeTopic':
         return Card(
           shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -167,7 +188,25 @@ class _HealthtopicState extends State<Healthtopic> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: Image.asset(data['image'], width: 118.0, height: 90.0, fit: BoxFit.cover),
+                child: Image.network(
+                  data['image'],
+                  width: 118.0,
+                  height: 90.0,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, object, stackTrace) {
+                    return Center(child: Icon(Icons.error_outline));
+                  },
+                ),
               ),
               SizedBox(width: 8.0),
               Expanded(
@@ -299,38 +338,52 @@ class _HealthtopicState extends State<Healthtopic> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //최상단 이미지 슬라이드 뉴스
+            // 최상단 이미지 슬라이드 뉴스 (JSONPlaceholder /photos 적용)
             Container(
               width: double.infinity,
               height: 320,
-              child: PageView.builder(
+              child: _photos.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : PageView.builder(
                 controller: controller,
-                itemCount: pageimgs.length,
+                itemCount: _photos.length > 4 ? 4 : _photos.length,
                 onPageChanged: (page) {
                   setState(() {
                     curruntPage = page;
-                    print(page);
                   });
                 },
                 itemBuilder: (context, index) {
+                  final photo = _photos[index];
                   return Padding(
-                    // 카드 주변에 약간의 간격을 주기 위해 Padding 추가
                     padding: const EdgeInsets.symmetric(vertical: 6.0),
                     child: Card(
                       shape: RoundedRectangleBorder(
-                        // 카드 모서리 둥글게 설정
                         borderRadius: BorderRadius.circular(16.0),
                       ),
-                      elevation: 4.0, // 그림자 효과
+                      elevation: 4.0,
                       child: Stack(
-                        fit: StackFit.expand, // Stack이 Card의 크기에 맞춰지도록 설정
+                        fit: StackFit.expand,
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(16.0),
-                            child: Image.asset(
-                              pageimgs[index], // 해당 페이지(인덱스)의 이미지
+                            child: Image.network(
+                              photo.thumbnailUrl,
                               width: double.infinity,
                               height: double.infinity,
                               fit: BoxFit.cover,
+                              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator( //로딩 서클 인디케이터
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, object, stackTrace) {
+                                return Center(child: Icon(Icons.error_outline));
+                              },
                             ),
                           ),
                           Positioned(
@@ -338,7 +391,7 @@ class _HealthtopicState extends State<Healthtopic> {
                             bottom: 16,
                             right: 16,
                             child: Text(
-                              pageTexts[index], // 해당 페이지(인덱스)의 텍스트
+                              photo.title,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20.0,
@@ -354,13 +407,11 @@ class _HealthtopicState extends State<Healthtopic> {
                   );
                 },
               ),
-            ), // 카드
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (num i = 0;
-                i < pageimgs.length;
-                i++) // pageimgs의 길이에 맞춰 인디케이터 생성
+                for (num i = 0; i <(_photos.length > 4 ? 4 : _photos.length); i++)
                   Container(
                     margin: EdgeInsets.all(3),
                     width: 10,
@@ -380,10 +431,10 @@ class _HealthtopicState extends State<Healthtopic> {
                     ),
                   ),
               ],
-            ), // 인디케이터
+            ),
             SizedBox(height: 48.0),
 
-            // 실시간 토픽 섹션
+            // 실시간 토픽 섹션 (JSONPlaceholder /photos 적용)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text('실시간 토픽',
@@ -392,12 +443,21 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(
               height: 424.0,
-              child: ListView.builder(
+              child: _photos.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : ListView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
-                itemCount: realTimeTopics.length,
+                itemCount: _photos.length > 4 ? 4 : _photos.length,
                 itemBuilder: (context, index) {
-                  return _buildContentCard(realTimeTopics[index], 'realTimeTopic');
+                  return _buildContentCard(
+                    {
+                      'image': _photos[index].thumbnailUrl,
+                      'title': _photos[index].title,
+                      'description': 'Album ID: ${_photos[index].albumId}', // 예시 설명
+                    },
+                    'realTimeTopic',
+                  );
                 },
               ),
             ),
@@ -465,4 +525,18 @@ class _HealthtopicState extends State<Healthtopic> {
       ),
     );
   }
+}
+
+//데이터 리스트 Future
+Future<List<Photo>> _fetchPhotos() async {
+  final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/photos'));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> decodedJson = json.decode(response.body) as List<dynamic>;
+    final List<Photo> photos = decodedJson.map((json) => Photo.fromJson(json)).toList();
+    return photos;
+  } else {
+    throw Exception('Failed to load photos');
+  }
+
 }

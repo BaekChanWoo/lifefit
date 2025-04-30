@@ -20,6 +20,7 @@ class _RegisterState extends State<Register> {
   final _passConfirmController = TextEditingController();
   final _nameController = TextEditingController();
   String? _nameError; // 닉네임 에러 메시지 저장
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -44,9 +45,16 @@ class _RegisterState extends State<Register> {
 
 
   _submit() async{
+    if(_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
     // 비밀번호와 비밀번호 확인이 일치하는지 확인
     if (_passController.text != _passConfirmController.text) {
       Get.snackbar('오류', '비밀번호와 비밀번호 확인이 일치하지 않습니다', snackPosition: SnackPosition.TOP);
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
@@ -58,7 +66,14 @@ class _RegisterState extends State<Register> {
     );
     if(result) {
       Get.offAll(() => const HomeScreen());
+    } else {
+      // 에러 메시지는 auth_controller.dart에서 표시하므로 여기서는 추가 표시 생략
+      print('Register failed, check auth_controller logs for details');
+      // 추가 디버깅 정보 출력
+      print('Input: uid=${_idController.text}, name=${_nameController.text}');
     }
+
+    setState(() => _isLoading = false);
   }
   @override
   Widget build(BuildContext context) {
@@ -121,7 +136,9 @@ class _RegisterState extends State<Register> {
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
-                child: const Text('회원가입'),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white,)
+                    : const Text('회원가입'),
             ),
           ],
         ),
