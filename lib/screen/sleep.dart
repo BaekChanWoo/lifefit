@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:math';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart'; // 슬라이더 패키지
+import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../const/colors.dart';
 
-// 수면 시간 기록 화면
+// 수면 데이터 모델
+class SleepModel {
+  final String id;
+  final DateTime date; // 기록 날짜
+  final double sleepHours; // 수면 시간
+  final String userId; // 사용자 id
+
+  SleepModel({
+    required this.id,
+    required this.date,
+    required this.sleepHours,
+    required this.userId,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'date': date.toIso8601String(),
+    'sleepHours': sleepHours,
+    'userId': userId,
+  };
+}
+
+//수면 시간 기록 화면
 class SleepScreen extends StatefulWidget {
   const SleepScreen({Key? key}) : super(key: key);
 
@@ -53,6 +76,20 @@ class _SleepScreenState extends State<SleepScreen> {
       dateOfNow = dateOfNow.add(const Duration(days: 1));
       updateDate();
     });
+  }
+  //Firebase에 수면 데이터 저장
+  Future<void> saveSleepData() async {
+    final sleepModel = SleepModel(
+      id: Uuid().v4(),  //랜덤으로 id 생성
+      date: dateOfNow,
+      sleepHours: sleepHours,
+      userId: 'guest', // 임시 사용자 id
+    );
+
+    await FirebaseFirestore.instance  //파이어베이스 클라우드 연결
+        .collection('sleep')   //sleep 컬ㄹ랙션
+        .doc(sleepModel.id)  //
+        .set(sleepModel.toJson());  //데이터 쓰기
   }
 
   //CupertinoPicker
@@ -133,10 +170,10 @@ class _SleepScreenState extends State<SleepScreen> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
         title: const Text('수면시간', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.menu, color: Colors.black),
+        actions: [
+          IconButton(
+            onPressed: saveSleepData, // 저장 버튼 추가
+            icon: const Icon(Icons.save, color: Colors.black),
           )
         ],
       ),
