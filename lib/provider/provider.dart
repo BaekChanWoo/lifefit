@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:lifefit/shared/global.dart';
+import 'package:flutter/foundation.dart';
 
 class Provider extends GetConnect{
 
@@ -9,7 +10,8 @@ class Provider extends GetConnect{
     allowAutoSignedCert = true; // 자체 서명된 SSL/TLS 인증서의 사용을 허용
     // httpClient.baseUrl = 'http://localhost:3000';
     // 실제 디바이스용: httpClient.baseUrl = 'http://192.168.x.x:3000';
-    httpClient.baseUrl = 'http://10.0.2.2:3000'; // 에뮬레이터용
+    //httpClient.baseUrl = 'http://10.0.2.2:3000'; // 에뮬레이터용
+    httpClient.baseUrl = kDebugMode ? 'http://10.0.2.2:3000' : 'http://your-server-ip:3000';
     httpClient.addRequestModifier<void>((request){    // Authorization 헤더 추가
       request.headers['Accept'] = 'application/json'; // JSON 형식의 데이터 처리 가능
 

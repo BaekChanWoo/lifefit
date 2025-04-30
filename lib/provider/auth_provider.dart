@@ -1,5 +1,5 @@
 import 'provider.dart';
-import 'package:lifefit/shared/global.dart';
+
 
 
 class AuthProvider extends Provider{

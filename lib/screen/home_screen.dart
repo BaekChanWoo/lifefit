@@ -14,7 +14,7 @@ import 'package:get/get.dart';
 import 'package:lifefit/screen/my/mypage.dart';
 import 'package:lifefit/screen/music.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:lifefit/shared/global.dart';
+
 import 'package:lifefit/controller/auth_controller.dart';
 
 
