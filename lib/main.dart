@@ -15,43 +15,48 @@ import 'dart:developer';
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
+
   // Firebase 초기화
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await firebase_auth.FirebaseAuth.instance.setPersistence(firebase_auth.Persistence.LOCAL);
+    // 주석 처리된 코드: 인증 상태 유지 설정 (로컬 저장소 사용)
+    // await firebase_auth.FirebaseAuth.instance.setPersistence(firebase_auth.Persistence.LOCAL);
     log('Firebase initialized successfully');
   } catch (e) {
     log('Firebase initialization error: $e');
   }
 
-  await initializeDateFormatting();
+  await initializeDateFormatting('ko_KR', null);
 
   // AuthController 초기화
   Get.put(AuthController());
 
+
   // Firebase 인증 상태 확인
   firebase_auth.User? initialUser;
+  // authStateChanges 스트림에서 첫 번째 사용자 상태를 가져옴( 로그인 여부 확인 )
   await for (var user in firebase_auth.FirebaseAuth.instance.authStateChanges().take(1)) {
     initialUser = user;
     break;
   }
 
-  // 초기 토큰 캐싱: 로그인한 경우에만 실행
+  // 초기 토큰 캐싱: 로그인한 사용자가 있는 경우에만 실행
   if (initialUser != null) {
     try {
+      // Firebase ID 토큰을 갱신하고 Global.accessToken에 저장
       await Global.updateAccessToken();
       log('Initial Firebase ID Token: ${Global.accessToken}');
     } catch (e) {
       log('Initial updateAccessToken error: $e');
       // 토큰 갱신 실패 시 로그아웃 처리
       await firebase_auth.FirebaseAuth.instance.signOut();
-      Global.clearAccessToken();
-      initialUser = null;
+      Global.clearAccessToken(); // 글로벌 토큰 초기화
+      initialUser = null;        // 사용자 상태 초기화
     }
   } else {
-    Global.clearAccessToken();
+    Global.clearAccessToken();   // 로그인된 사용자가 없으면 토큰 초기화
     log('No authenticated user at startup');
   }
 
@@ -60,7 +65,7 @@ void main() async {
       debugShowCheckedModeBanner: false,
       title: "LifeFit",
       initialRoute: initialUser != null ? '/' : '/intro',
-        // initialUser != null 일 때만 '/' 으로 이동. 로그아웃 후 /intro로 리다이렉트
+      // 초기 라우트 설정: 로그인 상태에 따라 홈 화면('/') 또는 인트로 화면('/intro')으로 이동
         routes: {
           '/' : (context) => const HomeScreen(),
           '/intro' : (context) => const Intro(),
