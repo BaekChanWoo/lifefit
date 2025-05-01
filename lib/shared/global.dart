@@ -32,5 +32,5 @@ class Global {
   }
 
   // 애플리케이션에서 사용할 서버의 URL
-  //static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'http://localhost:3000';
 }

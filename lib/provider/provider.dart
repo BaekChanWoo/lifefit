@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:lifefit/shared/global.dart';
 import 'package:flutter/foundation.dart';
 
+// GetConnect를 확장한 Provider 클래스로, 서버와의 HTTP 통신을 관리
 class Provider extends GetConnect{
 
 
@@ -11,11 +12,15 @@ class Provider extends GetConnect{
     allowAutoSignedCert = true; // 자체 서명된 SSL/TLS 인증서의 사용을 허용
     // httpClient.baseUrl = 'http://localhost:3000';
     // 실제 디바이스용: httpClient.baseUrl = 'http://192.168.x.x:3000';
-    //httpClient.baseUrl = 'http://10.0.2.2:3000'; // 에뮬레이터용
-    httpClient.baseUrl = kDebugMode ? 'http://10.0.2.2:3000' : 'http://192.168.10.127:3000';
-    httpClient.addRequestModifier<void>((request){    // Authorization 헤더 추가
-      request.headers['Accept'] = 'application/json'; // JSON 형식의 데이터 처리 가능
+    httpClient.baseUrl = 'http://10.0.2.2:3000'; // 에뮬레이터용
+    //httpClient.baseUrl = kDebugMode ? 'http://10.0.2.2:3000' : 'http://192.168.10.127:3000';
 
+
+
+    httpClient.addRequestModifier<void>((request){     // 모든 HTTP 요청에 적용되는 요청 수정자 추가
+      request.headers['Accept'] = 'application/json';  // 요청 헤더에 JSON 수락 설정
+
+      // 글로벌 액세스 토큰이 있으면 Authorization 헤더에 추가
       final token = Global.accessToken;
       if (token != null ) {
         request.headers['Authorization'] = 'Bearer $token';
@@ -25,8 +30,10 @@ class Provider extends GetConnect{
     super.onInit();
   }
 
-  // POST 요청 오버라이드: 401/403 에러 처리 및 재시도
-  // 모든 HTTP 요청에 일관된 토큰 관리, 코드 중복 방지
+  // POST 요청을 오버라이드하여 인증 오류(401/403) 처리 및 재시도 로직 추가
+  // url: 요청 URL, body: 요청 본문, 기타 옵션 파라미터 지원
+  // retryCount: 재시도 횟수 (기본값 1)
+  // 반환: 서버 응답 (Response<T>)
   Future<Response<T>> post<T>(
       String? url,
       dynamic body, {
@@ -54,7 +61,7 @@ class Provider extends GetConnect{
         // 토큰 갱신
         await Global.updateAccessToken();
 
-        // 재시도
+        // 재시도: 재시도 횟수 감소 후 재귀 호출
         return await post(
           url,
           body,
