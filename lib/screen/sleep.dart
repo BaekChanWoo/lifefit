@@ -1,4 +1,4 @@
-// 전체 수면 기록 화면 - 요일 클릭 시 날짜 이동까지 반영
+//수면 기록 화면
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../const/colors.dart';
+
 
 class SleepModel {
   final String id;
@@ -37,14 +38,14 @@ class SleepScreen extends StatefulWidget {
 }
 
 class _SleepScreenState extends State<SleepScreen> {
-  double sleepHours = 6.0;
-  late DateTime dateOfNow;
-  late String dateText;
-  late String dayText;
-  late int selectedDay;
+  double sleepHours = 6.0; //초기값
+  late DateTime dateOfNow; //현재 화면에 표시되는 날짜
+  late String dateText; // 날짜
+  late String dayText; // 요일
+  late int selectedDay; // 선택된 요일
 
   final List<String> days = ['일', '월', '화', '수', '목', '금', '토'];
-  List<double> sleepData = List<double>.filled(7, 0);
+  List<double> sleepData = List<double>.filled(7, 0); // 주차별 수면 데이터 저장용 리스트
 
   @override
   void initState() {
@@ -54,6 +55,7 @@ class _SleepScreenState extends State<SleepScreen> {
     sleepData[selectedDay] = sleepHours;
   }
 
+  // 날짜 및 요일 정보 업데이트, Firebase 데이터 로드
   void updateDate() {
     dateText = DateFormat('y년 M월 d일', 'ko_KR').format(dateOfNow);
     dayText = DateFormat('E', 'ko_KR').format(dateOfNow);
@@ -61,6 +63,7 @@ class _SleepScreenState extends State<SleepScreen> {
     loadSleepDataForSelectedDay();
   }
 
+  //이전 날짜
   void previousDay() {
     setState(() {
       dateOfNow = dateOfNow.subtract(const Duration(days: 1));
@@ -68,6 +71,7 @@ class _SleepScreenState extends State<SleepScreen> {
     });
   }
 
+  //다음 날짜
   void nextDay() {
     setState(() {
       dateOfNow = dateOfNow.add(const Duration(days: 1));
@@ -75,9 +79,11 @@ class _SleepScreenState extends State<SleepScreen> {
     });
   }
 
+  //날짜에 해당하는 Firebase 수면 데이터 불러오기
   Future<void> loadSleepDataForSelectedDay() async {
     final String userId = 'guest';
     final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
+
     final snapshot = await FirebaseFirestore.instance
         .collection('sleep')
         .where('userId', isEqualTo: userId)
@@ -99,6 +105,7 @@ class _SleepScreenState extends State<SleepScreen> {
     }
   }
 
+  //Firebase에 수면 데이터 저장하기
   Future<void> saveSleepData() async {
     final String userId = 'guest';
     final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
@@ -131,6 +138,7 @@ class _SleepScreenState extends State<SleepScreen> {
     });
   }
 
+  // 쿠퍼티노 수면 시간 선택
   void _showCupertinoPicker() {
     int initialHour = sleepHours.floor();
     int initialMinute = ((sleepHours - initialHour) * 60).round();
@@ -292,6 +300,7 @@ class _SleepScreenState extends State<SleepScreen> {
             ],
           ),
           const SizedBox(height: 30),
+          // 요일선택 박스
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(days.length, (index) {
@@ -314,6 +323,7 @@ class _SleepScreenState extends State<SleepScreen> {
             }),
           ),
           const SizedBox(height: 25),
+          // 막대그래프 표시
           SizedBox(
             height: 120,
             child: Row(
@@ -345,6 +355,7 @@ class _SleepScreenState extends State<SleepScreen> {
   }
 }
 
+// 요일 선택 박스
 class DayBox extends StatelessWidget {
   final String label;
   final bool selected;
