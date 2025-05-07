@@ -34,41 +34,73 @@ class MeetUpScreen extends StatefulWidget {
   State<MeetUpScreen> createState() => _MeetUpScreenState();
 }
 
+
 class _MeetUpScreenState extends State<MeetUpScreen> {
   //카테고리 목록
-  final List<String> categories = ['러닝', '헬스', '요가', '필라테스', '사이클', '클라이밍', '농구'];
+  final List<String> categories = [
+    '러닝',
+    '헬스',
+    '요가',
+    '필라테스',
+    '사이클',
+    '클라이밍',
+    '농구'
+  ];
 
   //현재 선택된 카테고리 상태
   String selectedCategory = '러닝';
 
-  // 게시글 하드코딩
-  final List<Post> _allPosts = [
-    ...List.generate(4, (index) => Post(
-      title: '러닝 모임 함께해요',
-      description: '아침 러닝, 초보자 환영!',
-      category: '러닝',
-      location: '한강',
-      dateTime: '2025.04.11.Fri. AM 07:30',
-      currentPeople: 3,
-      maxPeople: 5,
-      isMine: true,
-      applicants: [],
-    )),
-    ...List.generate(4, (index) => Post(
-      title: '헬스 초보 환영',
-      description: '온수역 헬스장에서 같이 운동해요',
-      category: '헬스',
-      location: '온수역 헬스장',
-      dateTime: '2025.04.11.Fri. AM 07:30',
-      currentPeople: 2,
-      maxPeople: 4,
-      isMine: true,
-      applicants: [],
-    )),
-  ];
-
-  // 한 번에 보일 게시글 수
+  List<Post> _allPosts = [];
+  bool _isLoading = true; // 로딩 상태 관리
   int _visiblePostCount = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPosts(); // Firestore에서 모집글 불러오기
+  }
+
+  // Firestore에서 데이터 가져오는 함수
+  Future<void> _loadPosts() async {
+    try {
+      final posts = await Post.fetchAllPosts();
+      setState(() {
+        _allPosts = posts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('게시글 불러오기 실패: $e');
+      setState(() => _isLoading = false);
+    }
+    // // 게시글 하드코딩
+    // final List<Post> _allPosts = [
+    //   ...List.generate(4, (index) => Post(
+    //     title: '러닝 모임 함께해요',
+    //     description: '아침 러닝, 초보자 환영!',
+    //     category: '러닝',
+    //     location: '한강',
+    //     dateTime: '2025.04.11.Fri. AM 07:30',
+    //     currentPeople: 3,
+    //     maxPeople: 5,
+    //     isMine: true,
+    //     applicants: [],
+    //   )),
+    //   ...List.generate(4, (index) => Post(
+    //     title: '헬스 초보 환영',
+    //     description: '온수역 헬스장에서 같이 운동해요',
+    //     category: '헬스',
+    //     location: '온수역 헬스장',
+    //     dateTime: '2025.04.11.Fri. AM 07:30',
+    //     currentPeople: 2,
+    //     maxPeople: 4,
+    //     isMine: true,
+    //     applicants: [],
+    //   )),
+    // ];
+
+    // 한 번에 보일 게시글 수
+    // int _visiblePostCount = 3;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +120,8 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
-        title: const Text('번개', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+            '번개', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
@@ -96,7 +129,9 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
           )
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator()) // 🔄 로딩 중
+          : Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
@@ -116,11 +151,13 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
                         });
                       },
                       style: TextButton.styleFrom(
-                        backgroundColor: isSelected ? PRIMARY_COLOR : Colors.grey.shade200,
+                        backgroundColor: isSelected ? PRIMARY_COLOR : Colors
+                            .grey.shade200,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
                       ),
                       child: Row(
                         children: [
@@ -183,7 +220,8 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
           }
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat, // 왼쪽 하단에 위치
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .startFloat, // 왼쪽 하단에 위치
     );
   }
 }
