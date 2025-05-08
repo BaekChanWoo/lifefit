@@ -5,14 +5,14 @@ import 'provider.dart';
 class AuthProvider extends Provider{
 
   // 회원가입 요청
-  Future<Map> register(String uid, String password, String name, [int? profile]) async {
+  Future<Map> register(String uid, String password, String name, [int? profile_id]) async {
     try {
       // 서버에 POST 요청 전송(JSON 형태로 서버에 전송)
       final response = await post('/api/register', {
       'uid' : uid,
         'password' : password,
         'name' : name,
-        'profile' : profile,
+        'profile_id' : profile_id,
       });
       if (response.body == null) {
         return {'result': 'error', 'message': '서버 응답이 비어 있습니다'};
