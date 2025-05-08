@@ -51,7 +51,7 @@ class ChangeCategory extends StatelessWidget {
 }
 
 
-//카테고리 아이콘
+//카테고리 아이콘.
 IconData _getIconForCategory(String category) {
   switch (category) {
     case '요가':

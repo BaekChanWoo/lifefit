@@ -92,7 +92,7 @@ class CategoryImages extends StatelessWidget {
       case '필라테스':
         return '필라테스 음악';
       default:
-        return ''; // 기본적으로 빈 문자열 또는 다른 기본 키워드 반환
+        return ''; // 기본적으로 빈 문자열 또는 다른 기본 키워드 반환.
     }
   }
 

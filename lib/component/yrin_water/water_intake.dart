@@ -46,7 +46,7 @@ class _WaterIntakeState extends State<WaterIntake> {
         centerTitle: true,
       ),
 
-      // 물 바디
+      // 물 바디.
       body: Stack(
         children: [
           Column(

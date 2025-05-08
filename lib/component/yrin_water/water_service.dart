@@ -5,7 +5,7 @@ class FirebaseWaterService {
   final CollectionReference waterCollection =
   FirebaseFirestore.instance.collection('water');
 
-  // 새 물 섭취 기록 추가
+  // 새 물 섭취 기록 추가.
   Future<void> addWaterIntake(String userId, int amount, DateTime intakeTime) async {
     try {
       final record = WaterIntakeRecord(userId: userId, amount: amount,);

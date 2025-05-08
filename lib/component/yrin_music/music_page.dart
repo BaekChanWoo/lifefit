@@ -14,7 +14,7 @@ class MusicPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('playlist',
           style: TextStyle(
-            color: Colors.white, // 글자색을 하얀색으로 설정
+            color: Colors.white,
           ),
         ),
         backgroundColor: Colors.black,
@@ -52,7 +52,7 @@ class MusicPage extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 0.0),
                   child: Container(
                     width: double.infinity,
-                    height: 40,// 가로 폭 최대
+                    height: 40,//
                     color: Colors.black,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -77,7 +77,7 @@ class MusicPage extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 200, // 필요에 따라 값 조정
+            top: 200, //
             left: 0,
             right: 0,
             bottom: 0,

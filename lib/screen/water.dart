@@ -6,7 +6,7 @@ import 'package:lifefit/component/yrin_water/water_graph.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class WaterModel {
-  final String? userId; // userId를 nullable로 변경
+  final String? userId; // userId를 nullable.
   final int amount;
   final DateTime date;
 
@@ -38,7 +38,7 @@ class _WaterHomeState extends State<WaterHome> {
     0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0,
   };
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // final FirebaseWaterService _firebaseWaterService = FirebaseWaterService(); // 더 이상 userId 기반 작업이 필요 없을 수 있음
+  // final FirebaseWaterService _firebaseWaterService = FirebaseWaterService();
   late DateTime dateOfNow;
 
   @override

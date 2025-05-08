@@ -3,7 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//물 섭취량 변경시 데이터 로드 그래프 (액자)
+//물 섭취량 변경시 데이터 로드 그래프 (액자).
 class WaterGraphScreen extends StatefulWidget {
   const WaterGraphScreen({super.key});
 
