@@ -75,10 +75,32 @@ class CategoryImages extends StatelessWidget {
     }
   }
 
+  String getSearchKeyword(String? category) {
+    switch (category) {
+      case '요가':
+        return '요가 음악';
+      case '클라이밍':
+        return '클라이밍 운동 음악';
+      case '사이클':
+        return '사이클 운동 음악';
+      case '농구':
+        return '농구 경기 음악';
+      case '러닝':
+        return '러닝 운동 음악';
+      case '헬스':
+        return '헬스 운동 음악';
+      case '필라테스':
+        return '필라테스 음악';
+      default:
+        return ''; // 기본적으로 빈 문자열 또는 다른 기본 키워드 반환
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final imagePaths = getImagePaths(selectedCategory);
-    final  displayedImagePaths = imagePaths.take(4).toList();
+    final displayedImagePaths = imagePaths.take(4).toList();
+    final searchKeyword = getSearchKeyword(selectedCategory);
 
     return Column(
       children: [
@@ -94,13 +116,16 @@ class CategoryImages extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) => MusicPage(categoryImages: path),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            MusicPage(categoryImages: path,
+                                searchKeyword: searchKeyword),
+                        transitionsBuilder: (context, animation,
+                            secondaryAnimation, child) {
                           const begin = Offset(0.0, 1.0);
                           const end = Offset.zero;
                           const curve = Curves.ease;
-
-                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          var tween = Tween(begin: begin, end: end).chain(
+                              CurveTween(curve: curve));
 
                           return SlideTransition(
                             position: animation.drive(tween),
@@ -110,24 +135,23 @@ class CategoryImages extends StatelessWidget {
                       ),
                     );
                   },
-                  child:  ClipRRect(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
                     child: SizedBox(
-                    width: 18,
-                    height: 15,
-                    child: Image.asset(
-                    path,
-                    fit: BoxFit.cover,
-                ),
-              ),
-                   )
+                      width: 18,
+                      height: 15,
+                      child: Image.asset(
+                        path,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
               );
             }).toList(),
           ),
         ),
         const SizedBox(height: 30), //
       ],
-        );
-
+    );
   }
 }
