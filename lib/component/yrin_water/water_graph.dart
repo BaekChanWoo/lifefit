@@ -1,129 +1,176 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/component/yrin_water/graph_data.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lifefit/const/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class WaterGraphScreen extends StatelessWidget {
-  final List<double> count = [1750, 500, 250, 250, 750, 2000, 250]; // 예시 데이터 //state 수정
-  WaterGraphScreen({super.key});
+//물 섭취량 변경시 데이터 로드 그래프 (액자).
+class WaterGraphScreen extends StatefulWidget {
+  const WaterGraphScreen({super.key});
 
+  @override
+  State<WaterGraphScreen> createState() => _WaterGraphScreenState();
+}
+
+class _WaterGraphScreenState extends State<WaterGraphScreen> {
+  Map<int, double> weeklyIntake = { // 요일별 섭취량 저장 (0: 월, 1: 화, ..., 6: 일)
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+  };
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String userId = 'guest'; // 실제 사용자 ID로 변경 필요
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWeeklyIntake();
+  }
+
+  Future<void> _loadWeeklyIntake() async {
+    final now = DateTime.now();
+    final firstDayOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final lastDayOfWeek = now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
+
+    weeklyIntake.forEach((key, value) {
+      weeklyIntake[key] = 0; // 초기화
+    });
+
+    final snapshot = await _firestore
+        .collection('water')
+        .where('userId', isEqualTo: userId)
+        .where('date', isGreaterThanOrEqualTo: firstDayOfWeek.toIso8601String().split('T')[0])
+        .where('date', isLessThanOrEqualTo: lastDayOfWeek.toIso8601String().split('T')[0])
+        .get();
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final date = DateTime.parse(data['date'] as String);
+      final intakeAmount = (data['amount'] as num).toDouble();
+      final dayOfWeek = date.weekday - 1; // 월요일이 0이 되도록 조정
+      if (weeklyIntake.containsKey(dayOfWeek)) {
+        weeklyIntake[dayOfWeek] = (weeklyIntake[dayOfWeek] ?? 0) + intakeAmount;
+      }
+    }
+    setState(() {});
+  }
+
+  void updateIntake(int amount) async {
+    final now = DateTime.now();
+    await _firestore.collection('water').add({
+      'userId': userId,
+      'amount': amount,
+      'date': now.toIso8601String(),
+    });
+    await _loadWeeklyIntake(); // 데이터 다시 로드하여 그래프 업데이트
+  }
+
+
+
+  //물 그래프 틀
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  Column(
+      body: Column(
         children: [
           const Spacer(),
           Center(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 100.0),
               child: SizedBox(
-                height: 180, // 그래프 높이 축소
-                width: MediaQuery.of(context).size.width * 0.3, // 그래프 너비 축소
-                child: WaterGraph(count: count),
+                height: 180,
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: WaterGraph(weeklyIntake: weeklyIntake),
               ),
             ),
-          )
+          ),
+          // Example button to update intake (for testing)
         ],
       ),
     );
   }
 }
 
+//물 막대 변경 (그림)
 class WaterGraph extends StatelessWidget {
-  final List<double> count;
+  final Map<int, double> weeklyIntake;
 
-  const WaterGraph({super.key, required this.count});
+  const WaterGraph({super.key, required this.weeklyIntake});
 
   @override
   Widget build(BuildContext context) {
-    // ... (WaterGraph 위젯 코드)
-    final barData = BarData(
-      mon: count[0],
-      tue: count[1],
-      wed: count[2],
-      thu: count[3],
-      fri: count[4],
-      sat: count[5],
-      sun: count[6],
-    ).barData;
+    final barDataList = weeklyIntake.entries.map((entry) {
+      return BarChartGroupData(
+        x: entry.key,
+        barRods: [
+          BarChartRodData(
+            toY: entry.value,
+            color: PRIMARY_COLOR,
+            width: 18,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(4),
+            ),
+          ),
+        ],
+      );
+    }).toList();
 
-    return Container( //그래프 모양
-      width: 300, // 상자 넓이 설정
-      height: 250, // 상자 높이 설정
+    return Container(
+      width: double.infinity, // 부모 너비에 맞춤
+      height: 250,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: BarChart(
-          BarChartData(
-            backgroundColor: Colors.white,
-            maxY: 2000,
-            minY: 0,
-            gridData: FlGridData(show: false),
-            borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
-              show: true,
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: true, getTitlesWidget: _getBottomTitles,
-                ),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: 250,
-                  reservedSize: 80,// Y축 간격 설정
-                  getTitlesWidget: (value, meta) {
-                    return Text(
-                        value.toInt().toString(), textAlign: TextAlign.center);
-                  },
-                ),
+      padding: const EdgeInsets.all(16.0),
+      child: BarChart(
+        BarChartData(
+          backgroundColor: Colors.white,
+          maxY: 2000,
+          minY: 0,
+          gridData: const FlGridData(show: false),
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            show: true,
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: _getBottomTitles,
               ),
             ),
-            barGroups: barData
-                .map(
-                  (data) =>
-                  BarChartGroupData(
-                    x: data.x,
-                    barRods: [
-                      BarChartRodData(
-                        toY: data.y,
-                        color: PRIMARY_COLOR,
-                        width: 18,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(4),
-                        ),
-                      ),
-                    ],
-                  ),
-            )
-                .toList(),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 250,
+                reservedSize: 80,
+                getTitlesWidget: (value, meta) {
+                  return Text(value.toInt().toString(), textAlign: TextAlign.center);
+                },
+              ),
+            ),
           ),
+          barGroups: barDataList,
         ),
       ),
     );
   }
-  //요일
+
   static Widget _getBottomTitles(double value, TitleMeta meta) {
     const koreanWeekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final text = Text(koreanWeekdays[value.toInt()],
-      style: TextStyle(
-        fontSize: 10, // 폰트 크기 설정
-        fontWeight: FontWeight.bold, // 폰트 굵기 설정
-        fontFamily: 'padauk', // 폰트 종류 설정 (예: Roboto)
-        color: Colors.black, // 폰트 색상 설정
+    final text = Text(
+      koreanWeekdays[value.toInt()],
+      style: const TextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+        fontFamily: 'padauk',
+        color: Colors.black,
       ),
     );
-
-
-    if (meta.axisSide != null) {  //유지보수 위해 수정 필요
-      return SideTitleWidget(meta: meta, child: text);
-    } else {
-      //  meta.axisSide가 null인 경우 처리
-      return const SizedBox.shrink(); // 빈 SizedBox 반환 또는 다른 위젯 반환
-    }
+    return SideTitleWidget(meta: meta, child: text);
   }
 }

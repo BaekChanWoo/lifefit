@@ -20,7 +20,7 @@ class BarData {
     required this.sat,
     required this.sun,
   });
-  //요일별 데이터 IndividualBar 객체 리스트 변환하여 반환
+  //요일별 데이터 IndividualBar 객체 리스트 변환하여 반환.
   List<IndividualBar> get barData => _initializeBarData();
 
   // 요일별 데이터bIndividualBar 객체 리스트 생성

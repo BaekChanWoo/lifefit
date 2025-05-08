@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 
 class WaterIntake extends StatefulWidget {
-  final int waterAmount;
   final Function(int) onAmountChanged;
 
   const WaterIntake({
     super.key,
-    required this.waterAmount,
-    required this.onAmountChanged, // 이름 변경
+    required this.onAmountChanged,
   });
-
 
   @override
   State<WaterIntake> createState() => _WaterIntakeState();
 }
 
 class _WaterIntakeState extends State<WaterIntake> {
+  int _currentWaterAmount = 0;
+
+  // 로컬 waterAmount 상태를 업데이트하는 함수
+  void _incrementWaterAmount() {
+    setState(() {
+      _currentWaterAmount += 250;
+      widget.onAmountChanged(_currentWaterAmount); // 부모 위젯에 변경된 값 전달
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +37,7 @@ class _WaterIntakeState extends State<WaterIntake> {
             '물 섭취량',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 24,
+              fontSize: 22,
               fontFamily: 'Padauk',
               fontWeight: FontWeight.w500,
             ),
@@ -39,7 +46,7 @@ class _WaterIntakeState extends State<WaterIntake> {
         centerTitle: true,
       ),
 
-      // 물 바디
+      // 물 바디.
       body: Stack(
         children: [
           Column(
@@ -81,13 +88,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                           children: [
                             //플러스 버튼 이벤트
                             GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (widget.waterAmount + 250<= 2000){
-                                    widget.onAmountChanged(widget.waterAmount + 250) ;
-                                  }
-                                });
-                              },
+                              onTap: _incrementWaterAmount,
                               child: Image.asset('assets/img/plus_button.png',
                                 width: 25,
                                 height: 25,
@@ -142,7 +143,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                                 Padding(  // 물 누적 값
                                   padding: const EdgeInsets.only(right: 20, top: 0),
                                   child: Text(
-                                    '${widget.waterAmount}',
+                                    '$_currentWaterAmount',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 18,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/news_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Healthtopic extends StatefulWidget {
   const Healthtopic({super.key});
@@ -12,7 +13,7 @@ class Healthtopic extends StatefulWidget {
 }
 
 class _HealthtopicState extends State<Healthtopic> {
-  List<Photo> _photos = [];
+  List<NewsArticle> _newsArticles = [];
 
   // 뉴스 테스트 이미지 에셋 경로
   final String test1Image = 'assets/img/test1.png';
@@ -23,27 +24,21 @@ class _HealthtopicState extends State<Healthtopic> {
   final PageController controller = PageController(initialPage: 0); //카드 페이지 컨트롤러
   int curruntPage = 0; // 카드 페이지 정수
 
-  @override // 카드 슬라이더 타이머, json 가져오기
+  @override //카드 슬라이더
   void initState() {
     super.initState();
 
     Timer.periodic(Duration(seconds: 7), (Timer timer) {
-      //타이머
       if (controller.hasClients && controller.page != null) {
-        // PageController가 PageView에 연결되어 있고, 페이지 정보가 있는 경우에만 실행
-        if (controller.page! < pageimgs.length - 1) {
-          // 현재 페이지가 마지막 페이지보다 이전 페이지인 경우
+        if (controller.page! < _newsArticles.length - 1) { // Update list name
           controller.nextPage(
-            // 다음 페이지 이동
-            duration: Duration(milliseconds: 350), // 애니메이션 지속 시간
+            duration: Duration(milliseconds: 350),
             curve: Curves.easeIn,
           );
         } else {
-          // 현재 페이지가 마지막 페이지인 경우
           controller.animateToPage(
-            // 첫 번째 페이지 이동
             0,
-            duration: Duration(milliseconds: 350), // 첫 페이지로 이동하는시간
+            duration: Duration(milliseconds: 350),
             curve: Curves.easeIn,
           );
         }
@@ -56,13 +51,12 @@ class _HealthtopicState extends State<Healthtopic> {
   // 데이터 가져오기
   Future<void> _fetchData() async {
     try {
-      final photos = await _fetchPhotos();
+      final newsArticles = await _fetchNews(); // Update function name
       setState(() {
-        _photos = photos;
+        _newsArticles = newsArticles; // Update list name
       });
     } catch (e) {
       print('Error fetching data: $e');
-      // 에러 처리
     }
   }
 
@@ -176,7 +170,7 @@ class _HealthtopicState extends State<Healthtopic> {
   // 공통 위젯 생성 함수 정의
   Widget _buildContentCard(Map<String, dynamic> data, String contentType) {
     switch (contentType) {
-      case 'realTimeTopic':
+      case 'realTimeTopic'://실시간 토픽 섹션
         return Card(
           shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -216,7 +210,8 @@ class _HealthtopicState extends State<Healthtopic> {
                     Text(data['title'], style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis, maxLines: 2),
                     SizedBox(height: 8.0),
-                    Text(data['description']),
+                    Text(data['description'], style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis, maxLines: 2),
                   ],
                 ),
               ),
@@ -337,71 +332,94 @@ class _HealthtopicState extends State<Healthtopic> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //최상단 이미지 슬라이드 뉴스
-            // 최상단 이미지 슬라이드 뉴스 (JSONPlaceholder /photos 적용)
+            //최상단 이미지 슬라이드 뉴스 (newsdata.io 적용)
             Container(
               width: double.infinity,
               height: 320,
-              child: _photos.isEmpty
+              child: _newsArticles.isEmpty // Update list name
                   ? Center(child: CircularProgressIndicator())
                   : PageView.builder(
                 controller: controller,
-                itemCount: _photos.length > 4 ? 4 : _photos.length,
+                itemCount: 4,  // _newsArticles.length > 4 ? 4 : _newsArticles.length, // Update list name
                 onPageChanged: (page) {
                   setState(() {
                     curruntPage = page;
                   });
                 },
                 itemBuilder: (context, index) {
-                  final photo = _photos[index];
+                  final article = _newsArticles[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6.0),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      elevation: 4.0,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
-                            child: Image.network(
-                              photo.thumbnailUrl,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator( //로딩 서클 인디케이터
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, object, stackTrace) {
-                                return Center(child: Icon(Icons.error_outline));
-                              },
+                    child: InkWell( // Use InkWell for tap effect
+                      onTap: () async { //탭으로 웹 사이트로 이동
+                        final Uri? _url = Uri.tryParse(article.link);
+                        if (_url != null) {
+                          try {
+                            final bool launched = await launchUrl(_url);
+                            if (!launched) {
+                              print('Failed to launch URL: ${_url.toString()}');
+                              // 사용자에게 알림
+                            }
+                          } catch (e) {
+                            print('Error launching URL: $e');
+                            // 사용자에게 에러 메시지 표시
+                          }
+                        } else {
+                          print('Invalid URL: ${article.link}');
+                          // 사용자에게 알림
+                        }
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        elevation: 4.0,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: article.imageUrl != null
+                                  ? Image.network(
+                                article.imageUrl!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (BuildContext context, Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, object, stackTrace) {
+                                  return Center(child: Icon(Icons.error_outline));
+                                },
+                              )
+                                  : Container(color: Colors.grey),
                             ),
-                          ),
-                          Positioned(
-                            left: 16,
-                            bottom: 16,
-                            right: 16,
-                            child: Text(
-                              photo.title,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
+                            Positioned(
+                              left: 16,
+                              bottom: 16,
+                              right: 16,
+                              child: Text(
+                                article.title,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -411,7 +429,7 @@ class _HealthtopicState extends State<Healthtopic> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (num i = 0; i <(_photos.length > 4 ? 4 : _photos.length); i++)
+                for (num i = 0; i < 4; i++) // (num i = 0; i <(_newsArticles.length > 4 ? 4 : _newsArticles.length); i++) // Update list name
                   Container(
                     margin: EdgeInsets.all(3),
                     width: 10,
@@ -434,7 +452,8 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(height: 48.0),
 
-            // 실시간 토픽 섹션 (JSONPlaceholder /photos 적용)
+
+            // 실시간 토픽 섹션 (newsdata.io 적용)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text('실시간 토픽',
@@ -443,18 +462,19 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(
               height: 424.0,
-              child: _photos.isEmpty
+              child: _newsArticles.isEmpty // Update list name
                   ? Center(child: CircularProgressIndicator())
                   : ListView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
-                itemCount: _photos.length > 4 ? 4 : _photos.length,
+                itemCount: _newsArticles.length > 4 ? 4 : _newsArticles.length, // Update list name
                 itemBuilder: (context, index) {
+                  final article = _newsArticles[index]; // Update variable name
                   return _buildContentCard(
                     {
-                      'image': _photos[index].thumbnailUrl,
-                      'title': _photos[index].title,
-                      'description': 'Album ID: ${_photos[index].albumId}', // 예시 설명
+                      'image': article.imageUrl ?? 'assets/img/test1.png', // Provide default image
+                      'title': article.title,
+                      'description': article.description,
                     },
                     'realTimeTopic',
                   );
@@ -527,16 +547,18 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 }
 
-//데이터 리스트 Future
-Future<List<Photo>> _fetchPhotos() async {
-  final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/photos'));
+//  newsdata.io 데이터 가져오는 함수 수정
+Future<List<NewsArticle>> _fetchNews() async {
+  final response = await http.get(Uri.parse('https://newsdata.io/api/1/news?country=kr&q=건강%20OR%20웰빙&apikey=pub_8514684c9e5ae1f3e898c8550491c72eebe05')); // Replace with your API endpoint
 
   if (response.statusCode == 200) {
-    final List<dynamic> decodedJson = json.decode(response.body) as List<dynamic>;
-    final List<Photo> photos = decodedJson.map((json) => Photo.fromJson(json)).toList();
-    return photos;
+    final Map<String, dynamic> decodedJson = json.decode(response.body);
+    final List<dynamic> results = decodedJson['results'];
+    final List<NewsArticle> newsArticles = results.map((json) => NewsArticle.fromJson(json)).toList();
+    return newsArticles;
   } else {
-    throw Exception('Failed to load photos');
+    throw Exception('Failed to load news');
   }
-
 }
+
+// 만개의 레시피 데이터 가져오는 함수 수정
