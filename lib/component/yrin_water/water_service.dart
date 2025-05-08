@@ -10,7 +10,7 @@ class FirebaseWaterService {
     try {
       final record = WaterIntakeRecord(userId: userId, amount: amount,);
       await waterCollection.doc(userId).collection('records').add(record.toJson());
-      print('Firebase에 물 섭취 기록 저장 성공: ${record.toJson()}');
+
     } catch (e) {
       print('Firebase에 물 섭취 기록 저장 실패: $e');
     }
