@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:lifefit/shared/global.dart';
-import 'package:flutter/foundation.dart';
+
 
 // GetConnect를 확장한 Provider 클래스로, 서버와의 HTTP 통신을 관리
 class Provider extends GetConnect{

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifefit/model/meetup_model.dart';
 import 'package:lifefit/const/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 //모집글 작성 및 수정 위젯
 class CreatePost extends StatefulWidget {
@@ -294,7 +296,7 @@ class _CreatePostState extends State<CreatePost> {
           child: const Text('취소', style: TextStyle(color: Colors.black)),
         ),
         ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState!.validate()) {
               if (selectedDate == null || selectedTime == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -320,6 +322,20 @@ class _CreatePostState extends State<CreatePost> {
                 isMine: true,
                 applicants: [],
               );
+
+              //Firestore에 저장
+              await FirebaseFirestore.instance.collection('meetups').add({
+                'title': newPost.title,
+                'description': newPost.description,
+                'category': newPost.category,
+                'location': newPost.location,
+                'dateTime': newPost.dateTime,
+                'currentPeople': newPost.currentPeople,
+                'maxPeople': newPost.maxPeople,
+                'isMine': newPost.isMine,
+                'applicants': newPost.applicants,
+                'createdAt': newPost.createdAt.toIso8601String(),
+              });
 
               Navigator.pop(context, newPost);
             }

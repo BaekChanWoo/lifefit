@@ -10,6 +10,11 @@ class Pedometer extends StatefulWidget {
 class _PedometerState extends State<Pedometer> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+
+      ),
+
+    );
   }
 }
