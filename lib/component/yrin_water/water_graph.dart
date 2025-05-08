@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lifefit/const/colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-
-
+//물 섭취량 변경시 데이터 로드 그래프 (액자)
 class WaterGraphScreen extends StatefulWidget {
   const WaterGraphScreen({super.key});
 
@@ -24,6 +21,8 @@ class _WaterGraphScreenState extends State<WaterGraphScreen> {
     5: 0,
     6: 0,
   };
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String userId = 'guest'; // 실제 사용자 ID로 변경 필요
 
   @override
   void initState() {
@@ -32,27 +31,46 @@ class _WaterGraphScreenState extends State<WaterGraphScreen> {
   }
 
   Future<void> _loadWeeklyIntake() async {
-    final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now();
-    for (int i = 0; i < 7; i++) {
-      final day = now.subtract(Duration(days: now.weekday - 1 - i)); // 해당 주의 각 요일
-      final formattedDate = DateFormat('yyyy-MM-dd').format(day);
-      weeklyIntake[i] = prefs.getDouble('waterIntake_$formattedDate') ?? 0;
+    final firstDayOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final lastDayOfWeek = now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
+
+    weeklyIntake.forEach((key, value) {
+      weeklyIntake[key] = 0; // 초기화
+    });
+
+    final snapshot = await _firestore
+        .collection('water')
+        .where('userId', isEqualTo: userId)
+        .where('date', isGreaterThanOrEqualTo: firstDayOfWeek.toIso8601String().split('T')[0])
+        .where('date', isLessThanOrEqualTo: lastDayOfWeek.toIso8601String().split('T')[0])
+        .get();
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final date = DateTime.parse(data['date'] as String);
+      final intakeAmount = (data['amount'] as num).toDouble();
+      final dayOfWeek = date.weekday - 1; // 월요일이 0이 되도록 조정
+      if (weeklyIntake.containsKey(dayOfWeek)) {
+        weeklyIntake[dayOfWeek] = (weeklyIntake[dayOfWeek] ?? 0) + intakeAmount;
+      }
     }
-    setState(() {}); // UI 업데이트
+    setState(() {});
   }
 
-  // 물 섭취량 업데이트 및 저장 (예시 함수 - 실제 로직에 맞춰 수정)
   void updateIntake(int amount) async {
     final now = DateTime.now();
-    final formattedDate = DateFormat('yyyy-MM-dd').format(now);
-    final prefs = await SharedPreferences.getInstance();
-    final currentIntake = prefs.getDouble('waterIntake_$formattedDate') ?? 0;
-    final newIntake = currentIntake + amount;
-    await prefs.setDouble('waterIntake_$formattedDate', newIntake);
-    _loadWeeklyIntake(); // 데이터 다시 로드하여 그래프 업데이트
+    await _firestore.collection('water').add({
+      'userId': userId,
+      'amount': amount,
+      'date': now.toIso8601String(),
+    });
+    await _loadWeeklyIntake(); // 데이터 다시 로드하여 그래프 업데이트
   }
 
+
+
+  //물 그래프 틀
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,22 +82,19 @@ class _WaterGraphScreenState extends State<WaterGraphScreen> {
               padding: const EdgeInsets.only(bottom: 100.0),
               child: SizedBox(
                 height: 180,
-                width: MediaQuery.of(context).size.width * 0.7, // 그래프 너비 조정
+                width: MediaQuery.of(context).size.width * 0.7,
                 child: WaterGraph(weeklyIntake: weeklyIntake),
               ),
             ),
           ),
           // Example button to update intake (for testing)
-          ElevatedButton(
-            onPressed: () => updateIntake(250),
-            child: const Text('물 250ml 추가'),
-          ),
         ],
       ),
     );
   }
 }
 
+//물 막대 변경 (그림)
 class WaterGraph extends StatelessWidget {
   final Map<int, double> weeklyIntake;
 

@@ -3,8 +3,27 @@ import 'package:lifefit/component/yrin_water/achievement.dart';
 import 'package:lifefit/component/yrin_water/time_display.dart';
 import 'package:lifefit/component/yrin_water/water_intake.dart';
 import 'package:lifefit/component/yrin_water/water_graph.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class WaterModel {
+  final String? userId; // userId를 nullable로 변경
+  final int amount;
+  final DateTime date;
+
+  WaterModel({
+    this.userId,
+    required this.amount,
+    required this.date,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'amount': amount,
+      'date': date.toIso8601String(),
+    };
+  }
+}
 
 class WaterHome extends StatefulWidget {
   const WaterHome({super.key});
@@ -15,32 +34,68 @@ class WaterHome extends StatefulWidget {
 
 class _WaterHomeState extends State<WaterHome> {
   int waterAmount = 0;
-  Map<int, double> weeklyIntake = { // 요일별 섭취량 저장 (0: 월, 1: 화, ..., 6: 일)
-    0: 0,
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
+  Map<int, double> weeklyIntake = {
+    0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0,
   };
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // final FirebaseWaterService _firebaseWaterService = FirebaseWaterService(); // 더 이상 userId 기반 작업이 필요 없을 수 있음
+  late DateTime dateOfNow;
 
   @override
   void initState() {
     super.initState();
+    dateOfNow = DateTime.now();
     _loadWeeklyIntake();
+    _loadTodayIntake();
+  }
+
+  Future<void> _loadTodayIntake() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day, 0, 0, 0);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    final snapshot = await _firestore
+        .collection('water')
+        .where('date', isGreaterThanOrEqualTo: startOfDay.toIso8601String())
+        .where('date', isLessThanOrEqualTo: endOfDay.toIso8601String())
+        .get();
+
+    int totalAmount = 0;
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final intakeAmount = (data['amount'] as num).toInt();
+      totalAmount += intakeAmount;
+    }
+    setState(() {
+      waterAmount = totalAmount;
+    });
   }
 
   Future<void> _loadWeeklyIntake() async {
-    final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now();
     final firstDayOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    for (int i = 0; i < 7; i++) {
-      final day = firstDayOfWeek.add(Duration(days: i));
-      final formattedDate = DateFormat('yyyy-MM-dd').format(day);
-      weeklyIntake[i] = prefs.getDouble('waterIntake_$formattedDate') ?? 0;
+    final lastDayOfWeek = now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
+
+    weeklyIntake.forEach((key, value) {
+      weeklyIntake[key] = 0;
+    });
+
+    final snapshot = await _firestore
+        .collection('water')
+        .where('date', isGreaterThanOrEqualTo: firstDayOfWeek.toIso8601String().split('T')[0])
+        .where('date', isLessThanOrEqualTo: lastDayOfWeek.toIso8601String().split('T')[0])
+        .get();
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final date = DateTime.parse(data['date'] as String);
+      final intakeAmount = (data['amount'] as num).toDouble();
+      final dayOfWeek = date.weekday - 1;
+      if (weeklyIntake.containsKey(dayOfWeek)) {
+        weeklyIntake[dayOfWeek] = (weeklyIntake[dayOfWeek] ?? 0) + intakeAmount;
+      }
     }
-    setState(() {}); // UI 업데이트
+    setState(() {});
   }
 
   void handleWaterAmountChanged(int newAmount) async {
@@ -48,39 +103,34 @@ class _WaterHomeState extends State<WaterHome> {
       waterAmount = newAmount;
     });
     final now = DateTime.now();
-    final formattedDate = DateFormat('yyyy-MM-dd').format(now);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('waterIntake_$formattedDate', newAmount.toDouble());
-    await _loadWeeklyIntake(); // 데이터 다시 로드하여 그래프 업데이트
+    await _firestore.collection('water').add({
+      'amount': newAmount - (newAmount - waterAmount),
+      'date': now.toIso8601String(),
+    });
+    await _loadWeeklyIntake();
+    await _loadTodayIntake();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return
-      Scaffold(
-        body: Stack(
-          children: [
-            WaterIntake(
-              initialWaterAmount: waterAmount,
-              onAmountChanged: handleWaterAmountChanged,
-            ),
-
-            //현재 시간
-            TimeDisplay(),
-
-            SizedBox(width: 20,),
-
-            Positioned(       //물 그래프(water_graph) 위치
-              bottom: 30,
-              left: 20,
-              right: 20,
-              height: 188,
-              child: WaterGraph(weeklyIntake: weeklyIntake),
-            ),
-            Achievement(waterAmount: waterAmount),    //달성 위젯
-          ],
-        ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          WaterIntake(
+            onAmountChanged: handleWaterAmountChanged,
+          ),
+          const TimeDisplay(),
+          const SizedBox(width: 20),
+          Positioned(
+            bottom: 30,
+            left: 20,
+            right: 20,
+            height: 188,
+            child: WaterGraph(weeklyIntake: weeklyIntake),
+          ),
+          Achievement(waterAmount: waterAmount), //달성 위젯
+        ],
+      ),
     );
   }
 }

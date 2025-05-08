@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/component/yrin_water/water_reset.dart';
 
 class WaterIntake extends StatefulWidget {
-  final int initialWaterAmount;
   final Function(int) onAmountChanged;
 
   const WaterIntake({
     super.key,
-    required this.initialWaterAmount,
     required this.onAmountChanged,
   });
-
 
   @override
   State<WaterIntake> createState() => _WaterIntakeState();
@@ -19,24 +15,14 @@ class WaterIntake extends StatefulWidget {
 class _WaterIntakeState extends State<WaterIntake> {
   int _currentWaterAmount = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _currentWaterAmount = widget.initialWaterAmount; // 초기값 설정
-    // 앱 시작 시 자정 여부 확인 및 초기화, 저장된 값 로딩
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      WaterResetService.scheduleDailyReset(setState, _updateWaterAmount);
+  // 로컬 waterAmount 상태를 업데이트하는 함수
+  void _incrementWaterAmount() {
+    setState(() {
+      _currentWaterAmount += 250;
+      widget.onAmountChanged(_currentWaterAmount); // 부모 위젯에 변경된 값 전달
     });
   }
 
-  // 로컬 waterAmount 상태를 업데이트하고 저장하는 함수
-  void _updateWaterAmount(int newAmount) {
-    setState(() {
-      _currentWaterAmount = newAmount; // 현재 물의 양 업데이트
-      widget.onAmountChanged(newAmount); // 부모 위젯의 상태 업데이트
-    });
-    WaterResetService.saveWaterAmount(newAmount); // 영구 저장
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +88,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                           children: [
                             //플러스 버튼 이벤트
                             GestureDetector(
-                              onTap: () {
-                                WaterResetService.incrementWaterAmount(
-                                    _currentWaterAmount, 250, _updateWaterAmount);
-
-                              },
+                              onTap: _incrementWaterAmount,
                               child: Image.asset('assets/img/plus_button.png',
                                 width: 25,
                                 height: 25,
