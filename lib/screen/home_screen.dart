@@ -16,7 +16,7 @@ import 'package:lifefit/screen/music.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import 'package:lifefit/controller/auth_controller.dart';
-
+import 'package:lifefit/controller/home_controller.dart';
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
@@ -100,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Get.offAllNamed('/intro');
       }
     });
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark); // 상태바 검은색
 
     return Scaffold(
@@ -140,37 +141,40 @@ class _HomeScreenState extends State<HomeScreen> {
               data: Theme.of(context).copyWith(
                 iconTheme: IconThemeData(color: Colors.black),
               ),
-              child: UserAccountsDrawerHeader(
-                  accountName: Text('백찬우',
-                    style: TextStyle(
-                        color: Colors.black ,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  accountEmail: null,
-                onDetailsPressed: () {},
-                arrowColor: Colors.black,
-                currentAccountPicture: CircleAvatar(
-                  backgroundImage: AssetImage('assets/img/mypageimg.jpg'),
-                ),
-                otherAccountsPictures: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.access_time , color: Colors.black, size: 23,),
-                      Text('4시간전 ',
-                        style: TextStyle(fontSize: 10 , color: Colors.black),
+              child: Obx(
+                () => UserAccountsDrawerHeader(
+                    accountName: Text(
+                      Get.find<HomeScreenController>().userName.value,
+                      style: TextStyle(
+                          color: Colors.black ,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  )
-                ],
-                decoration: BoxDecoration(
-                  color: PRIMARY_COLOR,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.0),
-                    bottomRight: Radius.circular(20.0),
-                  )
+                    ),
+                    accountEmail: null,
+                  onDetailsPressed: () {},
+                  arrowColor: Colors.black,
+                  currentAccountPicture: CircleAvatar(
+                    backgroundImage: AssetImage('assets/img/mypageimg.jpg'),
+                  ),
+                  otherAccountsPictures: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.access_time , color: Colors.black, size: 23,),
+                        Text('4시간전 ',
+                          style: TextStyle(fontSize: 10 , color: Colors.black),
+                        ),
+                      ],
+                    )
+                  ],
+                  decoration: BoxDecoration(
+                    color: PRIMARY_COLOR,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    )
+                  ),
                 ),
               ),
             ),
@@ -368,6 +372,7 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   @override
   Widget build(BuildContext context) {
+
     return Stack(
       children: [
         Positioned(
@@ -383,28 +388,31 @@ class _HomeContentState extends State<HomeContent> {
               padding: EdgeInsets.only(top: 25 , left: 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  RichText(
-                      text: const TextSpan(
-                          text: "안녕하세요 ",
-                          style: TextStyle(
-                            letterSpacing: 1.0,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500 ,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                                text: "백찬우님",
-                                style: TextStyle(
-                                  letterSpacing: 2.0,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
-                                )
-                            )
-                          ]
-                      )
+                  Obx(
+                  () =>  RichText(
+                        text: TextSpan(
+                            text: "안녕하세요 ",
+                            style: TextStyle(
+                              letterSpacing: 1.0,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500 ,
+                              color: Colors.black,
+                            ),
+                            children: [
+                              TextSpan(
+                                  text: "${Get.find<HomeScreenController>().userName.value}님",
+                                  style: TextStyle(
+                                    letterSpacing: 2.0,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                  )
+                              )
+                            ]
+                        )
+                    ),
                   ),
                 ],
               ),
