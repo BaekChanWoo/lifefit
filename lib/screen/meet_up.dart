@@ -64,6 +64,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
   Future<void> _loadPosts() async {
     try {
       final posts = await Post.fetchAllPosts();
+      print('✅ Firestore에서 가져온 게시글 수: ${posts.length}');
       setState(() {
         _allPosts = posts;
         _isLoading = false;
