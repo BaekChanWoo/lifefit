@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../const/colors.dart';
 
@@ -43,6 +44,8 @@ class _SleepScreenState extends State<SleepScreen> {
   late String dayText;
   late int selectedDay;
   DateTime? _currentWeekStart;
+  final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+
 
   final List<String> days = ['일', '월', '화', '수', '목', '금', '토'];
   List<double> sleepData = List<double>.filled(7, 0);
@@ -80,7 +83,7 @@ class _SleepScreenState extends State<SleepScreen> {
   }
 
   Future<void> loadWeeklySleepData() async {
-    final String userId = 'guest';
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
     final start = getStartOfWeek(dateOfNow);
     final end = start.add(const Duration(days: 7));
 
@@ -130,7 +133,8 @@ class _SleepScreenState extends State<SleepScreen> {
   }
 
   Future<void> saveSleepData() async {
-    final String userId = 'guest';
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+    print('🧾 현재 로그인된 userId: $userId');
     final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
     final Timestamp timestampDate = Timestamp.fromDate(onlyDate);
 
@@ -267,7 +271,7 @@ class _SleepScreenState extends State<SleepScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -288,13 +292,13 @@ class _SleepScreenState extends State<SleepScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 210,
-                height: 210,
+                width: 190,
+                height: 190,
                 child: SleekCircularSlider(
                   min: 0,
                   max: 12,
@@ -341,7 +345,7 @@ class _SleepScreenState extends State<SleepScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
                 ],
               ),
@@ -349,7 +353,7 @@ class _SleepScreenState extends State<SleepScreen> {
           ),
           // 평균 수면 시간 메시지 출력
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 4),
             child: Column(
               children: [
                 Text(
@@ -368,7 +372,7 @@ class _SleepScreenState extends State<SleepScreen> {
             ),
           ),
 
-          const SizedBox(height: 15),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(days.length, (index) {
@@ -390,7 +394,7 @@ class _SleepScreenState extends State<SleepScreen> {
               );
             }),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           SizedBox(
             height: 120,
             child: Row(
