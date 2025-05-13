@@ -323,12 +323,24 @@ class _SleepScreenState extends State<SleepScreen> {
                     ),
                   ),
                   onChange: (value) {
+                    double rounded = (value * 12).round() / 12.0;  // 1시간 = 12단계 → 5분 단위
                     setState(() {
-                      sleepHours = value;
-                      sleepData[selectedDay] = value;
+                      sleepHours = rounded;
+                      sleepData[selectedDay] = rounded;
                     });
                   },
+                  onChangeEnd: (value) async {
+                    double rounded = (value * 12).round() / 12.0;
+                    setState(() {
+                      sleepHours = rounded;
+                      sleepData[selectedDay] = rounded;
+                    });
+                    await saveSleepData();
+                    print('✅ 슬라이더 값 저장됨: $rounded');
+                  },
+
                 ),
+
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
