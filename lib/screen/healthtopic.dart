@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/news_model.dart';
 import '../model/healthvideo_model.dart';
-import '../model/realtimetopic_model.dart';
+import '../model/realtimetopic_model.dart'; //네이버
 import 'package:url_launcher/url_launcher.dart';
 
 class Healthtopic extends StatefulWidget {
