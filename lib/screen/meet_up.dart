@@ -167,10 +167,12 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
                 hasMore: hasMore,
                 onMorePressed: () {
                   setState(() {
-                    _visiblePostCount += 3; // More 버튼 클릭 시 게시글 추가
+                    _visiblePostCount += 3;
                   });
                 },
+                onRefreshRequested: _loadPosts,
               ),
+
             ),
           ],
         ),
@@ -187,11 +189,11 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
             builder: (context) => const CreatePost(),
           );
 
+//        글 등록 후 목록 새로고침
           if (newPost != null) {
-            setState(() {
-              _allPosts.insert(0, newPost); // 새 글 가장 위에 추가
-            });
+            await _loadPosts();  //irestore에서 최신 데이터 다시 가져오기
           }
+
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation
