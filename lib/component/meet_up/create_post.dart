@@ -334,7 +334,7 @@ class _CreatePostState extends State<CreatePost> {
                 'maxPeople': newPost.maxPeople,
                 'isMine': newPost.isMine,
                 'applicants': newPost.applicants,
-                'createdAt': newPost.createdAt.toIso8601String(),
+                'createdAt': Timestamp.fromDate(newPost.createdAt),
               });
 
               Navigator.pop(context, newPost);

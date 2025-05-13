@@ -39,7 +39,10 @@ class Post {
       maxPeople: json['maxPeople'] ?? 0,
       isMine: json['isMine'] ?? false,
       applicants: List<String>.from(json['applicants'] ?? []),
-      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: json['createdAt'] is Timestamp
+          ? (json['createdAt'] as Timestamp).toDate()
+          : DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+
     );
   }
 

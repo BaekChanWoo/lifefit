@@ -64,6 +64,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
   Future<void> _loadPosts() async {
     try {
       final posts = await Post.fetchAllPosts();
+      print('✅ Firestore에서 가져온 게시글 수: ${posts.length}');
       setState(() {
         _allPosts = posts;
         _isLoading = false;
@@ -72,34 +73,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
       print('게시글 불러오기 실패: $e');
       setState(() => _isLoading = false);
     }
-    // // 게시글 하드코딩
-    // final List<Post> _allPosts = [
-    //   ...List.generate(4, (index) => Post(
-    //     title: '러닝 모임 함께해요',
-    //     description: '아침 러닝, 초보자 환영!',
-    //     category: '러닝',
-    //     location: '한강',
-    //     dateTime: '2025.04.11.Fri. AM 07:30',
-    //     currentPeople: 3,
-    //     maxPeople: 5,
-    //     isMine: true,
-    //     applicants: [],
-    //   )),
-    //   ...List.generate(4, (index) => Post(
-    //     title: '헬스 초보 환영',
-    //     description: '온수역 헬스장에서 같이 운동해요',
-    //     category: '헬스',
-    //     location: '온수역 헬스장',
-    //     dateTime: '2025.04.11.Fri. AM 07:30',
-    //     currentPeople: 2,
-    //     maxPeople: 4,
-    //     isMine: true,
-    //     applicants: [],
-    //   )),
-    // ];
 
-    // 한 번에 보일 게시글 수
-    // int _visiblePostCount = 3;
   }
 
   @override
