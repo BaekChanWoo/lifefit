@@ -7,20 +7,24 @@ import 'create_post.dart';
 
 /// 게시글 리스트를 출력
 class PostList extends StatefulWidget {
-  final List<Post> posts; // 현재 게시글
-  final VoidCallback onMorePressed;   // More 버튼 클릭 시 호출
-  final bool hasMore;  // 추가 글 있는지
+  final List<Post> posts;
+  final VoidCallback onMorePressed;
+  final bool hasMore;
+
+  final VoidCallback? onRefreshRequested; // ← 콜백 추가
 
   const PostList({
     Key? key,
     required this.posts,
     required this.onMorePressed,
     required this.hasMore,
+    this.onRefreshRequested, // 콜백 받아오기
   }) : super(key: key);
 
   @override
   State<PostList> createState() => _PostListState();
 }
+
 
 class _PostListState extends State<PostList> {
   @override
@@ -123,22 +127,42 @@ class _PostListState extends State<PostList> {
                     right: 8,
                     child: PopupMenuButton<String>(
                       onSelected: (value) async {
-                        if (value == 'edit') {  //수정 버튼
+                        if (value == 'edit') {
                           final updatedPost = await showDialog<Post>(
                             context: context,
                             builder: (_) => CreatePost(existingPost: post),
                           );
 
                           if (updatedPost != null) {
-                            setState(() {
-                              widget.posts[index] = updatedPost;
-                            });
+                            widget.onRefreshRequested?.call(); //Firestore 새로고침
                           }
+
                         } else if (value == 'delete') {
-                          setState(() {
-                            widget.posts.removeAt(index);
-                          });
-                        } if (value == 'viewApplicants') {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('삭제'),
+                              content: const Text('해당 게시글을 삭제하시겠습니까?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false), // 취소
+                                  child: const Text('취소'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(true),  // 확인
+                                  child: const Text('삭제'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            await post.deleteFromFirestore(); //Firestore에서 삭제
+                            widget.onRefreshRequested?.call(); //화면 새로고침
+                          }
+                        }
+
+                        if (value == 'viewApplicants') {
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,

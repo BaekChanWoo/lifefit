@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../const/colors.dart';
-
 
 class SleepModel {
   final String id;
@@ -24,7 +24,7 @@ class SleepModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'date': date,
+    'date': Timestamp.fromDate(date),
     'sleepHours': sleepHours,
     'userId': userId,
   };
@@ -38,32 +38,86 @@ class SleepScreen extends StatefulWidget {
 }
 
 class _SleepScreenState extends State<SleepScreen> {
-  double sleepHours = 6.0; //초기값
-  late DateTime dateOfNow; //현재 화면에 표시되는 날짜
-  late String dateText; // 날짜
-  late String dayText; // 요일
-  late int selectedDay; // 선택된 요일
+  double sleepHours = 6.0;
+  late DateTime dateOfNow;
+  late String dateText;
+  late String dayText;
+  late int selectedDay;
+  DateTime? _currentWeekStart;
+  final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+
 
   final List<String> days = ['일', '월', '화', '수', '목', '금', '토'];
-  List<double> sleepData = List<double>.filled(7, 0); // 주차별 수면 데이터 저장용 리스트
+  List<double> sleepData = List<double>.filled(7, 0);
 
   @override
   void initState() {
     super.initState();
     dateOfNow = DateTime.now();
     updateDate();
-    sleepData[selectedDay] = sleepHours;
   }
 
-  // 날짜 및 요일 정보 업데이트, Firebase 데이터 로드
+  DateTime getStartOfWeek(DateTime date) {
+    return date.subtract(Duration(days: date.weekday % 7));
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
   void updateDate() {
     dateText = DateFormat('y년 M월 d일', 'ko_KR').format(dateOfNow);
     dayText = DateFormat('E', 'ko_KR').format(dateOfNow);
     selectedDay = dateOfNow.weekday % 7;
-    loadSleepDataForSelectedDay();
+
+    final newWeekStart = getStartOfWeek(dateOfNow);
+
+    if (_currentWeekStart == null || !_isSameDay(_currentWeekStart!, newWeekStart)) {
+      _currentWeekStart = newWeekStart;
+      loadWeeklySleepData();
+    } else {
+      setState(() {
+        sleepHours = sleepData[selectedDay];
+      });
+    }
   }
 
-  //이전 날짜
+  Future<void> loadWeeklySleepData() async {
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+    final start = getStartOfWeek(dateOfNow);
+    final end = start.add(const Duration(days: 7));
+
+    print('📆 쿼리 범위: ${start.toIso8601String()} ~ ${end.toIso8601String()}');
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('sleep')
+        .where('userId', isEqualTo: userId)
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+        .where('date', isLessThan: Timestamp.fromDate(end))
+        .get();
+
+    print('📦 가져온 문서 수: ${snapshot.docs.length}');
+
+    List<double> weeklyData = List.filled(7, 0);
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      final DateTime date = (data['date'] as Timestamp).toDate();
+      final double hours = data['sleepHours'];
+      int weekday = date.weekday % 7;
+      weeklyData[weekday] = hours;
+
+      print('🟢 날짜: $date | 수면: $hours시간 | 요일 index: $weekday');
+    }
+
+    setState(() {
+      sleepData = weeklyData;
+      sleepHours = sleepData[selectedDay];
+      print('✅ sleepData 최종: $sleepData');
+    });
+  }
+
+
   void previousDay() {
     setState(() {
       dateOfNow = dateOfNow.subtract(const Duration(days: 1));
@@ -71,7 +125,6 @@ class _SleepScreenState extends State<SleepScreen> {
     });
   }
 
-  //다음 날짜
   void nextDay() {
     setState(() {
       dateOfNow = dateOfNow.add(const Duration(days: 1));
@@ -79,66 +132,45 @@ class _SleepScreenState extends State<SleepScreen> {
     });
   }
 
-  //날짜에 해당하는 Firebase 수면 데이터 불러오기
-  Future<void> loadSleepDataForSelectedDay() async {
-    final String userId = 'guest';
-    final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
-
-    final snapshot = await FirebaseFirestore.instance
-        .collection('sleep')
-        .where('userId', isEqualTo: userId)
-        .where('date', isEqualTo: onlyDate)
-        .get();
-
-    if (snapshot.docs.isNotEmpty) {
-      final data = snapshot.docs.first.data();
-      double loadedHours = data['sleepHours'];
-      setState(() {
-        sleepHours = loadedHours;
-        sleepData[selectedDay] = loadedHours;
-      });
-    } else {
-      setState(() {
-        sleepHours = 0;
-        sleepData[selectedDay] = 0;
-      });
-    }
-  }
-
-  //Firebase에 수면 데이터 저장하기
   Future<void> saveSleepData() async {
-    final String userId = 'guest';
+    final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+    print('🧾 현재 로그인된 userId: $userId');
     final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
-    final query = await FirebaseFirestore.instance
-        .collection('sleep')
-        .where('userId', isEqualTo: userId)
-        .where('date', isEqualTo: onlyDate)
-        .get();
+    final Timestamp timestampDate = Timestamp.fromDate(onlyDate);
 
-    if (query.docs.isNotEmpty) {
-      await FirebaseFirestore.instance
+    print('📝 저장 시도 날짜: $onlyDate');
+
+    try {
+      final query = await FirebaseFirestore.instance
           .collection('sleep')
-          .doc(query.docs.first.id)
-          .update({'sleepHours': sleepHours});
-    } else {
-      final newModel = SleepModel(
-        id: Uuid().v4(),
-        date: onlyDate,
-        sleepHours: sleepHours,
-        userId: userId,
-      );
-      await FirebaseFirestore.instance
-          .collection('sleep')
-          .doc(newModel.id)
-          .set(newModel.toJson());
+          .where('userId', isEqualTo: userId)
+          .where('date', isEqualTo: timestampDate)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        print('🔄 기존 데이터 업데이트');
+        await FirebaseFirestore.instance
+            .collection('sleep')
+            .doc(query.docs.first.id)
+            .update({'sleepHours': sleepHours});
+      } else {
+        print('새 데이터 저장');
+        await FirebaseFirestore.instance
+            .collection('sleep')
+            .add({
+          'id': const Uuid().v4(),
+          'date': timestampDate,
+          'sleepHours': sleepHours,
+          'userId': userId,
+        });
+      }
+      print('저장 성공');
+    } catch (e) {
+      print('저장 실패: $e');
     }
-
-    setState(() {
-      sleepData[selectedDay] = sleepHours;
-    });
   }
 
-  // 쿠퍼티노 수면 시간 선택
+
   void _showCupertinoPicker() {
     int initialHour = sleepHours.floor();
     int initialMinute = ((sleepHours - initialHour) * 60).round();
@@ -174,7 +206,7 @@ class _SleepScreenState extends State<SleepScreen> {
                     ),
                     Expanded(
                       child: CupertinoPicker(
-                        scrollController: FixedExtentScrollController(initialItem: initialMinute),
+                        scrollController: FixedExtentScrollController(initialItem: initialMinute ~/ 5),
                         itemExtent: 32.0,
                         onSelectedItemChanged: (int value) {
                           selectedMinute = value * 5;
@@ -211,6 +243,25 @@ class _SleepScreenState extends State<SleepScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 평균 수면 시간 계산
+    double totalSleep = sleepData.reduce((a, b) => a + b);
+    int dayCount = sleepData.where((h) => h > 0).length;
+    double averageSleep = dayCount > 0 ? totalSleep / dayCount : 0.0;
+
+    String averageMessage = '수면 데이터가 없습니다.';
+    String sleepAdvice = '';
+    if (dayCount > 0) {
+      averageMessage = '평균 수면 시간은 ${averageSleep.toStringAsFixed(1)}시간입니다.';
+      if (averageSleep < 6) {
+        sleepAdvice = '수면이 부족해요 😴';
+      } else if (averageSleep <= 8) {
+        sleepAdvice = '적절한 수면을 취했어요 😌';
+      } else {
+        sleepAdvice = '푹 잘 주무셨네요 😄';
+      }
+    }
+
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
@@ -220,7 +271,7 @@ class _SleepScreenState extends State<SleepScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -241,13 +292,13 @@ class _SleepScreenState extends State<SleepScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 210,
-                height: 210,
+                width: 190,
+                height: 190,
                 child: SleekCircularSlider(
                   min: 0,
                   max: 12,
@@ -272,12 +323,24 @@ class _SleepScreenState extends State<SleepScreen> {
                     ),
                   ),
                   onChange: (value) {
+                    double rounded = (value * 12).round() / 12.0;  // 1시간 = 12단계 → 5분 단위
                     setState(() {
-                      sleepHours = value;
-                      sleepData[selectedDay] = value;
+                      sleepHours = rounded;
+                      sleepData[selectedDay] = rounded;
                     });
                   },
+                  onChangeEnd: (value) async {
+                    double rounded = (value * 12).round() / 12.0;
+                    setState(() {
+                      sleepHours = rounded;
+                      sleepData[selectedDay] = rounded;
+                    });
+                    await saveSleepData();
+                    print('✅ 슬라이더 값 저장됨: $rounded');
+                  },
+
                 ),
+
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -294,13 +357,34 @@ class _SleepScreenState extends State<SleepScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
+
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 30),
-          // 요일선택 박스
+          // 평균 수면 시간 메시지 출력
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 4),
+            child: Column(
+              children: [
+                Text(
+                  averageMessage,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  sleepAdvice,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 3),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(days.length, (index) {
@@ -322,8 +406,7 @@ class _SleepScreenState extends State<SleepScreen> {
               );
             }),
           ),
-          const SizedBox(height: 25),
-          // 막대그래프 표시
+          const SizedBox(height: 14),
           SizedBox(
             height: 120,
             child: Row(
@@ -355,7 +438,6 @@ class _SleepScreenState extends State<SleepScreen> {
   }
 }
 
-// 요일 선택 박스
 class DayBox extends StatelessWidget {
   final String label;
   final bool selected;
@@ -391,5 +473,6 @@ class DayBox extends StatelessWidget {
         ),
       ),
     );
+
   }
 }

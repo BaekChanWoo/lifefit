@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/model/meetup_model.dart';
@@ -44,22 +45,32 @@ class ApplySheet extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                if (isApplied) {
-                  //신청 취소 처리
-                  post.applicants.remove(currentUser);
-                  post.currentPeople--;
-                } else {
-                  //신청 처리
-                  if (post.currentPeople < post.maxPeople) {
-                    post.applicants.add(currentUser);
-                    post.currentPeople++;
+                onPressed: () async {
+                  if (isApplied) {
+                    post.applicants.remove(currentUser);
+                    post.currentPeople--;
+                  } else {
+                    if (post.currentPeople < post.maxPeople) {
+                      post.applicants.add(currentUser);
+                      post.currentPeople++;
+                    }
                   }
-                }
 
-                onApplied(); //상태 업데이트
-                Navigator.pop(context); // 시트 닫기
-              },
+                  //Firestore 업데이트
+                  if (post.docId != null) {
+                    await FirebaseFirestore.instance
+                        .collection('meetups')
+                        .doc(post.docId)
+                        .update({
+                      'applicants': post.applicants,
+                      'currentPeople': post.currentPeople,
+                    });
+                  }
+
+                  onApplied();
+                  Navigator.pop(context);
+                },
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: isApplied ? Colors.red : PRIMARY_COLOR,
                 padding: const EdgeInsets.symmetric(vertical: 14),
