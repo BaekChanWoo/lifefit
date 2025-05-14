@@ -62,7 +62,7 @@ class FirebaseWaterService {
 
       return snapshot.docs.map((doc) => DailyIntake.fromJson(doc.data() as Map<String, dynamic>)).toList();
     } catch (e) {
-      print('Firebase에서 특정 기간 일별 섭취량 불러오기 실패: $e');
+      print('Firebase에서 특정 기간 일별 섭취량 불러오기 실패: $e'); //바꾸기
       return [];
     }
   }

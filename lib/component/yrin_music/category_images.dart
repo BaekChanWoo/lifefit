@@ -6,6 +6,7 @@ class CategoryImages extends StatelessWidget {
 
   const CategoryImages({super.key, this.selectedCategory});
 
+
   List<Map<String, String>> getImageData(String? category) {
     if (category == null) {
       return [];

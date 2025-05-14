@@ -14,7 +14,7 @@ class ChangeCategory extends StatelessWidget {
     this.textStyle, //
   });
 
-  @override  //카테고리
+  @override  // 카테고리
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50,
