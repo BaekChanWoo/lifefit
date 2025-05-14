@@ -305,13 +305,12 @@ class _CreatePostState extends State<CreatePost> {
                 return;
               }
 
-              // 날짜 + 시간 문자열
               final dateTimeString =
                   '${selectedDate!.year}.${selectedDate!.month.toString().padLeft(2, '0')}.${selectedDate!.day.toString().padLeft(2, '0')} '
                   '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}';
 
-              // Post 객체 생성 후 반환
               final newPost = Post(
+                docId: widget.existingPost?.docId, // ← 수정 시 전달
                 title: title,
                 description: description,
                 category: selectedCategory!,
@@ -320,29 +319,48 @@ class _CreatePostState extends State<CreatePost> {
                 currentPeople: widget.existingPost?.currentPeople ?? 1,
                 maxPeople: maxPeople,
                 isMine: true,
-                applicants: [],
+                applicants: widget.existingPost?.applicants ?? [],
               );
 
-              //Firestore에 저장
-              await FirebaseFirestore.instance.collection('meetups').add({
-                'title': newPost.title,
-                'description': newPost.description,
-                'category': newPost.category,
-                'location': newPost.location,
-                'dateTime': newPost.dateTime,
-                'currentPeople': newPost.currentPeople,
-                'maxPeople': newPost.maxPeople,
-                'isMine': newPost.isMine,
-                'applicants': newPost.applicants,
-                'createdAt': Timestamp.fromDate(newPost.createdAt),
-              });
+              // 수정이면 update 아니면 add
+              if (widget.existingPost != null && newPost.docId != null) {
+                await FirebaseFirestore.instance
+                    .collection('meetups')
+                    .doc(newPost.docId)
+                    .update({
+                  'title': newPost.title,
+                  'description': newPost.description,
+                  'category': newPost.category,
+                  'location': newPost.location,
+                  'dateTime': newPost.dateTime,
+                  'currentPeople': newPost.currentPeople,
+                  'maxPeople': newPost.maxPeople,
+                  'isMine': newPost.isMine,
+                  'applicants': newPost.applicants,
+                  'createdAt': newPost.createdAt.toIso8601String(),
+                });
+              } else {
+                await FirebaseFirestore.instance.collection('meetups').add({
+                  'title': newPost.title,
+                  'description': newPost.description,
+                  'category': newPost.category,
+                  'location': newPost.location,
+                  'dateTime': newPost.dateTime,
+                  'currentPeople': newPost.currentPeople,
+                  'maxPeople': newPost.maxPeople,
+                  'isMine': newPost.isMine,
+                  'applicants': newPost.applicants,
+                  'createdAt': newPost.createdAt.toIso8601String(),
+                });
+              }
 
-              Navigator.pop(context, newPost);
+              Navigator.pop(context, newPost); // 수정/등록 후 반환
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: PRIMARY_COLOR),
           child: const Text('등록', style: TextStyle(color: Colors.white)),
-        ),
+        )
+
       ],
     );
   }
