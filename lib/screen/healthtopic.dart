@@ -518,7 +518,7 @@ Future<List<ArticleItem>> _fetchNaverNews() async {
   }
 }
 
-// 만개의 레시피 데이터 가져오는 함수
+// 레시피 데이터 가져오는 함수
 
 // 유튜브 건강 관련 영상 데이터 함수
 Future<List<SearchResult>> _fetchYoutubeVideos() async {
