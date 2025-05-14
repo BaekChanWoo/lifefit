@@ -23,9 +23,11 @@ class _MusicYoutubeState extends State<MusicYoutube> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('"${widget.searchKeyword}" 검색 결과'),
+      appBar:AppBar(
+        backgroundColor: Colors.black,
+          toolbarHeight: 20.0,
       ),
+      backgroundColor: Colors.black,
       body: FutureBuilder<List<SearchVideoItem>>(
         future: _searchResultsFuture,
         builder: (context, snapshot) {
@@ -72,11 +74,16 @@ class _MusicYoutubeState extends State<MusicYoutube> {
                               children: [
                                 Text(
                                   videoItem.title,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    color: Colors.white,),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(videoItem.channelName),
+                                Text(videoItem.channelName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold, color: Colors.white,),
+                                ),
                               ],
                             ),
                           ),
