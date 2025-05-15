@@ -27,6 +27,7 @@ class _HealthtopicState extends State<Healthtopic> {
   final PageController controller = PageController(initialPage: 0); //카드 페이지 컨트롤러
   int curruntPage = 0; // 카드 페이지 정수
 
+  //슬라이더 카운트
   @override
   void initState() {
     super.initState();
@@ -73,7 +74,8 @@ class _HealthtopicState extends State<Healthtopic> {
     }
   }
 
-  @override // 미사용시 컨트롤러 리소스해제
+  // 미사용시 컨트롤러 리소스해제
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -118,9 +120,12 @@ class _HealthtopicState extends State<Healthtopic> {
           child: Row(
             children: [
               Container( // Image 대신 Container 사용
-                width: 118.0,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300], // 컨테이너의 배경색
+                  borderRadius: BorderRadius.circular(10.0), // 모든 모서리를 10.0의 반지름으로 둥글게 만듭니다.
+                ),
+                width: 90.0,
                 height: 90.0,
-                color: Colors.grey[300], // 배경색 지정
                 child: Center(
                   child: Text(
                     '${index + 1}', // 1, 2, 3, 4 숫자 표시
@@ -246,7 +251,7 @@ class _HealthtopicState extends State<Healthtopic> {
         title: Center(
           child: Text(
             '건강토픽',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500),
             textAlign: TextAlign.center,
           ),
         ),
@@ -389,7 +394,7 @@ class _HealthtopicState extends State<Healthtopic> {
                   TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 424.0,
+              height: 564.0,
               child: FutureBuilder<List<ArticleItem>>( // FutureBuilder 사용
                 future: _fetchNaverNews(),
                 builder: (context, snapshot) {
@@ -402,7 +407,7 @@ class _HealthtopicState extends State<Healthtopic> {
                     return ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
-                      itemCount: naverArticles.length > 4 ? 4 : naverArticles.length,
+                      itemCount: naverArticles.length > 5 ? 5 : naverArticles.length,
                       itemBuilder: (context, index) {
                         final article = naverArticles[index];
                         return _buildContentCard(
@@ -479,9 +484,9 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 }
 
-//  newsdata.io 데이터 가져오는 함수
+//  newsdata.io 데이터 가져오는 함수(카드 슬라이더 뉴스)
 Future<List<NewsArticle>> _fetchNewsDataIo() async {
-  final response = await http.get(Uri.parse('https://newsdata.io/api/1/news?country=kr&q=건강%20OR%20웰빙&apikey=pqhdks684c9e5ae1f3e898c8550491c72eebe05'));
+  final response = await http.get(Uri.parse('https://newsdata.io/api/1/news?country=kr&q=건강%20OR%20웰빙&apikey=pub_8514684c9e5ae1f3e898c8550491c72eebe05'));
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> decodedJson = json.decode(response.body);
@@ -495,8 +500,8 @@ Future<List<NewsArticle>> _fetchNewsDataIo() async {
 
 // 네이버 검색 API 호출 및 데이터 모델 적용 (실시간 토픽 전용)
 Future<List<ArticleItem>> _fetchNaverNews() async {
-  final String clientId = 'qhdks'; // Replace with your Naver Client ID
-  final String clientSecret = 'qhdks'; // Replace with your Naver Client Secret
+  final String clientId = 'E8ElLohbjuT1eaH79agX'; // Replace with your Naver Client ID
+  final String clientSecret = 'PAqjeoE83U'; // Replace with your Naver Client Secret
   final String query = '건강 OR 웰빙'; // 검색어
 
   final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5');
@@ -519,10 +524,12 @@ Future<List<ArticleItem>> _fetchNaverNews() async {
 }
 
 // 레시피 데이터 가져오는 함수
+//Future<List<Map<String, dynamic>>> _fetchRecipeData() async {
 
+//}
 // 유튜브 건강 관련 영상 데이터 함수
 Future<List<SearchResult>> _fetchYoutubeVideos() async {
-  final String apiKey = 'AIzaSyBqhdks-E_PQxs'; // 여기에 실제 API 키를 넣으세요.
+  final String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // 여기에 실제 API 키를 넣으세요.
   final int maxResults = 5; // 가져올 영상 개수
   final String apiUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=$apiKey&q=건강 관련 영상&maxResults=$maxResults&type=video';
 
