@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifefit/model/meetup_model.dart';
 import 'applicant_list.dart';
@@ -29,6 +30,7 @@ class PostList extends StatefulWidget {
 class _PostListState extends State<PostList> {
   @override
   Widget build(BuildContext context) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
     // 최신 글을 위로 정렬
     final sortedPosts = List<Post>.from(widget.posts)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -83,7 +85,7 @@ class _PostListState extends State<PostList> {
 
                       const SizedBox(height: 3),
 
-                      //인원 수 신청 버튼 나란히
+                      //인원 수 신청 버튼
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -94,8 +96,7 @@ class _PostListState extends State<PostList> {
 
                           // 신청 버튼
                           ApplyButton(
-                            isApplied: post.applicants.contains('차예빈'),
-                            //isApplied: post.currentPeople >= post.maxPeople,
+                            isApplied: post.applicants.contains(currentUserId), // ← 현재 로그인 사용자 기준
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
@@ -106,13 +107,14 @@ class _PostListState extends State<PostList> {
                                 builder: (_) => ApplySheet(
                                   post: post,
                                   onApplied: () {
-                                    // 시트에서 인원이 증가했을 때 화면 갱신
-                                    setState(() {});
+                                    setState(() {}); // ← 버튼 UI 갱신
                                   },
                                 ),
                               );
                             },
                           ),
+
+
                         ],
                       ),
 

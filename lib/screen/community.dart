@@ -6,11 +6,10 @@ import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/main_mypage.dart';
 import 'package:lifefit/component/community/feed.dart';
+import 'package:lifefit/controller/home_controller.dart';
 
 // 커뮤니티 메인 페이지
 class Community extends StatefulWidget {
-
-
   const Community({super.key});
 
   @override
@@ -27,7 +26,18 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
   void initState(){
     super.initState();
 
-    _tabController = TabController(length: 2, vsync: this);
+    // Get.arguments에서 initialTab을 확인하여 초기 탭 설정
+    int initialTab = Get.arguments != null && Get.arguments['initialTab'] != null
+        ? Get.arguments['initialTab']
+        : 0;
+
+    _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: initialTab, // 초기 탭 설정
+    );
+
+
     _tabController.animation!.addListener((){
       final value = _tabController.animation!.value;
       final show = value < 0.5; // 0번 탭에 가까우면 보여주기(0.0 피드 , 1.0 마이페이지)
@@ -51,7 +61,8 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
     return  Scaffold(
         floatingActionButton: _showFab ? FloatingActionButton.extended(
           backgroundColor: PRIMARY_COLOR,
-          onPressed: (){Get.to(() => const FeedCreate());
+          onPressed: (){
+            Get.to(() => const FeedCreate());
             },
           icon: Icon(Icons.add ,
             color: Colors.black,
@@ -60,14 +71,14 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
             style: TextStyle(fontSize: 15.0 , color: Colors.black),
           ),
         ) : null,
-
         appBar: AppBar(
-          title: Row(children: [
-            const Text(
-              '백찬우',
+          title: Row(
+            children: [
+            Obx(() =>  Text(
+              Get.find<HomeScreenController>().userName.value,
               style: TextStyle(fontSize: 25 , fontWeight: FontWeight.w500),
             ),
-            //Icon(Icons.keyboard_arrow_down, size: 25,),
+            ),
           ],
           ),
           actions: [

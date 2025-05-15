@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lifefit/const/colors.dart';
 
-//신청 버튼 위젯 ui만 담당하는 역할임
+import '../../const/colors.dart';
+
 class ApplyButton extends StatelessWidget {
-  final bool isApplied; // 신청 여부 (true면 이미 신청함)
+  final bool isApplied;
   final VoidCallback onPressed;
 
   const ApplyButton({
@@ -15,7 +16,7 @@ class ApplyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed, //버튼 클릭해서 취소 가능
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: isApplied ? Colors.grey : PRIMARY_COLOR,
         shape: RoundedRectangleBorder(
