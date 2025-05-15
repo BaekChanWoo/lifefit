@@ -9,7 +9,7 @@ class ApplicantList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //실제 신청자 리스트 사용 (없을 경우 기본 메시지)
+    //실제 신청자 리스트 사용 (없으면 기본 메시지)
     final List<String> applicants = post.applicants;
 
     return DraggableScrollableSheet(

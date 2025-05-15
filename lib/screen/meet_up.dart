@@ -95,7 +95,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
         title: const Text(
-            '번개', style: TextStyle(fontWeight: FontWeight.bold)),
+            '번개', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
@@ -104,7 +104,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator()) // 🔄 로딩 중
+          ? const Center(child: CircularProgressIndicator()) // 로딩 중
           : Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
