@@ -9,10 +9,52 @@ import 'package:lifefit/shared/global.dart';
 class AuthController extends GetxController {
 
   final authProvider = Get.put(AuthProvider()); // lifefit의 AuthProvider 참조
-  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth
-      .instance; // 별칭 사용
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance; // 별칭 사용
+  final RxInt _userId = 0.obs; // 서버의 user.id를 저장
 
 
+  @override
+  void onInit() {
+    super.onInit();
+    // 앱 시작 시 사용자 정보 동기화
+    _auth.authStateChanges().listen((firebase_auth.User? user) async {
+      if (user != null) {
+        log('Auth state restored: UID=${user.uid}', name: 'AuthController');
+        if (Global.accessToken == null) {
+          await Global.updateAccessToken();
+          log('Restored accessToken: ${Global.accessToken}', name: 'AuthController');
+        }
+        await _syncUserProfile();
+        log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
+      } else {
+        log('No user authenticated', name: 'AuthController');
+        _userId.value = 0;
+      }
+    });
+  }
+
+  // 현재 사용자 ID 반환
+  int get currentUserId {
+    if (_userId.value == 0 || _auth.currentUser == null) {
+      throw Exception('사용자가 로그인하지 않았습니다.');
+    }
+    return _userId.value;
+  }
+
+  // 사용자 정보 동기화 (/api/user/my 호출)
+  Future<void> _syncUserProfile() async {
+    try {
+      final response = await authProvider.getUserProfile();
+      if (response['result'] == 'ok' && response['data']?['id'] != null) {
+        _userId.value = response['data']['id'];
+        log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
+      } else {
+        log('Failed to sync user profile: ${response['message']}', name: 'AuthController');
+      }
+    } catch (e) {
+      log('Error syncing user profile: $e', name: 'AuthController');
+    }
+  }
 
   // 아이디 유효성 검사 메서드
   // uid: 사용자 입력 아이디
@@ -85,7 +127,11 @@ class AuthController extends GetxController {
 
       // 서버에 로그인 요청 (AuthProvider를 통해 POST /api/login 호출)
       Map body = await authProvider.login(uid, password);
+      log('Login response: $body', name: 'AuthController');
       if (body['result'] == 'ok') {
+        if (body['user_id'] == null) {
+          log('Warning: user_id missing in login response', name: 'AuthController');
+        }
         // 커스텀 토큰 확인
         if (body['custom_token'] == null || body['custom_token'].isEmpty) {
           Get.snackbar(
@@ -94,6 +140,12 @@ class AuthController extends GetxController {
         }
         String customToken = body['custom_token'];
         log("token : $customToken");
+
+        // user_id 저장
+        if (body['user_id'] != null) {
+          _userId.value = body['user_id'];
+          log('Stored user_id: ${_userId.value}', name: 'AuthController');
+        }
 
         // Firebase Authentication에 로그인
         try {
@@ -128,6 +180,9 @@ class AuthController extends GetxController {
           Get.snackbar('오류', '토큰 캐싱 오류: $e', snackPosition: SnackPosition.TOP);
           return false;
         }
+
+        // 사용자 정보 동기화
+        await _syncUserProfile();
 
         Get.offAllNamed('/'); // 홈 화면으로 이동
         return true;
@@ -184,6 +239,12 @@ class AuthController extends GetxController {
         String customToken = body['custom_token'];
         log("token : $customToken");
 
+        // user_id 저장
+        if (body['user_id'] != null) {
+          _userId.value = body['user_id'];
+          log('Stored user_id: ${_userId.value}', name: 'AuthController');
+          log('Warning: user_id missing in login response', name: 'AuthController');
+        }
 
         // Firebase Authentication에 커스텀 토큰으로 로그인 (네트워크 오류 시 재시도 포함)
         int maxRetries = 2;
@@ -239,6 +300,9 @@ class AuthController extends GetxController {
           return false;
         }
 
+        // 사용자 정보 동기화
+        await _syncUserProfile();
+
         log("Navigating to home screen");
         Get.offAllNamed('/'); // 홈 화면으로 이동
         return true;
@@ -267,6 +331,8 @@ class AuthController extends GetxController {
       // 글로벌 토큰 초기화
       Global.clearAccessToken();
       log('Access token cleared');
+
+      _userId.value = 0; // user_id 초기화
 
       // 로그인 화면으로 리다이렉트
       Get.offAllNamed('/intro'); // 또는 '/login'
