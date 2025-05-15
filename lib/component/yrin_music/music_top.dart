@@ -25,7 +25,7 @@ class _MusicTopState extends State<MusicTop> {
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'padauk',
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
               ), // 왼쪽 여백 추가,
