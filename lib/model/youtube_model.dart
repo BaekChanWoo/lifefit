@@ -199,7 +199,7 @@ const List<String> YOUTUBE_API_KEYS =
 ['AIzaSyC9_2ZsXAZqV-liahgGDOGVTCUCFQqUm3M', 'AIzaSyAQqh4fHbI1TFiVpE57p7wQ8retNDzBsBU'];
 int _currentApiKeyIndex = 0;
 
-// Firebase Firestore 인스턴스
+// Firebase Firestore
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 const String _cacheCollection = 'youtube_search_cache';
 const Duration _cacheDuration = Duration(days:7); // 캐시 유지 시간
