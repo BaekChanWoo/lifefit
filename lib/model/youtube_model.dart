@@ -83,24 +83,21 @@ class Id {
 }
 
 class Snippet {
-  String? publishedAt;
-  String? channelId;
-  String title;
-  String? description;
-  Thumbnails? thumbnails;
-  String? channelTitle;
-  String? liveBroadcastContent;
-  DateTime? publishTime;
+  String? publishedAt;   //동영상 게시 날짜
+  String? channelId;      //채널 고유 id
+  String title;           // 동영상 제목
+  //동영상 설명   -삭제 수정
+  Thumbnails? thumbnails;   //썸네일 이미지 정보
+  String? channelTitle;     //채널 이름
+  // 동영상 라이브 스트리미잉구분 -삭제
+   //처음 공개된 시간 -삭제
 
   Snippet({
     this.publishedAt,
     this.channelId,
     required this.title,
-    this.description,
     this.thumbnails,
     this.channelTitle,
-    this.liveBroadcastContent,
-    this.publishTime,
   });
 
   factory Snippet.fromJson(dynamic json) {
@@ -108,11 +105,8 @@ class Snippet {
       publishedAt: json['publishedAt'] as String?,
       channelId: json['channelId'] as String?,
       title: json['title'] == null ? '' : json['title'] as String,
-      description: json['description'] as String?,
       thumbnails: json['thumbnails'] == null ? null : Thumbnails.fromJson(json['thumbnails']),
       channelTitle: json['channelTitle'] as String?,
-      liveBroadcastContent: json['liveBroadcastContent'] as String?,
-      publishTime: json['publishTime'] == null ? null : DateTime.parse(json['publishTime'] as String),
     );
   }
 }
