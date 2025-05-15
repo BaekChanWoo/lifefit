@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/model/youtube_model.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class YoutubeSearchResultsList extends StatefulWidget {
+class YoutubeSearch extends StatefulWidget {
   final String searchKeyword;
 
-  const YoutubeSearchResultsList({super.key, required this.searchKeyword});
+  const YoutubeSearch({super.key, required this.searchKeyword});
 
   @override
-  State<YoutubeSearchResultsList> createState() => _YoutubeSearchResultsListState();
+  State<YoutubeSearch> createState() => _YoutubeSearchState();
 }
 
-class _YoutubeSearchResultsListState extends State<YoutubeSearchResultsList> {
+class _YoutubeSearchState extends State<YoutubeSearch> {
   late Future<List<SearchVideoItem>> _searchResultsFuture;
 
   @override
@@ -95,6 +95,8 @@ class YoutubeVideoPlayerScreen extends StatelessWidget {
   final String videoId;
 
   const YoutubeVideoPlayerScreen({super.key, required this.videoId});
+
+  //수정 중
 
   @override
   Widget build(BuildContext context) {

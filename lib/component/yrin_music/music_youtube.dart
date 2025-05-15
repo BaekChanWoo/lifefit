@@ -23,9 +23,11 @@ class _MusicYoutubeState extends State<MusicYoutube> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('"${widget.searchKeyword}" 검색 결과'),
+      appBar:AppBar(
+        backgroundColor: Colors.black,
+          toolbarHeight: 20.0,
       ),
+      backgroundColor: Colors.black,
       body: FutureBuilder<List<SearchVideoItem>>(
         future: _searchResultsFuture,
         builder: (context, snapshot) {
@@ -50,7 +52,7 @@ class _MusicYoutubeState extends State<MusicYoutube> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Row( // Row 위젯을 사용하여 가로로 배치
+                    child: Row(
                       children: [
                         SizedBox(
                           width: 120,
@@ -65,18 +67,23 @@ class _MusicYoutubeState extends State<MusicYoutube> {
                         ),
                         const SizedBox(width: 8.0),
                         Expanded(
-                          child: Align( // Align 위젯으로 왼쪽 정렬
+                          child: Align(
                             alignment: Alignment.centerLeft,
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start, // Column 내부 요소 왼쪽 정렬
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   videoItem.title,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    color: Colors.white,),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(videoItem.channelName),
+                                Text(videoItem.channelName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold, color: Colors.white,),
+                                ),
                               ],
                             ),
                           ),

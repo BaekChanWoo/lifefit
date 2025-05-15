@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // 모집(Post) 모델 정의
 class Post {
+  final String? docId; //문서 id
   final String title; // 제목
   final String description; // 설명
   final String category; // 운동 카테고리
@@ -15,6 +16,7 @@ class Post {
   final DateTime createdAt; // 생성 시간
 
   Post({
+    this.docId,
     required this.title,
     required this.description,
     required this.category,
@@ -28,8 +30,9 @@ class Post {
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Firestore 문서 변환하는 생성자
-  factory Post.fromJson(Map<String, dynamic> json) {
+  factory Post.fromJson(Map<String, dynamic> json, String id) {
     return Post(
+      docId: id, // 문서 ID 저장
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       category: json['category'] ?? '',
@@ -39,9 +42,21 @@ class Post {
       maxPeople: json['maxPeople'] ?? 0,
       isMine: json['isMine'] ?? false,
       applicants: List<String>.from(json['applicants'] ?? []),
-      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: json['createdAt'] is Timestamp
+          ? (json['createdAt'] as Timestamp).toDate()
+          : DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+
     );
   }
+  Future<void> deleteFromFirestore() async {
+    if (docId != null) {
+      await FirebaseFirestore.instance
+          .collection('meetups')
+          .doc(docId)
+          .delete();
+    }
+  }
+
 
   // Firestore에서 게시글을 읽어오는 함수
   static Future<List<Post>> fetchAllPosts() async {
@@ -50,6 +65,8 @@ class Post {
         .orderBy('createdAt', descending: true)  //최신 글 먼저
         .get();
 
-    return snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => Post.fromJson(doc.data(), doc.id)) // ← 문서 ID 전달
+        .toList();
   }
 }

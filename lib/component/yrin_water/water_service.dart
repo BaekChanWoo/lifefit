@@ -10,7 +10,7 @@ class FirebaseWaterService {
     try {
       final record = WaterIntakeRecord(userId: userId, amount: amount,);
       await waterCollection.doc(userId).collection('records').add(record.toJson());
-      print('Firebase에 물 섭취 기록 저장 성공: ${record.toJson()}');
+
     } catch (e) {
       print('Firebase에 물 섭취 기록 저장 실패: $e');
     }
@@ -62,7 +62,7 @@ class FirebaseWaterService {
 
       return snapshot.docs.map((doc) => DailyIntake.fromJson(doc.data() as Map<String, dynamic>)).toList();
     } catch (e) {
-      print('Firebase에서 특정 기간 일별 섭취량 불러오기 실패: $e');
+      print('Firebase에서 특정 기간 일별 섭취량 불러오기 실패: $e'); //바꾸기
       return [];
     }
   }
