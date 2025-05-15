@@ -202,7 +202,7 @@ int _currentApiKeyIndex = 0;
 // Firebase Firestore 인스턴스
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 const String _cacheCollection = 'youtube_search_cache';
-const Duration _cacheDuration = Duration(minutes: 50); // 캐시 유지 시간
+const Duration _cacheDuration = Duration(days:7); // 캐시 유지 시간
 
 Future<List<SearchVideoItem>> fetchYoutubeListWithDio(String keyword) async {
 
