@@ -116,8 +116,8 @@ class _RegisterState extends State<Register> {
             const SizedBox(height: 14),
             // 닉네임
             LabelTextfield(
-              label: '닉네임',
-              hintText: '닉네임을 입력해주세요',
+              label: '이름',
+              hintText: '이름을 입력해주세요',
               controller: _nameController,
               keyboardType: TextInputType.text, // 한글 입력 지원
               errorText: _nameError, // 실시간 에러 표시

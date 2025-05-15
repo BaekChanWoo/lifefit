@@ -1,38 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:lifefit/const/categories.dart';
 
 class FeedDropDown extends StatefulWidget {
-  const FeedDropDown({super.key});
+  final Function(String) onChanged;
+  const FeedDropDown({super.key, required this.onChanged});
 
   @override
   State<FeedDropDown> createState() => _FeedDropDownState();
 }
 
 class _FeedDropDownState extends State<FeedDropDown> {
-  String selectedValue = '요가';
-  final List<String> items = ['요가' , '헬스' , '클라이밍' , '러닝' , '싸이클' , '필라테스' , '농구'];
+  String selectedValue = feedCategories.first; // 첫 번째 카테고리로 초기화
+  final List<String> items = feedCategories;
 
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton2(
-        hint: Text('운동 종목'),
-        items: items.map((item) => DropdownMenuItem<String>(
-            value: item,
-            child: Text(
-              item,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 15),
-            ),
-        )).toList(),
-        value: selectedValue,
-        onChanged: (String? value){
+      hint: Text('운동 종목'),
+      items: items.map((item) => DropdownMenuItem<String>(
+        value: item,
+        child: Text(
+          item,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 15),
+        ),
+      )).toList(),
+      value: selectedValue,
+      onChanged: (String? value){
+        if(value != null) {
           setState(() {
-            if(value != null) {
-              selectedValue = value;
-            }
+            selectedValue = value;
           });
-        },
+          widget.onChanged(value);
+        }
+      },
       buttonStyleData: ButtonStyleData(
         padding: const EdgeInsets.only(left: 8, right: 2),
         height: 40,

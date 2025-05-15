@@ -3,9 +3,10 @@ import 'package:lifefit/component/community/feed_category_button.dart';
 import 'package:flutter/material.dart';
 import 'package:lifefit/component/community/feed_list_item.dart';
 import 'package:get/get.dart';
+import 'package:lifefit/const/categories.dart';
 
 
-// 피드 페이지
+// 피드 페이지(index.dart)
 class Feed extends StatefulWidget {
 
   const Feed({super.key});
@@ -16,26 +17,60 @@ class Feed extends StatefulWidget {
 
 // 러닝, 헬스, 요가, 필라테스, 싸이클, 클라이밍, 농구
 class _FeedState extends State<Feed> {
-  //int _currentPage = 1;
   final FeedController feedController = Get.put(FeedController()); // 인스턴스 생성
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    //feedController.feedIndex(_currentPage);
+    _loadFeed(); // 비동기 메서드로 분리
   }
+
+  Future<void> _loadFeed() async {
+    await feedController.feedIndex(
+        page: 1,
+        category: feedController.selectedCategory.value.isEmpty
+            ? null : feedController.selectedCategory.value
+    );
+  }
+
   bool _onNotification(ScrollNotification scrollInfo) {
-    if (scrollInfo is ScrollEndNotification &&
-        scrollInfo.metrics.extentAfter == 0) {
-      //feedController.feedIndex(page: ++_currentPage);
+    if (scrollInfo is ScrollEndNotification && scrollInfo.metrics.extentAfter == 0) {
+      feedController.feedIndex(
+        page: (feedController.feedList.length ~/ 10) + 1,
+        category: feedController.selectedCategory.value.isEmpty ? null : feedController.selectedCategory.value,
+      );
       return true;
     }
     return false;
   }
 
   Future<void> _onRefresh() async {
-    //_currentPage = 1;
-    //await feedController.feedIndex();
+    await feedController.feedIndex(
+      page: 1,
+      category: feedController.selectedCategory.value.isEmpty ? null : feedController.selectedCategory.value,
+    );
+  }
+
+  // 카테고리별 아이콘 매핑 함수
+  IconData _getIconForCategory(String category) {
+    switch (category) {
+      case '요가':
+        return Icons.self_improvement;
+      case '헬스':
+        return Icons.fitness_center;
+      case '클라이밍':
+        return Icons.terrain;
+      case '러닝':
+        return Icons.directions_run;
+      case '싸이클':
+        return Icons.directions_bike;
+      case '필라테스':
+        return Icons.accessibility_new;
+      case '농구':
+        return Icons.sports_basketball;
+      default:
+        return Icons.category;
+    }
   }
 
   @override
@@ -50,20 +85,29 @@ class _FeedState extends State<Feed> {
               // 카테고리 바
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: const [
-                  CategoryButton(icon:Icons.self_improvement , title: '요가',),
-                  SizedBox(width: 12,),
-                  CategoryButton(icon:Icons.fitness_center, title: '헬스',),
-                  SizedBox(width: 12,),
-                  CategoryButton(icon:Icons.terrain , title: '클라이밍',),
-                  SizedBox(width: 12,),
-                  CategoryButton(icon:Icons.directions_run, title: '러닝',),
-                  SizedBox(width: 12,),
-                  CategoryButton(icon:Icons.directions_bike , title: '싸이클',),
-                  SizedBox(width: 12,),
-                  CategoryButton(icon:Icons.accessibility_new , title: '필라테스',),
-                  SizedBox(width: 12,),
-                  CategoryButton(icon:Icons.sports_basketball , title: '농구',),
+                children: [
+                  CategoryButton(
+                    icon: Icons.all_inclusive,
+                    title: '전체',
+                    isSelected: feedController.selectedCategory,
+                    onTap: () {
+                      feedController.selectedCategory.value = '';
+                      feedController.feedIndex(page: 1);
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  ...feedCategories.map((category) => Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: CategoryButton(
+                      icon: _getIconForCategory(category),
+                      title: category,
+                      isSelected: feedController.selectedCategory,
+                      onTap: () {
+                        feedController.selectedCategory.value = category;
+                        feedController.feedIndex(page: 1, category: category);
+                      },
+                    ),
+                  )).toList(),
                 ],
               ),
             ),
@@ -71,22 +115,29 @@ class _FeedState extends State<Feed> {
             // 피드 리스트 목록
             // feedList가 변경될 때마다 관련 위젯이 자동으로 업데이트
             Expanded(
-              child: Obx(() => NotificationListener<ScrollNotification>(
-                      onNotification: _onNotification,
-                      child: RefreshIndicator(
-                        onRefresh: _onRefresh,
-                        child: ListView.builder(
-                          itemCount: feedController.feedList.length,
-                          itemBuilder: (context, index) {
-                            final item = feedController.feedList[index];
-                          return FeedListItem(item);
-                           },
-                        ),
-                       ),
-               ),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: _onNotification,
+                child: RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: Obx(() {
+                    if (feedController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (feedController.feedList.isEmpty) {
+                      return const Center(child: Text('피드가 없습니다.'));
+                    }
+                    return ListView.builder(
+                      itemCount: feedController.feedList.length,
+                      itemBuilder: (context, index) {
+                        final item = feedController.feedList[index];
+                        return FeedListItem(item);
+                      },
+                    );
+                  }),
+                ),
               ),
-             )
-            ],
+            ),
+          ],
         ),
       ),
     );

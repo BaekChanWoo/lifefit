@@ -14,6 +14,7 @@ import 'package:lifefit/provider/auth_provider.dart';
 import 'package:lifefit/controller/home_controller.dart';
 
 
+
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
@@ -33,7 +34,7 @@ void main() async {
   await initializeDateFormatting('ko_KR', null);
 
   // GetX 의존성 초기화
-  Get.lazyPut(() => AuthProvider(), fenix: true);
+  Get.put(AuthController(), permanent: true); // 영속 인스턴스
   Get.lazyPut(() => AuthController(), fenix: true);
   Get.lazyPut(() => HomeScreenController(), fenix: true);
 

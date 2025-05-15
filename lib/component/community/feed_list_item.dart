@@ -4,6 +4,7 @@ import 'package:lifefit/component/community/feed_show.dart';
 import 'package:lifefit/model/feed_model.dart';
 
 
+
 // 이미지 크기
 const double _imageSize = 100;
 
@@ -18,75 +19,84 @@ class FeedListItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.to(() => FeedShow(item: data));
+        Get.to(() => FeedShow(data.id));
       },
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Stack(
           children: [
             Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 이미지
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Image.asset('assets/img/mypageimg.jpg',
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 이미지
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: data.imageId != null
+                      ? Image.network(
+                    'http://10.0.2.2:3000${data.imagePath}', // 실제 서버 URL로 교체
                     width: _imageSize,
                     height: _imageSize,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/img/mypageimg.jpg',
+                      width: _imageSize,
+                      height: _imageSize,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                      : Image.asset(
+                    'assets/img/mypageimg.jpg',
+                    width: _imageSize,
+                    height: _imageSize,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                /*
-                Image.network( // 서버에 저장된 URL을 바탕으로 보여줌
-                  "https://example.com/image.jpg",
-                  width: _imageSize,
-                  height: _imageSize,
-                  fit: BoxFit.cover,
-                ),*/
-              ),
-              // 정보
-              Flexible(
+                // 정보
+                Flexible(
                   child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 11),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                    padding: EdgeInsets.symmetric(horizontal: 11),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           data.title, // 제목
                           overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Row(
-                            children: [
-                              Text('서울 노원구',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              Text('  3분전',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 30.0,),
-                          Text(
-                            data.name,
-                            style: TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              data.category,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            Text(
+                              '${(DateTime.now().difference(data.createdAt!).inMinutes)}분전',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30.0,),
+                        Text(
+                          data.name,
+                          style: TextStyle(fontSize: 16 , fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
                   ),
-              ),
-              IconButton(
+                ),
+                IconButton(
                   onPressed: (){},
                   icon: const Icon(Icons.more_vert,
-                  color: Colors.grey,
+                    color: Colors.grey,
                     size: 16,
                   ),
-              ),
-              // 기타
-            ],
-          ),
+                ),
+                // 기타
+              ],
+            ),
             Positioned(
-              right: 10,
-              bottom: 0,
+                right: 10,
+                bottom: 0,
                 child: Row(
                   children: [
                     Icon(
@@ -113,7 +123,7 @@ class FeedListItem extends StatelessWidget {
                   ],
                 )
             ),
-        ],
+          ],
         ),
       ),
     );
