@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../model/weather_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http; // http 패키지 import
+import 'package:geolocator/geolocator.dart'; // geolocator 패키지 import
 
 class Weather extends StatefulWidget {
   const Weather({super.key});
@@ -8,6 +12,9 @@ class Weather extends StatefulWidget {
 }
 
 class _WeatherState extends State<Weather> {
+  WeatherDataModel? weatherData;
+  final String apiKey = '991c5581e1367c613e17cbe4d4c447af'; // 여기에 API 키를 넣으세요
+  final String baseUrl = 'https://api.openweathermap.org/data/2.5';
   // 미세먼지 날씨 테스트 이미지 에셋 경로
   final String weathertest1Image = 'assets/img/weathertest1.png';
   final String weathertest2Image = 'assets/img/weathertest2.png';
@@ -35,16 +42,66 @@ class _WeatherState extends State<Weather> {
     },
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadWeatherData();
+  }
+
+  Future<void> _loadWeatherData() async {
+    Position? position = await getCurrentLocation();
+    if (position != null) {
+      weatherData = await fetchWeatherData(position.latitude, position.longitude);
+    } else {
+      // 위치 정보를 가져오지 못한 경우, 기본값 설정 또는 에러 처리
+      print('Could not get current location, showing default weather.');
+      weatherData = await fetchWeatherData(37.49, 126.88); // Guro-gu 좌표 (기본값)
+    }
+    setState(() {});
+  }
+
+  Future<WeatherDataModel?> fetchWeatherData(double latitude, double longitude) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/weather?lat=$latitude&lon=$longitude&appid=$apiKey&lang=kr&units=metric');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      return WeatherDataModel.fromJson(json);
+    } else {
+      print('Error fetching weather data: ${response.statusCode}');
+      return null;
+    }
+  }
+
+  Future<Position?> getCurrentLocation() async {
+    try {
+      // 위치 권한 요청
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied');
+        return null;
+      }
+
+      // 현재 위치 가져오기
+      return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium);
+    } catch (e) {
+      print('Error getting location: $e');
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Center(
           child: Text(
-            '미세먼지/날씨',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            '날씨/미세먼지',
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500),
             textAlign: TextAlign.center,
           ),
         ),
@@ -52,17 +109,18 @@ class _WeatherState extends State<Weather> {
           IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
         ],
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: weatherData == null
+            ? Center(child: CircularProgressIndicator())
+            : Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 상단 메인 카드
             Card(
-              elevation: 4.0, // 그림자 깊이
-              shadowColor: Colors.greenAccent.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
-              shape: RoundedRectangleBorder( // 카드 모양 설정 (선택 사항)
+              elevation: 4.0,
+              shadowColor: Colors.greenAccent.withValues(alpha: 0.5),
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
               color: Colors.white,
@@ -76,43 +134,46 @@ class _WeatherState extends State<Weather> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.location_on),
-                        const Text('서울시 구로구', style: TextStyle(fontSize: 15)),
+                        Text(
+                            '${weatherData!.name}, ${weatherData!.sys.country ?? ''}',
+                            style: TextStyle(fontSize: 15)),
                       ],
                     ),
                     const SizedBox(height: 20),
-
                     // 큰 아이콘 및 상태 텍스트 섹션
                     Container(
                       alignment: Alignment.center,
                       child: Column(
                         children: [
-                          Image.asset(
-                            weathertest1Image,
+                          Image.network(
+                            'https://openweathermap.org/img/wn/${weatherData!.weather[0].icon}@2x.png',
                             width: 166.0,
                             height: 166.0,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            '좋음',
+                            weatherData!.weather[0].main,
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
-                          Text('쾌적한 야외 활동을 즐기세요.', style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(weatherData!.weather[0].description,
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
                     const SizedBox(height: 20),
-
                     // 미세먼지/날씨 정보 섹션
                     Row(
                       children: [
                         for (var data in dustInfoList)
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 패딩 조절
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0),
                               child: _buildInfoColumn(
                                 data['image']!,
                                 data['air']!,
@@ -121,18 +182,18 @@ class _WeatherState extends State<Weather> {
                               ),
                             ),
                           ),
-                        for (var data in weatherInfoList)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 패딩 조절
-                              child: _buildInfoColumn(
-                                data['image']!,
-                                data['air']!,
-                                data['condition']!,
-                                50,
-                              ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0),
+                            child: _buildInfoColumn(
+                              'https://openweathermap.org/img/wn/${weatherData!.weather[0].icon}@2x.png',
+                              '${weatherData!.main.temp.toString()}°C',
+                              '습도: ${weatherData!.main.humidity}%',
+                              50,
                             ),
                           ),
+                        ),
                       ],
                     )
                   ],
@@ -140,12 +201,11 @@ class _WeatherState extends State<Weather> {
               ),
             ),
             const SizedBox(height: 20),
-
             // 하단 추가 정보 카드
             Card(
-              elevation: 4.0, // 그림자 깊이
-              shadowColor: Colors.greenAccent.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
-              shape: RoundedRectangleBorder( // 카드 모양 설정 (선택 사항)
+              elevation: 4.0,
+              shadowColor: Colors.greenAccent.withValues(alpha: 0.5),
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),
               color: Colors.white,
@@ -159,27 +219,28 @@ class _WeatherState extends State<Weather> {
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('시간별 날씨',
                           style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold)),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold)),
                     ),
                     _buildWeatherTimeRow(),
                     const SizedBox(height: 20),
-
                     // 주간 날씨
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('주간 날씨',
                           style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold)),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold)),
                     ),
                     _buildWeatherDayRow(),
                     const SizedBox(height: 20),
-
                     // 대기 정보
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('대기 상태',
                           style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold)),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold)),
                     ),
                     _buildAirInfoRow(),
                   ],
@@ -195,7 +256,6 @@ class _WeatherState extends State<Weather> {
   // 공통 정보 Column 위젯
   Widget _buildInfoColumn(String imagePath, String title, String value,
       double imageSize) {
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
