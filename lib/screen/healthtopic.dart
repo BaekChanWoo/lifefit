@@ -124,8 +124,8 @@ class _HealthtopicState extends State<Healthtopic> {
                   color: Colors.grey[300], // 컨테이너의 배경색
                   borderRadius: BorderRadius.circular(10.0), // 모든 모서리를 10.0의 반지름으로 둥글게 만듭니다.
                 ),
-                width: 90.0,
-                height: 90.0,
+                width: 70.0,
+                height: 70.0,
                 child: Center(
                   child: Text(
                     '${index + 1}', // 1, 2, 3, 4 숫자 표시
@@ -140,9 +140,7 @@ class _HealthtopicState extends State<Healthtopic> {
                   children: [
                     Text(data['title'], style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis, maxLines: 2),
-                    SizedBox(height: 8.0),
-                    Text(data['description'], style: TextStyle(fontSize: 13.0),
-                        overflow: TextOverflow.ellipsis, maxLines: 2),
+
                   ],
                 ),
               ),
@@ -255,6 +253,7 @@ class _HealthtopicState extends State<Healthtopic> {
             textAlign: TextAlign.center,
           ),
         ),
+          backgroundColor: Colors.white,
         actions: [
           IconButton(icon: Icon(Icons.menu), onPressed: () {}), // 메뉴...
         ],
@@ -386,7 +385,7 @@ class _HealthtopicState extends State<Healthtopic> {
             SizedBox(height: 48.0),
 
 
-            // 실시간 토픽 섹션 (newsdata.io 적용) 네이버 적용 예정
+            // 실시간 토픽 섹션 (네이버 적용)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text('실시간 토픽',
@@ -394,7 +393,7 @@ class _HealthtopicState extends State<Healthtopic> {
                   TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 564.0,
+              height: 432.0,
               child: FutureBuilder<List<ArticleItem>>( // FutureBuilder 사용
                 future: _fetchNaverNews(),
                 builder: (context, snapshot) {
@@ -428,7 +427,7 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(height: 48.0),
 
-            // 식사 추천 섹션
+            // 식사 추천 섹션(공공 db 예정)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text('식사로 챙기는 건강!',
@@ -502,7 +501,7 @@ Future<List<NewsArticle>> _fetchNewsDataIo() async {
 Future<List<ArticleItem>> _fetchNaverNews() async {
   final String clientId = 'E8ElLohbjuT1eaH79agX'; // Replace with your Naver Client ID
   final String clientSecret = 'PAqjeoE83U'; // Replace with your Naver Client Secret
-  final String query = '건강 OR 웰빙'; // 검색어
+  final String query = '건강 + 웰빙 + 운동'; // 검색어
 
   final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5');
 
