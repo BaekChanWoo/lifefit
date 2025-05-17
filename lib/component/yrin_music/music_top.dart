@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/const/colors.dart';
+
 
 class MusicTop extends StatefulWidget {
   const MusicTop({super.key});
@@ -16,7 +16,7 @@ class _MusicTopState extends State<MusicTop> {
 
           appBar: AppBar(  //음악플리 수정 필요 뒤로가기
             centerTitle: true,
-            backgroundColor:  PRIMARY_COLOR,
+            backgroundColor: Colors.white,
 
             title: const Padding(
               padding: EdgeInsets.only(left: 0),

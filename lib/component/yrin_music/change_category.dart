@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifefit/const/colors.dart';
 
 class ChangeCategory extends StatelessWidget {
   final List<String> categories;
@@ -37,9 +38,11 @@ class ChangeCategory extends StatelessWidget {
                   category,
                   style: textStyle,
                 ),
-                backgroundColor: isSelected ? Color(0xFF99FF99) : Colors.grey[300],
+                backgroundColor: isSelected ? PRIMARY_COLOR.withOpacity(0.8)
+                    : PRIMARY_COLOR.withOpacity(0.3),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
+                  borderRadius: BorderRadius.circular(11.0),
+                  // side: BorderSide.none,
                 ),
               ),
             ),
