@@ -64,9 +64,10 @@ class _FeedShowState extends State<FeedShow> {
                       if (confirm == true) {
                         final success = await feedController.feedDelete(widget.feedId);
                         if (success) {
-                          //Get.back(); // 삭제 후 이전 화면으로 돌아감
-                          // Community 페이지로 이동하며 Feed 탭(0번 인덱스) 선택
-                          Get.offAll(() => const Community(), arguments: {'initialTab': 0});
+                          // HomeScreen으로 이동, Community 탭(인덱스 3) 활성화
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            Get.offAllNamed('/', arguments: {'selectedTab': 3});
+                          });
                         }
                       }
                     },
@@ -93,7 +94,7 @@ class _FeedShowState extends State<FeedShow> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10.0),
                   child: Image.network(
-                    'https://your-server.com/images/${feed.imageId}', // 실제 서버 URL로 교체
+                    'http://10.0.2.2:3000${feed.imagePath}', // 실제 서버 URL
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,
