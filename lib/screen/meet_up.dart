@@ -5,28 +5,6 @@ import '../component/meet_up/post_list.dart';
 import '../const/colors.dart';
 import '../model/meetup_model.dart';
 
-// 카테고리별 아이콘을 반환하는 함수
-IconData getCategoryIcon(String category) {
-  switch (category) {
-    case '러닝':
-      return Icons.directions_run;
-    case '헬스':
-      return Icons.fitness_center;
-    case '요가':
-      return Icons.self_improvement;
-    case '필라테스':
-      return Icons.accessibility_new;
-    case '사이클':
-      return Icons.directions_bike;
-    case '클라이밍':
-      return Icons.terrain;
-    case '농구':
-      return Icons.sports_basketball;
-    default:
-      return Icons.sports; // 기본 스포츠 아이콘
-  }
-}
-
 class MeetUpScreen extends StatefulWidget {
   const MeetUpScreen({Key? key}) : super(key: key);
 
@@ -38,6 +16,7 @@ class MeetUpScreen extends StatefulWidget {
 class _MeetUpScreenState extends State<MeetUpScreen> {
   //카테고리 목록
   final List<String> categories = [
+    '전체',
     '러닝',
     '헬스',
     '요가',
@@ -48,7 +27,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
   ];
 
   //현재 선택된 카테고리 상태
-  String selectedCategory = '러닝';
+  String selectedCategory = '전체';
 
   List<Post> _allPosts = [];
   bool _isLoading = true; // 로딩 상태 관리
@@ -80,9 +59,11 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
   Widget build(BuildContext context) {
     // 현재 선택된 카테고리에 해당하는 게시글 필터링
     final filteredPosts = _allPosts
-        .where((post) => post.category == selectedCategory)
+        .where((post) =>
+    selectedCategory == '전체' || post.category == selectedCategory)
         .take(_visiblePostCount)
         .toList();
+
 
     // 더 불러올 게시글이 있는지 여부 판단
     final hasMore = _allPosts
@@ -95,68 +76,29 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
         title: const Text(
-            '번개', style: TextStyle(fontWeight: FontWeight.bold)),
+            '번개', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.menu, color: Colors.black),
+            //child: Icon(Icons.menu, color: Colors.black),
           )
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator()) // 🔄 로딩 중
+          ? const Center(child: CircularProgressIndicator()) // 로딩 중
           : Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            // 카테고리 선택 버튼 리스트 (아이콘 포함)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: categories.map((category) {
-                  final isSelected = category == selectedCategory;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                    child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          selectedCategory = category; // 카테고리 선택 시 상태 변경
-                          _visiblePostCount = 3; // 글 수 초기화
-                        });
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: isSelected ? PRIMARY_COLOR : Colors
-                            .grey.shade200,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                      ),
-                      child: Row(
-                        children: [
-                          // 카테고리 아이콘
-                          Icon(
-                            getCategoryIcon(category),
-                            size: 18,
-                            color: isSelected ? Colors.white : Colors.black,
-                          ),
-                          const SizedBox(width: 6),
-                          // 카테고리 텍스트
-                          Text(
-                            category,
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
+            CategorySelector(
+              categories: categories,
+              selectedCategory: selectedCategory,
+              onCategorySelected: (category) {
+                setState(() {
+                  selectedCategory = category;
+                  _visiblePostCount = 3;
+                });
+              },
             ),
             const SizedBox(height: 10),
 
@@ -172,7 +114,6 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
                 },
                 onRefreshRequested: _loadPosts,
               ),
-
             ),
           ],
         ),
@@ -193,7 +134,6 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
           if (newPost != null) {
             await _loadPosts();  //irestore에서 최신 데이터 다시 가져오기
           }
-
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation
