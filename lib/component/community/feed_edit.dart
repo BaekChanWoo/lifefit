@@ -41,8 +41,10 @@ class _FeedEditState extends State<FeedEdit> {
     imageId = widget.model.imageId;
   }
 
+  // 갤러리에서 이미지 선택
   Future<void> _pickImage() async {
-    if (await Permission.photos.request().isGranted) {
+    final status = await Permission.photos.request();
+    if (status.isGranted) {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 800,
@@ -53,8 +55,37 @@ class _FeedEditState extends State<FeedEdit> {
           _image = File(pickedFile.path);
         });
       }
+    } else if (status.isLimited) {
+      // iOS에서 제한된 접근
+      Get.snackbar(
+        '제한된 접근',
+        '일부 사진만 접근 가능합니다. 설정에서 "모든 사진"을 허용해주세요.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 5),
+        mainButton: TextButton(
+          onPressed: () => openAppSettings(),
+          child: Text('설정으로 이동'),
+        ),
+      );
+    } else if (status.isPermanentlyDenied) {
+      // 영구 거부
+      Get.snackbar(
+        '권한 거부',
+        '갤러리 접근 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 5),
+        mainButton: TextButton(
+          onPressed: () => openAppSettings(),
+          child: Text('설정으로'),
+        ),
+      );
     } else {
-      Get.snackbar('권한 오류', '갤러리 접근 권한이 필요합니다.');
+      // 일반 거부
+      Get.snackbar(
+        '권한 오류',
+        '갤러리 접근 권한이 필요합니다. 다시 시도해주세요.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
