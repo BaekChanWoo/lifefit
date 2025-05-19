@@ -27,10 +27,10 @@ class _WaterIntakeState extends State<WaterIntake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFDDDDDD), // 전체 배경색 회색
+      backgroundColor: Colors.white, // 전체 배경색 회색
 
       appBar: AppBar(
-        backgroundColor: const Color(0xFFDDDDDD),
+        backgroundColor: Colors.white,
         title: Container(
           padding: EdgeInsets.all(10),
           child: Text(
@@ -61,8 +61,16 @@ class _WaterIntakeState extends State<WaterIntake> {
                   margin: const EdgeInsets.all(20),
 
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: Colors.white
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white,
+                    boxShadow: [ // 그림자 효과 추가
+                      BoxShadow(
+                        color: Colors.greenAccent.withOpacity(0.5), // 그림자 색상 (연두색, 투명도 조절)
+                        spreadRadius: 2, // 그림자 퍼짐 정도
+                        blurRadius: 5, // 그림자 흐림 정도
+                        offset: const Offset(0, 5), // 그림자 위치 (가로, 세로)
+                      ),
+                    ],
                   ),
 
                   child: Column(

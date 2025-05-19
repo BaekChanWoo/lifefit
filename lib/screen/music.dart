@@ -34,8 +34,8 @@ class _MusicState extends State< Music> {
             right: 10,
             child: ChangeCategory( // CategorySelector 위젯 추가
               categories: categories,
-              onCategoryTap: onCategoryTap,
-              selectedCategory: selectedCategory,
+              onChangeCategory: onCategoryTap,
+              selectedCategory: selectedCategory ?? '',
             ),
           ),
 

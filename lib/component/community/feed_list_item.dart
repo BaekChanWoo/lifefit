@@ -31,7 +31,7 @@ class FeedListItem extends StatelessWidget {
                 // 이미지
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10.0),
-                  child: data.imageId != null
+                  child: data.imageId != null && data.imagePath != null
                       ? Image.network(
                     'http://10.0.2.2:3000${data.imagePath}', // 실제 서버 URL로 교체
                     width: _imageSize,
@@ -70,7 +70,8 @@ class FeedListItem extends StatelessWidget {
                               style: TextStyle(color: Colors.grey),
                             ),
                             Text(
-                              '${(DateTime.now().difference(data.createdAt!).inMinutes)}분전',
+                                data.createdAt != null ?
+                              '${(DateTime.now().difference(data.createdAt!).inMinutes)}분전' : '알 수 없음',
                               style: TextStyle(color: Colors.grey),
                             ),
                           ],
