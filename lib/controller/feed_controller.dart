@@ -83,12 +83,11 @@ class FeedController extends GetxController{
           'name': name,
           'content': content,
           'image_id': imageId,
-          //'image_path': imageId != null && response['image_path']?.isNotEmpty == true ? response['image_path'] : null,
           'image_path': imageId != null && response['image_path'] != null ? response['image_path'] : null,
           'category': finalCategory,
           'created_at': DateTime.now().toIso8601String(),
           'is_me': true,
-          'writer': {'id': userId}, // UserModel에 user_id 반영
+          'writer': {'id': userId}, // UserModel에 user_id 반영(게시물 작성자 ID)
         });
 
         // 빌드 완료 후 feedList 업데이트
@@ -125,7 +124,6 @@ class FeedController extends GetxController{
             title: title,
             content: content,
             imageId: imageId,
-            //imagePath: imageId != null && response['image_path']?.isNotEmpty == true ? response['image_path'] : null,
             imagePath: imageId != null && response['image_path'] != null ? response['image_path'] : null,
             category: finalCategory,
             name: name,
