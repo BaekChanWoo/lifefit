@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lifefit/component/community/mypage_button.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/mypage_feed_number.dart';
+import 'package:lifefit/controller/home_controller.dart';
+
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -120,13 +123,13 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "백찬우",
-                      style: TextStyle(
+                    Obx(() => Text(
+                      Get.find<HomeScreenController>().userName.value,
+                      style: const TextStyle(
                         fontSize: 22.0,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    )),
                     const SizedBox(height: 4.0),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),

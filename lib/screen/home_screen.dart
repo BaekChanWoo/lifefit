@@ -40,6 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState(){
     super.initState();
+    // Get.arguments에서 selectedTab 확인
+    int initialTab = Get.arguments != null && Get.arguments['selectedTab'] != null
+        ? Get.arguments['selectedTab']
+        : 0;
+    _selectedIndex = initialTab;
+
     _pageController = PageController(initialPage: _selectedIndex); // 홈 화면(중첩 내비게이션 포함)
     // 탭에 표시될 화면 초기화
     _screens = [
@@ -223,14 +229,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   backgroundColor: Colors.white,
                   radius: 10.0,
-                  /*
-                  onConfirm: () async {
-                    final AuthController authController = Get.find<AuthController>();
-                    await authController.logout();
-                    Get.back();
-                  },
-                  onCancel: () => Get.back(),
-                   */
                   confirm: ElevatedButton(
                     onPressed: () async {
                       final AuthController authController = Get.find<AuthController>();

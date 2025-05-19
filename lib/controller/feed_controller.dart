@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/model/feed_model.dart';
 import 'package:lifefit/provider/feed_provider.dart';
@@ -18,12 +19,17 @@ class FeedController extends GetxController{
     feedIndex(); // 컨트롤러 초기화 시 데이터 로딩
   }
 
+
   // 피드 목록을 가져옵니다. page가 1이면 목록을 새로고침하고, 그렇지 않으면 추가 로드합니다.
   // 첫 페이지를 새로 고침할 때는 assignAll을 사용하여 기존 목록을 새 데이터로 교체
   Future<void> feedIndex({int page = 1, String? category}) async {
     try {
       isLoading.value = true;
-      final response = await feedProvider.index(page: page, category: category);
+
+      // 카테고리가 빈 문자열이면 null로 처리
+      final effectiveCategory = (category != null && category.isNotEmpty) ? category : null;
+      final response = await feedProvider.index(page: page, category: effectiveCategory);
+
       isLoading.value = false;
 
       developer.log('feedIndex response: $response', name: 'FeedController');
@@ -31,7 +37,7 @@ class FeedController extends GetxController{
       if (_isSuccessResponse(response)) {
         final List<dynamic> data = response['data'] ?? [];
         final newFeeds = data.map((m) => FeedModel.parse(m)).toList();
-
+        developer.log('New feeds received: $newFeeds', name: 'FeedController');
         if (page == 1) {
           feedList.assignAll(newFeeds);
         } else {
@@ -46,11 +52,13 @@ class FeedController extends GetxController{
           );
         }
       } else {
-        _handleError(page, response['message']?.toString() ?? '피드를 불러오지 못했습니다.');
+        //_handleError(page, response['message']?.toString() ?? '피드를 불러오지 못했습니다.');
+        Get.snackbar('조회 에러', response['message']?.toString() ?? '피드를 불러오지 못했습니다.', snackPosition: SnackPosition.BOTTOM);
       }
     } catch (e) {
       isLoading.value = false;
-      _handleError(page, '서버에 연결할 수 없습니다: $e');
+      //_handleError(page, '서버에 연결할 수 없습니다: $e');
+      Get.snackbar('네트워크 에러', '서버에 연결할 수 없습니다: $e', snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -59,8 +67,13 @@ class FeedController extends GetxController{
   // 피드 생성
   // 새 피드를 생성하고 목록에 추가합니다.
   Future<bool> feedCreate(String title, String name, String content, int? imageId, String category, int userId) async {
+
+    // 카테고리가 null이나 빈 문자열이면 기본값 '기타' 사용
+    final finalCategory = category.isNotEmpty ? category : '기타';
+
+    developer.log('feedCreate called with category: $category', name: 'FeedController');
     try {
-      final response = await feedProvider.store(title, name, content, imageId, category, userId);
+      final response = await feedProvider.store(title, name, content, imageId, finalCategory, userId);
       developer.log('feedCreate response: $response', name: 'FeedController');
 
       if (_isSuccessResponse(response)) {
@@ -70,13 +83,19 @@ class FeedController extends GetxController{
           'name': name,
           'content': content,
           'image_id': imageId,
-          'image_path': imageId != null && response['image_path']?.isNotEmpty == true ? response['image_path'] : null,
-          'category': category,
+          //'image_path': imageId != null && response['image_path']?.isNotEmpty == true ? response['image_path'] : null,
+          'image_path': imageId != null && response['image_path'] != null ? response['image_path'] : null,
+          'category': finalCategory,
           'created_at': DateTime.now().toIso8601String(),
           'is_me': true,
           'writer': {'id': userId}, // UserModel에 user_id 반영
         });
-        feedList.insert(0, newFeed);
+
+        // 빌드 완료 후 feedList 업데이트
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          feedList.insert(0, newFeed);
+          feedList.refresh(); // Obx가 변경을 감지하도록 명시적 새로고침
+        });
         return true;
       } else {
         Get.snackbar('생성 에러', response['message']?.toString() ?? '게시물 생성에 실패했습니다.', snackPosition: SnackPosition.BOTTOM);
@@ -91,8 +110,12 @@ class FeedController extends GetxController{
   // 피드 수정
   // 기존 피드를 수정합니다.
   Future<bool> feedUpdate(int id, String title, String content, int? imageId, String category, String name) async {
+
+    // 카테고리가 null이나 빈 문자열이면 기본값 '기타' 사용
+    final finalCategory = category.isNotEmpty ? category : '기타';
+
     try {
-      final response = await feedProvider.update(id, title, content, imageId, category, name);
+      final response = await feedProvider.update(id, title, content, imageId, finalCategory, name);
       developer.log('feedUpdate response: $response', name: 'FeedController');
 
       if (_isSuccessResponse(response)) {
@@ -102,8 +125,9 @@ class FeedController extends GetxController{
             title: title,
             content: content,
             imageId: imageId,
-            imagePath: imageId != null && response['image_path']?.isNotEmpty == true ? response['image_path'] : null,
-            category: category,
+            //imagePath: imageId != null && response['image_path']?.isNotEmpty == true ? response['image_path'] : null,
+            imagePath: imageId != null && response['image_path'] != null ? response['image_path'] : null,
+            category: finalCategory,
             name: name,
           );
           feedList.refresh();

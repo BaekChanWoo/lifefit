@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:lifefit/const/categories.dart';
+import 'dart:developer';
 
 class FeedDropDown extends StatefulWidget {
   final Function(String) onChanged;
-  const FeedDropDown({super.key, required this.onChanged});
+  final String? initialValue; // 초기값 추가
+
+  const FeedDropDown({
+    super.key,
+    required this.onChanged,
+    this.initialValue,
+  });
 
   @override
   State<FeedDropDown> createState() => _FeedDropDownState();
 }
 
 class _FeedDropDownState extends State<FeedDropDown> {
-  String selectedValue = feedCategories.first; // 첫 번째 카테고리로 초기화
+  late String selectedValue;
   final List<String> items = feedCategories;
 
+  @override
+  void initState() {
+    super.initState();
+    // 초기값이 제공되면 사용하고, 아니면 기본값 사용
+    selectedValue = widget.initialValue ?? feedCategories.first;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +42,11 @@ class _FeedDropDownState extends State<FeedDropDown> {
       )).toList(),
       value: selectedValue,
       onChanged: (String? value){
-        if(value != null) {
+        if (value != null) {
           setState(() {
             selectedValue = value;
           });
+          log('Category changed to: $value', name: 'FeedDropDown');
           widget.onChanged(value);
         }
       },
