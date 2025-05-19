@@ -1,5 +1,6 @@
 import 'package:lifefit/model/user_model.dart';
 
+
 // lage 대신 final 사용 -> 필드의 불변성을 보장
 class FeedModel {
   final int id;
@@ -28,12 +29,12 @@ class FeedModel {
 
   factory FeedModel.parse(Map<String, dynamic> map) {
     return FeedModel(
-      id: map['id'] as int,
-      title: map['title'] as String,
-      content: map['content'] ?? '',
-      name: map['name'] as String,
-      category: map['category'] ?? '기타',
-      isMe: map['is_me'] ?? false,
+      id: map['id'] as int? ?? 0, // null이면 0으로 대체
+      title: map['title']?.toString() ?? '', // null이면 빈 문자열
+      content: map['content']?.toString() ?? '', // null이면 빈 문자열
+      name: map['name']?.toString() ?? '', // null이면 빈 문자열
+      category: map['category']?.toString() ?? '기타', // null이면 '기타'
+      isMe: map['is_me'] as bool? ?? false, // null이면 false
       imageId: map['image_id'] as int?,
       imagePath: map['image_path'] as String?,
       createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/component/community/feed_list_item.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/const/categories.dart';
-
+import 'dart:developer' as developer; // developer log 사용
 
 // 피드 페이지(index.dart)
 class Feed extends StatefulWidget {
@@ -22,7 +22,11 @@ class _FeedState extends State<Feed> {
   @override
   void initState() {
     super.initState();
-    _loadFeed(); // 비동기 메서드로 분리
+    // feedController.onInit에서 이미 feedIndex 호출하므로 중복 호출 방지
+    // 필요 시 선택된 카테고리로 새로고침
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadFeed();
+    });
   }
 
   Future<void> _loadFeed() async {
@@ -107,7 +111,7 @@ class _FeedState extends State<Feed> {
                         feedController.feedIndex(page: 1, category: category);
                       },
                     ),
-                  )).toList(),
+                  ))
                 ],
               ),
             ),
@@ -119,21 +123,17 @@ class _FeedState extends State<Feed> {
                 onNotification: _onNotification,
                 child: RefreshIndicator(
                   onRefresh: _onRefresh,
-                  child: Obx(() {
-                    if (feedController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (feedController.feedList.isEmpty) {
-                      return const Center(child: Text('피드가 없습니다.'));
-                    }
-                    return ListView.builder(
-                      itemCount: feedController.feedList.length,
-                      itemBuilder: (context, index) {
-                        final item = feedController.feedList[index];
-                        return FeedListItem(item);
-                      },
-                    );
-                  }),
+                  child: Obx(() => feedController.isLoading.value
+                      ? const Center(child: CircularProgressIndicator())
+                      : feedController.feedList.isEmpty
+                      ? const Center(child: Text('피드가 없습니다.'))
+                      : ListView.builder(
+                    itemCount: feedController.feedList.length,
+                    itemBuilder: (context, index) {
+                      final item = feedController.feedList[index];
+                      return FeedListItem(item);
+                    },
+                  )),
                 ),
               ),
             ),

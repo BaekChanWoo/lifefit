@@ -28,7 +28,7 @@ class CategoryButton extends StatelessWidget {
           color: isSelected.value == title || (title == '전체' && isSelected.value.isEmpty)
               ? PRIMARY_COLOR.withOpacity(0.8)
               : PRIMARY_COLOR.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(11),
         ),
         child: Row(
           children: [
