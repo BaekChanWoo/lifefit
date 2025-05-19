@@ -185,3 +185,82 @@ class Sys {
     );
   }
 }
+
+class AirPollutionDataModel {
+  final Coord coord;
+  final List<AirQuality> list;
+
+  AirPollutionDataModel({required this.coord, required this.list});
+
+  factory AirPollutionDataModel.fromJson(Map<String, dynamic> json) {
+    return AirPollutionDataModel(
+      coord: Coord.fromJson(json['coord']),
+      list: (json['list'] as List)
+          .map((item) => AirQuality.fromJson(item))
+          .toList(),
+    );
+  }
+}
+
+class AirQuality {
+  final MainAirQuality main;
+  final Components components;
+  final int dt;
+
+  AirQuality({required this.main, required this.components, required this.dt});
+
+  factory AirQuality.fromJson(Map<String, dynamic> json) {
+    return AirQuality(
+      main: MainAirQuality.fromJson(json['main']),
+      components: Components.fromJson(json['components']),
+      dt: json['dt'] as int,
+    );
+  }
+}
+
+class MainAirQuality {
+  final int aqi;
+
+  MainAirQuality({required this.aqi});
+
+  factory MainAirQuality.fromJson(Map<String, dynamic> json) {
+    return MainAirQuality(
+      aqi: json['aqi'] as int,
+    );
+  }
+}
+
+class Components {
+  final double co;
+  final double no;
+  final double no2;
+  final double o3;
+  final double so2;
+  final double pm2_5;
+  final double pm10;
+  final double nh3;
+
+  Components({
+    required this.co,
+    required this.no,
+    required this.no2,
+    required this.o3,
+    required this.so2,
+    required this.pm2_5,
+    required this.pm10,
+    required this.nh3,
+  });
+
+  factory Components.fromJson(Map<String, dynamic> json) {
+    return Components(
+      co: (json['co'] as num).toDouble(),
+      no: (json['no'] as num).toDouble(),
+      no2: (json['no2'] as num).toDouble(),
+      o3: (json['o3'] as num).toDouble(),
+      so2: (json['so2'] as num).toDouble(),
+      pm2_5: (json['pm2_5'] as num).toDouble(),
+      pm10: (json['pm10'] as num).toDouble(),
+      nh3: (json['nh3'] as num).toDouble(),
+    );
+  }
+}
