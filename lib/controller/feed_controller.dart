@@ -32,12 +32,9 @@ class FeedController extends GetxController{
 
       isLoading.value = false;
 
-      developer.log('feedIndex response: $response', name: 'FeedController');
-
       if (_isSuccessResponse(response)) {
         final List<dynamic> data = response['data'] ?? [];
         final newFeeds = data.map((m) => FeedModel.parse(m)).toList();
-        developer.log('New feeds received: $newFeeds', name: 'FeedController');
         if (page == 1) {
           feedList.assignAll(newFeeds);
         } else {
