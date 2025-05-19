@@ -1,5 +1,5 @@
 import 'package:lifefit/model/user_model.dart';
-import 'dart:developer';
+
 
 // lage 대신 final 사용 -> 필드의 불변성을 보장
 class FeedModel {

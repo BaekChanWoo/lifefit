@@ -229,14 +229,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   backgroundColor: Colors.white,
                   radius: 10.0,
-                  /*
-                  onConfirm: () async {
-                    final AuthController authController = Get.find<AuthController>();
-                    await authController.logout();
-                    Get.back();
-                  },
-                  onCancel: () => Get.back(),
-                   */
                   confirm: ElevatedButton(
                     onPressed: () async {
                       final AuthController authController = Get.find<AuthController>();

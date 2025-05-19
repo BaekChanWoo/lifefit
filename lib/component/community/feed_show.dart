@@ -1,11 +1,9 @@
 // feed_show.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/component/community/feed_edit.dart';
-import 'package:intl/intl.dart';
-import 'package:lifefit/screen/community.dart';
+
 
 class FeedShow extends StatefulWidget {
   final int feedId;

@@ -157,7 +157,7 @@ class _FeedEditState extends State<FeedEdit> {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: PRIMARY_COLOR , width: 2),
+                            border: Border.all(color: Colors.grey , width: 2),
                           ),child: _image != null
                             ? Image.file(_image!, fit: BoxFit.cover)
                             : widget.model.imageId != null && widget.model.imagePath != null

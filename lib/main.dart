@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/screen/auth/register.dart';
 import 'package:lifefit/controller/auth_controller.dart';
 import 'package:lifefit/screen/home_screen.dart';

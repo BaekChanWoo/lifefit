@@ -11,7 +11,6 @@ import 'package:http_parser/http_parser.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:lifefit/screen/community.dart';
 import 'package:lifefit/const/categories.dart';
 import '../../controller/auth_controller.dart';
 
@@ -178,7 +177,7 @@ class _FeedCreateState extends State<FeedCreate> {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: PRIMARY_COLOR, width: 2),
+                            border: Border.all(color: Colors.grey, width: 2),
                           ),
                           child: _image == null
                               ? const Icon(
