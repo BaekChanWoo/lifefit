@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/component/community/feed_edit.dart';
-
+import 'package:lifefit/controller/auth_controller.dart';
+import 'dart:developer' as developer;
 
 class FeedShow extends StatefulWidget {
   final int feedId;
@@ -15,11 +16,36 @@ class FeedShow extends StatefulWidget {
 
 class _FeedShowState extends State<FeedShow> {
   final FeedController feedController = Get.find<FeedController>();
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   void initState() {
     super.initState();
     feedController.feedShow(widget.feedId);
+  }
+
+  // 현재 사용자가 게시물 작성자인지 확인
+  bool isCurrentUserAuthor() {
+    final feed = feedController.currentFeed.value;
+    if (feed == null) return false;
+
+    try {
+      // 디버깅 로그 추가
+      developer.log(
+          'isCurrentUserAuthor check - isMe: ${feed.isMe}, '
+              'writerId: ${feed.writer?.id}, '
+              'currentUserId: ${authController.currentUserId}',
+          name: 'FeedShow'
+      );
+
+      // 로그인한 사용자 ID와 피드 작성자 ID 직접 비교
+      int currentUserId = authController.currentUserId; // 현재 로그인한 사용자 ID
+      // 작성자 ID가 있고 현재 로그인한 사용자 ID와 일치할 경우에만 true 반환
+      return feed.writer != null && feed.writer!.id == currentUserId;
+    } catch (e) {
+      developer.log('Error in isCurrentUserAuthor: $e', name: 'FeedShow');
+      return false;
+    }
   }
 
   @override
@@ -31,7 +57,10 @@ class _FeedShowState extends State<FeedShow> {
           // 본인 게시물인 경우 수정/삭제 버튼 표시
           Obx(() {
             final feed = feedController.currentFeed.value;
-            if (feed != null && feed.isMe) {
+            final isAuthor = feed != null && isCurrentUserAuthor();
+
+            // 작성자 ID와 로그인한 사용자 ID가 일치할 때만 수정/삭제 버튼이 표시
+            if (isAuthor) {
               return Row(
                 children: [
                   IconButton(

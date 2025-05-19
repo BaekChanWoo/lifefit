@@ -1,438 +1,196 @@
 import 'package:flutter/material.dart';
+import '../model/weather_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Weather extends StatefulWidget {
-  const Weather({super.key});
+  const Weather({Key? key}) : super(key: key);
 
   @override
-  State<Weather> createState() => _WeatherState();
+  _WeatherState createState() => _WeatherState();
 }
 
 class _WeatherState extends State<Weather> {
-  // 미세먼지 날씨 테스트 이미지 에셋 경로
-  final String weathertest1Image = 'assets/img/weathertest1.png';
-  final String weathertest2Image = 'assets/img/weathertest2.png';
+  WeatherDataModel? weatherData;
+  AirPollutionDataModel? airPollutionData;
+  final String weatherApiKey = '661900b7652cefedb11f6e2ddd2b0daa';
+  final String baseUrl = 'http://api.openweathermap.org/data/2.5';
+  bool isLoading = false;
 
-  // 미세먼지 정보 데이터 리스트
-  final List<Map<String, String>> dustInfoList = [
-    {
-      'air': '미세먼지',
-      'condition': '500㎍/m³',
-      'image': 'assets/img/weathertest1.png',
-    },
-    {
-      'air': '초미세먼지',
-      'condition': '500㎍/m³',
-      'image': 'assets/img/weathertest1.png',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadWeatherData();
+  }
 
-  // 날씨 정보 데이터 리스트
-  final List<Map<String, String>> weatherInfoList = [
-    {
-      'air': '맑음/20도',
-      'condition': '20%',
-      'image': 'assets/img/weathertest2.png',
-    },
-  ];
+  Future<void> _loadWeatherData() async {
+    setState(() {
+      isLoading = true;
+    });
 
+    weatherData = await fetchWeatherData();
+    airPollutionData = await fetchAirPollutionData(37.5665, 126.9780);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<WeatherDataModel?> fetchWeatherData() async {
+    final Uri url = Uri.parse(
+        '$baseUrl/weather?q=Seoul&appid=$weatherApiKey&lang=kr&units=metric');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+        return WeatherDataModel.fromJson(json);
+      } else {
+        _showError('날씨 정보를 가져오는데 실패했습니다. 상태 코드: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      _showError('날씨 정보를 가져오는 중 오류가 발생했습니다: $e');
+      return null;
+    }
+  }
+
+  Future<AirPollutionDataModel?> fetchAirPollutionData(
+      double latitude, double longitude) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/air_pollution?lat=$latitude&lon=$longitude&appid=$weatherApiKey');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+        return AirPollutionDataModel.fromJson(json);
+      } else {
+        _showError('대기 정보 가져오기 실패: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      _showError('대기 정보 가져오기 오류: $e');
+      return null;
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  String _getAirQualityDescription(int aqi) {
+    if (aqi <= 50) {
+      return '좋음';
+    } else if (aqi <= 100) {
+      return '보통';
+    } else if (aqi <= 150) {
+      return '양호';
+    } else if (aqi <= 200) {
+      return '나쁨';
+    } else if (aqi <= 300) {
+      return '매우 나쁨';
+    } else {
+      return '심각';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            '미세먼지/날씨',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-        ),
+        title: Text('날씨',
+          style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500),
+          textAlign: TextAlign.center,),
+        backgroundColor: Colors.white,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadWeatherData,
+          ),
         ],
       ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // 상단 메인 카드
-            Card(
-              elevation: 4.0, // 그림자 깊이
-              shadowColor: Colors.greenAccent.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
-              shape: RoundedRectangleBorder( // 카드 모양 설정 (선택 사항)
+      body: Center(
+        child: isLoading
+            ? const CircularProgressIndicator()
+            : weatherData == null
+            ? const Text('날씨 정보를 가져올 수 없습니다.')
+            : Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Container( // Container로 Card 감싸기
+            constraints: const BoxConstraints(maxWidth: double.infinity), // 최대 너비 설정
+            child: Card(
+              elevation: 4.0,
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // 위치 정보
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.location_on),
-                        const Text('서울시 구로구', style: TextStyle(fontSize: 15)),
-                      ],
+                    Text(
+                      '${weatherData!.name}, ${weatherData!.sys.country}',
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
-
-                    // 큰 아이콘 및 상태 텍스트 섹션
-                    Container(
-                      alignment: Alignment.center,
-                      child: Column(
+                    Image.network(
+                      'https://openweathermap.org/img/wn/${weatherData!
+                          .weather[0]
+                          .icon}@2x.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '${weatherData!.main.temp}°C',
+                      style: const TextStyle(fontSize: 32),
+                    ),
+                    Text(
+                      weatherData!.weather[0].description,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '습도: ${weatherData!.main.humidity}%',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '풍속: ${weatherData!.wind.speed} m/s',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    if (airPollutionData != null)
+                      Column(
                         children: [
-                          Image.asset(
-                            weathertest1Image,
-                            width: 166.0,
-                            height: 166.0,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(height: 6),
                           Text(
-                            '좋음',
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                            '대기질 지수 (AQI): ${airPollutionData!.list[0].main
+                                .aqi}',
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 12),
-                          Text('쾌적한 야외 활동을 즐기세요.', style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(
+                            '${_getAirQualityDescription(
+                                airPollutionData!.list[0].main.aqi)}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // 미세먼지/날씨 정보 섹션
-                    Row(
-                      children: [
-                        for (var data in dustInfoList)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 패딩 조절
-                              child: _buildInfoColumn(
-                                data['image']!,
-                                data['air']!,
-                                data['condition']!,
-                                60,
-                              ),
-                            ),
-                          ),
-                        for (var data in weatherInfoList)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우 패딩 조절
-                              child: _buildInfoColumn(
-                                data['image']!,
-                                data['air']!,
-                                data['condition']!,
-                                50,
-                              ),
-                            ),
-                          ),
-                      ],
-                    )
+                      )
+                    else
+                      const Text('대기 정보를 가져올 수 없습니다.'),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // 하단 추가 정보 카드
-            Card(
-              elevation: 4.0, // 그림자 깊이
-              shadowColor: Colors.greenAccent.withValues(alpha: 0.5), // 그림자 색상 및 투명도 조절
-              shape: RoundedRectangleBorder( // 카드 모양 설정 (선택 사항)
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // 시간별 날씨
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text('시간별 날씨',
-                          style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    ),
-                    _buildWeatherTimeRow(),
-                    const SizedBox(height: 20),
-
-                    // 주간 날씨
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text('주간 날씨',
-                          style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    ),
-                    _buildWeatherDayRow(),
-                    const SizedBox(height: 20),
-
-                    // 대기 정보
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text('대기 상태',
-                          style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    ),
-                    _buildAirInfoRow(),
-                  ],
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-
-  // 공통 정보 Column 위젯
-  Widget _buildInfoColumn(String imagePath, String title, String value,
-      double imageSize) {
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Image.asset(
-          imagePath,
-          width: imageSize,
-          height: imageSize,
-          fit: BoxFit.contain,
-        ),
-        const SizedBox(
-          height: 2,
-        ),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 15),
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 15),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  // 시간별 날씨 정보 섹션
-  Widget _buildWeatherTimeRow() {
-    // 데이터 리스트
-    List<Map<String, String>> weatherDatatime = [
-      {
-        'time': '24시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '1시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '2시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '3시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '4시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '5시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '6시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '7시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'time': '8시',
-        'temperature': '6/-3도',
-        'precipitation': '20%',
-        'image': 'assets/img/weathertest2.png'
-      },
-    ];
-
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: weatherDatatime.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: [
-                Text(weatherDatatime[index]['time']!),
-                const SizedBox(height: 6.0),
-                Image.asset(
-                  weatherDatatime[index]['image']!,
-                  width: 46,
-                  height: 46,
-                ),
-                const SizedBox(height: 6.0),
-                Text(weatherDatatime[index]['temperature']!),
-                Text(weatherDatatime[index]['precipitation']!),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // 일별 날씨 정보 섹션
-  Widget _buildWeatherDayRow() {
-    List<Map<String, String>> weatherDataday = [
-      {
-        'day': '일',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '월',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '화',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '수',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '목',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '금',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '토',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '일',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-      {
-        'day': '월',
-        'temperature': '6/-3도',
-        'image': 'assets/img/weathertest2.png'
-      },
-    ];
-    return SizedBox(
-      height: 112,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: weatherDataday.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: [
-                Text(weatherDataday[index]['day']!),
-                const SizedBox(height: 6.0),
-                Image.asset(
-                  weatherDataday[index]['image']!,
-                  width: 46,
-                  height: 46,
-                ),
-                const SizedBox(height: 6.0),
-                Text(weatherDataday[index]['temperature']!),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // 대기 정보 섹션
-  Widget _buildAirInfoRow() {
-    List<Map<String, String>> AirInfo = [
-      {
-        'air': '이산화탄소',
-        'condition': '좋음',
-        'image': 'assets/img/weathertest1.png'
-      },
-      {
-        'air': '일산화탄소',
-        'condition': '좋음',
-        'image': 'assets/img/weathertest1.png'
-      },
-      {'air': '오존', 'condition': '나쁨', 'image': 'assets/img/weathertest1.png'},
-      {'air': '습도', 'condition': '10%', 'image': 'assets/img/weathertest1.png'},
-
-      // ... 필요한 만큼 데이터 추가
-    ];
-    return SizedBox(
-      height: 112,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: AirInfo.map((data) =>
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    data['image']!,
-                    width: 46,
-                    height: 46,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 6.0),
-                  Text(
-                    data['air']!,
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    data['condition']!,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            )
-        ).toList(),
       ),
     );
   }

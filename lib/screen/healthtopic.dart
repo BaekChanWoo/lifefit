@@ -16,8 +16,10 @@ class Healthtopic extends StatefulWidget {
 
 class _HealthtopicState extends State<Healthtopic> {
   //데이터 리스트
-  List<NewsArticle> _newsArticles = [];
+  List<NewsArticle> _newsSliderArticles = []; // 카드 슬라이더 뉴스
+  List<ArticleItem> _realTimeTopicArticles = []; // 실시간 토픽
   List<SearchResult> _youtubeVideos = [];
+  List<Map<String, dynamic>> _recipeData = [];
 
   // 테스트 이미지 에셋 경로
   final String test1Image = 'assets/img/test1.png';
@@ -27,13 +29,14 @@ class _HealthtopicState extends State<Healthtopic> {
   final PageController controller = PageController(initialPage: 0); //카드 페이지 컨트롤러
   int curruntPage = 0; // 카드 페이지 정수
 
+  //슬라이더 카운트
   @override
   void initState() {
     super.initState();
 
     Timer.periodic(Duration(seconds: 7), (Timer timer) {
       if (controller.hasClients && controller.page != null) {
-        if (controller.page! < _newsArticles.length - 1) { // Update list name
+        if (controller.page! < _newsSliderArticles.length - 1) {
           controller.nextPage(
             duration: Duration(milliseconds: 350),
             curve: Curves.easeIn,
@@ -48,32 +51,51 @@ class _HealthtopicState extends State<Healthtopic> {
       }
     });
 
-    _fetchData(); // newsdata.io 데이터 가져오기 (뉴스 슬라이더용)
-    _fetchYoutubeVideos().then((videos) { // 유튜브 데이터 가져오기
+    _fetchNewsSliderData(); // 카드 슬라이더 뉴스 데이터 가져오기
+    _fetchRealTimeTopicData(); // 실시간 토픽 데이터 가져오기
+    _fetchYoutubeVideos().then((videos) {
       setState(() {
         _youtubeVideos = videos;
       });
     });
+    _fetchRecipeData().then((recipes) {
+      setState(() {
+        _recipeData = recipes;
+      });
+    });
   }
 
-  // 데이터 가져오기
-  Future<void> _fetchData() async {
+  // 카드 슬라이더 뉴스 데이터 가져오기
+  Future<void> _fetchNewsSliderData() async {
     try {
-      final naverNews = await _fetchNaverNews();
       final newsDataIo = await _fetchNewsDataIo();
 
       setState(() {
-        _newsArticles.clear(); // 기존 데이터 초기화
-        _newsArticles.addAll(naverNews.cast<NewsArticle>());
-        _newsArticles.addAll(newsDataIo);
-        _newsArticles.sort((a, b) => b.pubDate.compareTo(a.pubDate)); // 최신순 정렬
+        _newsSliderArticles.clear();
+        _newsSliderArticles.addAll(newsDataIo);
+        _newsSliderArticles.sort((a, b) => b.pubDate.compareTo(a.pubDate));
       });
     } catch (e) {
-      print('Error fetching news: $e');
+      print('Error fetching news slider data: $e');
     }
   }
 
-  @override // 미사용시 컨트롤러 리소스해제
+  // 실시간 토픽 데이터 가져오기
+  Future<void> _fetchRealTimeTopicData() async {
+    try {
+      final naverNews = await _fetchNaverNews();
+
+      setState(() {
+        _realTimeTopicArticles.clear();
+        _realTimeTopicArticles.addAll(naverNews);
+      });
+    } catch (e) {
+      print('Error fetching real-time topic data: $e');
+    }
+  }
+
+  // 미사용시 컨트롤러 리소스해제
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -115,33 +137,55 @@ class _HealthtopicState extends State<Healthtopic> {
           elevation: 0.0,
           color: Colors.white,
           margin: EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            children: [
-              Container( // Image 대신 Container 사용
-                width: 118.0,
-                height: 90.0,
-                color: Colors.grey[300], // 배경색 지정
-                child: Center(
-                  child: Text(
-                    '${index + 1}', // 1, 2, 3, 4 숫자 표시
-                    style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          child: InkWell( // InkWell로 감싸서 터치 효과 추가
+            onTap: () async {
+              final Uri? _url = Uri.tryParse(data['link']); // 'link' 키로 URL 가져오기
+              if (_url != null) {
+                try {
+                  final bool launched = await launchUrl(_url);
+                  if (!launched) {
+                    print('Failed to launch URL: ${_url.toString()}');
+                    // 사용자에게 알림
+                  }
+                } catch (e) {
+                  print('Error launching URL: $e');
+                  // 사용자에게 에러 메시지 표시
+                }
+              } else {
+                print('Invalid URL: ${data['link']}');
+                // 사용자에게 알림
+              }
+            },
+            child: Row(
+              children: [
+                Container( // Image 대신 Container 사용
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300], // 컨테이너의 배경색
+                    borderRadius: BorderRadius.circular(10.0), // 모든 모서리를 10.0의 반지름으로 둥글게 만듭니다.
+                  ),
+                  width: 70.0,
+                  height: 70.0,
+                  child: Center(
+                    child: Text(
+                      '${index + 1}', // 1, 2, 3, 4 숫자 표시
+                      style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 8.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(data['title'], style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis, maxLines: 2),
-                    SizedBox(height: 8.0),
-                    Text(data['description'], style: TextStyle(fontSize: 13.0),
-                        overflow: TextOverflow.ellipsis, maxLines: 2),
-                  ],
+                SizedBox(width: 8.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(removeHtmlTags(data['title']), // HTML 태그 제거
+                        style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,)
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       case 'mealRecommendation': // 레시피 섹션
@@ -157,7 +201,25 @@ class _HealthtopicState extends State<Healthtopic> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(data['image'], width: 154.0, height: 154.0, fit: BoxFit.cover),
+                  child: Image.network( // Image.network 사용
+                    data['image'],
+                    width: 154.0,
+                    height: 154.0,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, object, stackTrace) {
+                      return Center(child: Icon(Icons.error_outline));
+                    },
+                  ),
                 ),
                 SizedBox(height: 8.0),
                 Text(data['title'], textAlign: TextAlign.left),
@@ -246,10 +308,11 @@ class _HealthtopicState extends State<Healthtopic> {
         title: Center(
           child: Text(
             '건강토픽',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500),
             textAlign: TextAlign.center,
           ),
         ),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(icon: Icon(Icons.menu), onPressed: () {}), // 메뉴...
         ],
@@ -264,22 +327,22 @@ class _HealthtopicState extends State<Healthtopic> {
             Container(
               width: double.infinity,
               height: 320,
-              child: _newsArticles.isEmpty // Update list name
+              child: _newsSliderArticles.isEmpty
                   ? Center(child: CircularProgressIndicator())
                   : PageView.builder(
                 controller: controller,
-                itemCount: 4,  // _newsArticles.length > 4 ? 4 : _newsArticles.length, // Update list name
+                itemCount: 4,
                 onPageChanged: (page) {
                   setState(() {
                     curruntPage = page;
                   });
                 },
                 itemBuilder: (context, index) {
-                  final article = _newsArticles[index];
+                  final article = _newsSliderArticles[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6.0),
-                    child: InkWell( // Use InkWell for tap effect
-                      onTap: () async { //탭으로 웹 사이트로 이동
+                    child: InkWell(
+                      onTap: () async {
                         final Uri? _url = Uri.tryParse(article.link);
                         if (_url != null) {
                           try {
@@ -357,7 +420,7 @@ class _HealthtopicState extends State<Healthtopic> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (num i = 0; i < 4; i++) // (num i = 0; i <(_newsArticles.length > 4 ? 4 : _newsArticles.length); i++) // Update list name
+                for (num i = 0; i < 4; i++)
                   Container(
                     margin: EdgeInsets.all(3),
                     width: 10,
@@ -381,7 +444,7 @@ class _HealthtopicState extends State<Healthtopic> {
             SizedBox(height: 48.0),
 
 
-            // 실시간 토픽 섹션 (newsdata.io 적용) 네이버 적용 예정
+            // 실시간 토픽 섹션 (네이버 적용)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text('실시간 토픽',
@@ -389,8 +452,8 @@ class _HealthtopicState extends State<Healthtopic> {
                   TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 424.0,
-              child: FutureBuilder<List<ArticleItem>>( // FutureBuilder 사용
+              height: 432.0,
+              child: FutureBuilder<List<ArticleItem>>(
                 future: _fetchNaverNews(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -402,7 +465,7 @@ class _HealthtopicState extends State<Healthtopic> {
                     return ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
-                      itemCount: naverArticles.length > 4 ? 4 : naverArticles.length,
+                      itemCount: naverArticles.length > 5 ? 5 : naverArticles.length,
                       itemBuilder: (context, index) {
                         final article = naverArticles[index];
                         return _buildContentCard(
@@ -411,7 +474,7 @@ class _HealthtopicState extends State<Healthtopic> {
                             'description': article.description,
                           },
                           'realTimeTopic',
-                          index, // index 전달
+                          index,
                         );
                       },
                     );
@@ -423,7 +486,7 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(height: 48.0),
 
-            // 식사 추천 섹션
+            // 레시피 섹션(공공 db 예정)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text('식사로 챙기는 건강!',
@@ -432,11 +495,25 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(
               height: 250.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: mealRecommendations.length,
-                itemBuilder: (context, index) {
-                  return _buildContentCard(mealRecommendations[index], 'mealRecommendation');
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _fetchRecipeData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
+                    final recipeData = snapshot.data!;
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: recipeData.length,
+                      itemBuilder: (context, index) {
+                        return _buildContentCard(recipeData[index], 'mealRecommendation');
+                      },
+                    );
+                  } else {
+                    return Center(child: Text('No data'));
+                  }
                 },
               ),
             ),
@@ -477,77 +554,108 @@ class _HealthtopicState extends State<Healthtopic> {
       ),
     );
   }
-}
 
-//  newsdata.io 데이터 가져오는 함수
-Future<List<NewsArticle>> _fetchNewsDataIo() async {
-  final response = await http.get(Uri.parse('https://newsdata.io/api/1/news?country=kr&q=건강%20OR%20웰빙&apikey=pqhdks684c9e5ae1f3e898c8550491c72eebe05'));
+  //  newsdata.io 데이터 가져오는 함수(카드 슬라이더 뉴스)
+  Future<List<NewsArticle>> _fetchNewsDataIo() async {
+    final response = await http.get(Uri.parse('https://newsdata.io/api/1/news?country=kr&q=건강%20OR%20웰빙&apikey=pub_8514684c9e5ae1f3e898c8550491c72eebe05'));
 
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> decodedJson = json.decode(response.body);
-    final List<dynamic> results = decodedJson['results'];
-    final List<NewsArticle> newsArticles = results.map((json) => NewsArticle.fromJson(json)).toList();
-    return newsArticles;
-  } else {
-    throw Exception('Failed to load news');
-  }
-}
-
-// 네이버 검색 API 호출 및 데이터 모델 적용 (실시간 토픽 전용)
-Future<List<ArticleItem>> _fetchNaverNews() async {
-  final String clientId = 'qhdks'; // Replace with your Naver Client ID
-  final String clientSecret = 'qhdks'; // Replace with your Naver Client Secret
-  final String query = '건강 OR 웰빙'; // 검색어
-
-  final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5');
-
-  final response = await http.get(
-    uri,
-    headers: {
-      'X-Naver-Client-Id': clientId,
-      'X-Naver-Client-Secret': clientSecret,
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> jsonResponse = json.decode(response.body);
-    final SearchResponse searchResponse = SearchResponse.fromJson(jsonResponse);
-    return searchResponse.items;
-  } else {
-    throw Exception('Failed to load Naver news: ${response.statusCode}');
-  }
-}
-
-// 레시피 데이터 가져오는 함수
-
-// 유튜브 건강 관련 영상 데이터 함수
-Future<List<SearchResult>> _fetchYoutubeVideos() async {
-  final String apiKey = 'AIzaSyBqhdks-E_PQxs'; // 여기에 실제 API 키를 넣으세요.
-  final int maxResults = 5; // 가져올 영상 개수
-  final String apiUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=$apiKey&q=건강 관련 영상&maxResults=$maxResults&type=video';
-
-  final Uri uri = Uri.parse(apiUrl);
-
-  final response = await http.get(uri);
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> jsonResponse = json.decode(response.body);
-    final SearchListResponse searchListResponse = SearchListResponse.fromJson(jsonResponse);
-    return searchListResponse.items;
-  } else {
-    throw Exception('Failed to load youtube videos: ${response.statusCode}');
-  }
-}
-// 유튜브 앱
-_launchYoutubeVideo(String videoId) async {
-  final Uri _url = Uri.parse('youtube://' + videoId);
-  if (await canLaunchUrl(_url)) {
-    await launchUrl(_url);
-  } else {
-    final Uri _webUrl = Uri.parse('https://www.youtube.com/watch?v=' + videoId); // 웹 URL
-    if (await canLaunchUrl(_webUrl)) {
-      await launchUrl(_webUrl);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> decodedJson = json.decode(response.body);
+      final List<dynamic> results = decodedJson['results'];
+      final List<NewsArticle> newsArticles = results.map((json) => NewsArticle.fromJson(json)).toList();
+      return newsArticles;
     } else {
-      throw 'Could not launch $videoId';
+      throw Exception('Failed to load news');
     }
+  }
+
+  // 네이버 검색 API 호출 및 데이터 모델 적용 (실시간 토픽 전용)
+  Future<List<ArticleItem>> _fetchNaverNews() async {
+    final String clientId = 'E8ElLohbjuT1eaH79agX';
+    final String clientSecret = 'PAqjeoE83U';
+    final String query = '건강 + 웰빙 + 운동';
+
+    final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5');
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'X-Naver-Client-Id': clientId,
+        'X-Naver-Client-Secret': clientSecret,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      final SearchResponse searchResponse = SearchResponse.fromJson(jsonResponse);
+      return searchResponse.items.map((item) => ArticleItem(
+        title: item.title,
+        originallink: item.originallink,
+        link: item.link,
+        description: item.description,
+        pubDate: item.pubDate,
+      )).toList();
+    } else {
+      throw Exception('Failed to load Naver news: ${response.statusCode}');
+    }
+  }
+
+  // 레시피 데이터 가져오는 함수
+  Future<List<Map<String, dynamic>>> _fetchRecipeData() async {
+    final String apiKey = 'YOUR_RECIPE_API_KEY';
+    final String apiUrl = 'YOUR_RECIPE_API_URL';
+
+    final Uri uri = Uri.parse(apiUrl);
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      final List<dynamic> results = jsonResponse['results'];
+      return results.map((result) => {
+        'title': result['title'],
+        'image': result['image'],
+        'recipe': result['recipe'],
+      }).toList();
+    } else {
+      throw Exception('Failed to load recipe data: ${response.statusCode}');
+    }
+  }
+
+  // 유튜브 건강 관련 영상 데이터 함수
+  Future<List<SearchResult>> _fetchYoutubeVideos() async {
+    final String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs';
+    final int maxResults = 5;
+    final String apiUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=$apiKey&q=건강 관련 영상&maxResults=$maxResults&type=video';
+
+    final Uri uri = Uri.parse(apiUrl);
+
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      final SearchListResponse searchListResponse = SearchListResponse.fromJson(jsonResponse);
+      return searchListResponse.items;
+    } else {
+      throw Exception('Failed to load youtube videos: ${response.statusCode}');
+    }
+  }
+  // 유튜브 앱
+  _launchYoutubeVideo(String videoId) async {
+    final Uri _url = Uri.parse('youtube://' + videoId);
+    if (await canLaunchUrl(_url)) {
+      await launchUrl(_url);
+    } else {
+      final Uri _webUrl = Uri.parse('https://www.youtube.com/watch?v=' + videoId);
+      if (await canLaunchUrl(_webUrl)) {
+        await launchUrl(_webUrl);
+      } else {
+        throw 'Could not launch $videoId';
+      }
+    }
+  }
+
+  // HTML 태그 제거 함수
+  String removeHtmlTags(String htmlText) {
+    RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+    return htmlText.replaceAll(exp, '');
   }
 }
