@@ -104,12 +104,14 @@ class _ApplySheetState extends State<ApplySheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.post.category, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
+          Text(widget.post.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
           Text(widget.post.location, style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 4),
           Text(widget.post.dateTime, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
+          Text(widget.post.description, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 4),
           Text(
             '현재 인원: ${widget.post.currentPeople}명 / ${widget.post.maxPeople}명',
             style: const TextStyle(fontSize: 14, color: Colors.grey),
