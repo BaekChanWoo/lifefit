@@ -17,6 +17,14 @@ class _MusicTopState extends State<MusicTop> {
           appBar: AppBar(  //음악플리 수정 필요 뒤로가기
             centerTitle: true,
             backgroundColor: Colors.white,
+            elevation: 4.0,
+            shadowColor: Colors.greenAccent,
+            shape: const Border(
+              bottom: BorderSide(
+                color: Colors.transparent,
+                width: 0.0,
+              ),
+            ),
 
             title: const Padding(
               padding: EdgeInsets.only(left: 0),

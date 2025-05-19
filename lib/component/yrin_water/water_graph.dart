@@ -122,7 +122,7 @@ class WaterGraph extends StatelessWidget {
       width: double.infinity, // 부모 너비에 맞춤
       height: 250,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.brown[50],
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(16.0),
