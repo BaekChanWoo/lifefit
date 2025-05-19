@@ -1,19 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// 모집(Post) 모델 정의
 class Post {
-  final String? docId; //문서 id
-  final String title; // 제목
-  final String description; // 설명
-  final String category; // 운동 카테고리
-  final String location; // 운동 장소
-  final String dateTime; // 날짜 및 시간
-  int currentPeople;// 현재 인원
-  int maxPeople;  // 최대 인원
-
-  final bool isMine; // 내가 작성한 글인지 확인
-  List<String> applicants; // 신청자 목록
-  final DateTime createdAt; // 생성 시간
+  final String? docId;
+  final String title;
+  final String description;
+  final String category;
+  final String location;
+  final String dateTime;
+  int currentPeople;
+  int maxPeople;
+  final bool isMine;
+  List<Map<String, String>> applicants; // ✅ 수정됨
+  final DateTime createdAt;
   final String authorName;
   final String authorId;
 
@@ -26,18 +24,30 @@ class Post {
     required this.dateTime,
     required this.currentPeople,
     required this.maxPeople,
-    this.isMine=false,
+    this.isMine = false,
     this.applicants = const [],
     DateTime? createdAt,
     required this.authorName,
     required this.authorId,
-
-
-
   }) : createdAt = createdAt ?? DateTime.now();
 
-  // Firestore 문서 변환하는 생성자
   factory Post.fromJson(Map<String, dynamic> json, [String? id]) {
+    // 신청자 파싱 처리 (안전하게 map으로 변환)
+    List<Map<String, String>> parsedApplicants = [];
+    if (json['applicants'] != null) {
+      final rawList = json['applicants'] as List;
+      parsedApplicants = rawList.map((e) {
+        if (e is Map) {
+          return {
+            'uid': e['uid']?.toString() ?? '',
+            'name': e['name']?.toString() ?? '',
+          };
+        } else {
+          return {'uid': e.toString(), 'name': '익명'}; // 혹시 문자열로 저장된 예전 데이터 대비
+        }
+      }).toList();
+    }
+
     return Post(
       docId: id,
       title: json['title'] ?? '',
@@ -48,15 +58,14 @@ class Post {
       currentPeople: json['currentPeople'] ?? 0,
       maxPeople: json['maxPeople'] ?? 0,
       isMine: json['isMine'] ?? false,
-      applicants: List<String>.from(json['applicants'] ?? []),
+      applicants: parsedApplicants,
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
           : DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      authorName: json['authorName'] ?? '알 수 없음', // ← 추가
-      authorId: json['authorId'] ?? '', // ← 추가
+      authorName: json['authorName'] ?? '알 수 없음',
+      authorId: json['authorId'] ?? '',
     );
   }
-
 
   Future<void> deleteFromFirestore() async {
     if (docId != null) {
@@ -67,16 +76,14 @@ class Post {
     }
   }
 
-
-  // Firestore에서 게시글을 읽어오는 함수
   static Future<List<Post>> fetchAllPosts() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('meetups')
-        .orderBy('createdAt', descending: true)  //최신 글 먼저
+        .orderBy('createdAt', descending: true)
         .get();
 
     return snapshot.docs
-        .map((doc) => Post.fromJson(doc.data(), doc.id)) // ← 문서 ID 전달
+        .map((doc) => Post.fromJson(doc.data(), doc.id))
         .toList();
   }
 }

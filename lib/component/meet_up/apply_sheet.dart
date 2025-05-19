@@ -3,26 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/model/meetup_model.dart';
+import 'package:get/get.dart';
+import '../../controller/home_controller.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<String> getUserNameById(String uid) async {
-  try {
-    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    if (doc.exists) {
-      return doc.data()?['name'] ?? uid;
-    } else {
-      return uid;
-    }
-  } catch (e) {
-    return uid;
-  }
-}
-
-// 신청 시트
 class ApplySheet extends StatefulWidget {
-  final Post post;             // 선택한 게시글
-  final VoidCallback onApplied; // 외부 상태 업데이트 콜백
+  final Post post;
+  final VoidCallback onApplied;
 
   const ApplySheet({
     Key? key,
@@ -36,14 +23,25 @@ class ApplySheet extends StatefulWidget {
 
 class _ApplySheetState extends State<ApplySheet> {
   late String currentUserId;
-  late bool isApplied;
+  late String currentUserName;
+  bool isApplied = false;
 
   @override
   void initState() {
     super.initState();
-    currentUserId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
-    isApplied = widget.post.applicants.contains(currentUserId);
+
+    final user = FirebaseAuth.instance.currentUser;
+    currentUserId = user?.uid ?? 'guest';
+
+    // 🔥 이름은 HomeScreenController에서 가져오기
+    final homeController = Get.find<HomeScreenController>();
+    final rawName = homeController.userName.value;
+    currentUserName = rawName.trim().isNotEmpty ? rawName : '익명';
+
+    isApplied = widget.post.applicants.any((app) => app['uid'] == currentUserId);
   }
+
+
 
   Future<void> _handleApply() async {
     final docId = widget.post.docId;
@@ -57,8 +55,8 @@ class _ApplySheetState extends State<ApplySheet> {
     final docRef = FirebaseFirestore.instance.collection('meetups').doc(docId);
 
     if (isApplied) {
-      // 신청 취소
-      widget.post.applicants.remove(currentUserId);
+      // 신청 취소: uid 일치하는 항목 제거
+      widget.post.applicants.removeWhere((applicant) => applicant['uid'] == currentUserId);
       widget.post.currentPeople--;
 
       await docRef.update({
@@ -70,7 +68,10 @@ class _ApplySheetState extends State<ApplySheet> {
     } else {
       // 신청
       if (widget.post.currentPeople < widget.post.maxPeople) {
-        widget.post.applicants.add(currentUserId);
+        widget.post.applicants.add({
+          'uid': currentUserId,
+          'name': currentUserName,
+        });
         widget.post.currentPeople++;
 
         await docRef.update({
@@ -87,8 +88,8 @@ class _ApplySheetState extends State<ApplySheet> {
       }
     }
 
-    widget.onApplied();         // 상위에서 리스트 갱신
-    Navigator.pop(context);    // 바텀시트 닫기
+    widget.onApplied();
+    Navigator.pop(context);
   }
 
   @override
