@@ -58,14 +58,14 @@ class _WaterIntakeState extends State<WaterIntake> {
                   height: 250,
 
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), //수정필요
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(28),
 
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: Colors.white,
-                    boxShadow: [ // 그림자 효과 추가
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.greenAccent.withOpacity(0.5), // 그림자 색상 (연두색, 투명도 조절)
+                        color: Colors.grey.withOpacity(0.5), // 그림자 색상 (연두색, 투명도 조절)
                         spreadRadius: 2, // 그림자 퍼짐 정도
                         blurRadius: 5, // 그림자 흐림 정도
                         offset: const Offset(0, 5), // 그림자 위치 (가로, 세로)
