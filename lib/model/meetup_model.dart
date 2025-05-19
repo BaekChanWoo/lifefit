@@ -14,6 +14,8 @@ class Post {
   final bool isMine; // 내가 작성한 글인지 확인
   List<String> applicants; // 신청자 목록
   final DateTime createdAt; // 생성 시간
+  final String authorName;
+  final String authorId;
 
   Post({
     this.docId,
@@ -27,12 +29,17 @@ class Post {
     this.isMine=false,
     this.applicants = const [],
     DateTime? createdAt,
+    required this.authorName,
+    required this.authorId,
+
+
+
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Firestore 문서 변환하는 생성자
-  factory Post.fromJson(Map<String, dynamic> json, String id) {
+  factory Post.fromJson(Map<String, dynamic> json, [String? id]) {
     return Post(
-      docId: id, // 문서 ID 저장
+      docId: id,
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       category: json['category'] ?? '',
@@ -45,9 +52,12 @@ class Post {
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
           : DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-
+      authorName: json['authorName'] ?? '알 수 없음', // ← 추가
+      authorId: json['authorId'] ?? '', // ← 추가
     );
   }
+
+
   Future<void> deleteFromFirestore() async {
     if (docId != null) {
       await FirebaseFirestore.instance

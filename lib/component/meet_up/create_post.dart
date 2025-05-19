@@ -1,8 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:lifefit/model/meetup_model.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../controller/home_controller.dart'; // ✅ 추가
 
 
 //모집글 작성 및 수정 위젯
@@ -114,7 +119,7 @@ class _CreatePostState extends State<CreatePost> {
   //시간 선택 호출
   Future<void> _showCupertinoTimePicker(BuildContext context) async {
     final now = DateTime.now();
-    final nowTrimmed = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+   // final nowTrimmed = DateTime(now.year, now.month, now.day, now.hour, now.minute);
     DateTime tempPicked = DateTime(
       now.year,
       now.month,
@@ -297,6 +302,13 @@ class _CreatePostState extends State<CreatePost> {
         ),
         ElevatedButton(
           onPressed: () async {
+            final userController = Get.find<HomeScreenController>();
+
+            // 사용자 이름이 비어있으면 한 번 더 fetch 시도
+            if (userController.userName.value.trim().isEmpty) {
+              await userController.fetchUserName();
+            }
+
             if (_formKey.currentState!.validate()) {
               if (selectedDate == null || selectedTime == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -309,8 +321,13 @@ class _CreatePostState extends State<CreatePost> {
                   '${selectedDate!.year}.${selectedDate!.month.toString().padLeft(2, '0')}.${selectedDate!.day.toString().padLeft(2, '0')} '
                   '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}';
 
+              final authorId = FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
+              final authorName = userController.userName.value.trim().isNotEmpty
+                  ? userController.userName.value
+                  : '익명';
+
               final newPost = Post(
-                docId: widget.existingPost?.docId, // ← 수정 시 전달
+                docId: widget.existingPost?.docId,
                 title: title,
                 description: description,
                 category: selectedCategory!,
@@ -320,9 +337,11 @@ class _CreatePostState extends State<CreatePost> {
                 maxPeople: maxPeople,
                 isMine: true,
                 applicants: widget.existingPost?.applicants ?? [],
+                authorId: authorId,
+                authorName: authorName,
               );
 
-              // 수정이면 update 아니면 add
+              // Firestore에 저장 또는 수정
               if (widget.existingPost != null && newPost.docId != null) {
                 await FirebaseFirestore.instance
                     .collection('meetups')
@@ -338,6 +357,8 @@ class _CreatePostState extends State<CreatePost> {
                   'isMine': newPost.isMine,
                   'applicants': newPost.applicants,
                   'createdAt': newPost.createdAt.toIso8601String(),
+                  'authorName': newPost.authorName,
+                  'authorId': newPost.authorId,
                 });
               } else {
                 await FirebaseFirestore.instance.collection('meetups').add({
@@ -351,10 +372,12 @@ class _CreatePostState extends State<CreatePost> {
                   'isMine': newPost.isMine,
                   'applicants': newPost.applicants,
                   'createdAt': newPost.createdAt.toIso8601String(),
+                  'authorName': newPost.authorName,
+                  'authorId': newPost.authorId,
                 });
               }
 
-              Navigator.pop(context, newPost); // 수정/등록 후 반환
+              Navigator.pop(context, newPost);
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: PRIMARY_COLOR),

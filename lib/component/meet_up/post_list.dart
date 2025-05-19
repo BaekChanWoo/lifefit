@@ -56,19 +56,30 @@ class _PostListState extends State<PostList> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 제목 표시
-                      Text(
-                        post.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          // 제목
+                          Text(
+                            post.title,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          Text(
+                            '작성자: ${post.authorName}',
+                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                        ],
                       ),
 
-                      const SizedBox(height: 3),
 
+                      const SizedBox(height: 5),
                       // 설명 표시
-                      Text(post.description),
+                      //Text(post.description),
 
                       // 위치 및 시간 표시
                       Row(

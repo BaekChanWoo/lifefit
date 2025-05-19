@@ -4,6 +4,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/model/meetup_model.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+Future<String> getUserNameById(String uid) async {
+  try {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (doc.exists) {
+      return doc.data()?['name'] ?? uid;
+    } else {
+      return uid;
+    }
+  } catch (e) {
+    return uid;
+  }
+}
+
 // 신청 시트
 class ApplySheet extends StatefulWidget {
   final Post post;             // 선택한 게시글
