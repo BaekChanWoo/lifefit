@@ -123,27 +123,59 @@ class _FeedShowState extends State<FeedShow> {
                   child: Image.network(
                     'http://10.0.2.2:3000${feed.imagePath}', // 실제 서버 URL
                     width: double.infinity,
-                    height: 200,
+                    height: 250,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Image.asset(
                       'assets/img/mypageimg.jpg',
                       width: double.infinity,
-                      height: 200,
+                      height: 250,
                       fit: BoxFit.cover,
                     ),
                   ),
                 )
               else
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(6.0),
                   child: Image.asset(
                     'assets/img/mypageimg.jpg',
                     width: double.infinity,
-                    height: 200,
+                    height: 250,
                     fit: BoxFit.cover,
                   ),
                 ),
               const SizedBox(height: 16),
+              // 사용자 프로필 정보 (사진과 이름)
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundImage: feed.imagePath != null
+                        ? NetworkImage('http://10.0.2.2:3000${feed.imagePath}')
+                        : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
+                    onBackgroundImageError: feed.imagePath != null
+                        ? (exception, stackTrace) {
+                      developer.log('Profile image load failed: $exception', name: 'FeedShow');
+                    }
+                        : null,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    feed.writer?.name ?? '익명',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.0), // 위쪽 여백만 설정
+                child: Divider(
+                  color: Colors.grey,
+                  thickness: 2.0,
+                ),
+              ),
+              const SizedBox(height: 12),
               // 제목
               Text(
                 feed.title,
@@ -170,7 +202,7 @@ class _FeedShowState extends State<FeedShow> {
                 feed.name,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 32),
               // 설명
               Text(
                 feed.content,
@@ -178,6 +210,7 @@ class _FeedShowState extends State<FeedShow> {
               ),
               const SizedBox(height: 16),
               // 좋아요 및 댓글 (더미 데이터)
+
               Row(
                 children: [
                   const Icon(Icons.favorite_border, color: Colors.grey, size: 20),
@@ -189,6 +222,7 @@ class _FeedShowState extends State<FeedShow> {
                   const Text('1', style: TextStyle(color: Colors.grey)),
                 ],
               ),
+
             ],
           ),
         );

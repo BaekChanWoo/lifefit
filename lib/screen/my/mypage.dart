@@ -3,9 +3,10 @@ import 'package:lifefit/model/user_model.dart';
 import 'package:lifefit/screen/home_screen.dart';
 import 'package:lifefit/widgets/listitems/user_mypage.dart';
 import 'package:get/get.dart';
-import 'package:lifefit/controller/home_controller.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/controller/auth_controller.dart';
+import 'package:lifefit/screen/my/my_edit.dart';
+
 
 
 class MyPage extends StatefulWidget {
@@ -37,9 +38,12 @@ class _MyPage extends State<MyPage> {
                   ),
                   ),
               ),
-              const ListTile(
+              ListTile(
                 title: Text('프로필 수정'),
                 leading: Icon(Icons.edit_note),
+                onTap: (){
+                  Get.to(() => const MyEdit());
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.logout_outlined),
