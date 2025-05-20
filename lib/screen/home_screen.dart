@@ -18,6 +18,9 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:lifefit/controller/auth_controller.dart';
 import 'package:lifefit/controller/home_controller.dart';
 
+import '../component/pedometer/daily_challenge.dart';
+import '../component/pedometer/step_progress_bar.dart';
+
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -437,27 +440,29 @@ class _HomeContentState extends State<HomeContent> {
                     width: 1.0,
                   ),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("일일 챌린지",
+                      const Text("일일 챌린지",
                         style: TextStyle(
                           fontSize: 15.0,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                       SizedBox(height: 5.0,),
-                       Text("10000 걸음 걷기",
+                      const SizedBox(height: 5.0),
+                      const Text("10000 걸음 목표!",
                         style: TextStyle(
                           fontSize: 12.0,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const DailyChallenge(),
                     ],
                   ),
                 ),
+
               ),
             )
         ),
