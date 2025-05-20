@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Post {
   final String? docId;
@@ -10,7 +11,7 @@ class Post {
   int currentPeople;
   int maxPeople;
   final bool isMine;
-  List<Map<String, String>> applicants; // ✅ 수정됨
+  List<Map<String, String>> applicants;
   final DateTime createdAt;
   final String authorName;
   final String authorId;
@@ -32,7 +33,9 @@ class Post {
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory Post.fromJson(Map<String, dynamic> json, [String? id]) {
-    // 신청자 파싱 처리 (안전하게 map으로 변환)
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    // 기존 applicants 파싱
     List<Map<String, String>> parsedApplicants = [];
     if (json['applicants'] != null) {
       final rawList = json['applicants'] as List;
@@ -43,7 +46,7 @@ class Post {
             'name': e['name']?.toString() ?? '',
           };
         } else {
-          return {'uid': e.toString(), 'name': '익명'}; // 혹시 문자열로 저장된 예전 데이터 대비
+          return {'uid': e.toString(), 'name': '익명'};
         }
       }).toList();
     }
@@ -57,15 +60,16 @@ class Post {
       dateTime: json['dateTime'] ?? '',
       currentPeople: json['currentPeople'] ?? 0,
       maxPeople: json['maxPeople'] ?? 0,
-      isMine: json['isMine'] ?? false,
       applicants: parsedApplicants,
+      authorName: json['authorName'] ?? '알 수 없음',
+      authorId: json['authorId'] ?? '',
+      isMine: json['authorId'] == currentUserId,
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
           : DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      authorName: json['authorName'] ?? '알 수 없음',
-      authorId: json['authorId'] ?? '',
     );
   }
+
 
   Future<void> deleteFromFirestore() async {
     if (docId != null) {
