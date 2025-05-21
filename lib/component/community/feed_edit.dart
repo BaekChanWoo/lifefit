@@ -125,12 +125,18 @@ class _FeedEditState extends State<FeedEdit> {
 
     feedController.isLoading.value = true;
     int? newImageId = imageId;
+
     if (_image != null) {
       newImageId = await uploadImage(_image!);
       if (newImageId == null) {
         feedController.isLoading.value = false;
         return;
       }
+      // state에도 반영해두면, 뒤에서 preview나 로컬 상태 갱신 시 편합니다.
+      setState(() {
+        imageId = newImageId;
+      });
+
     }
 
     try{
@@ -138,7 +144,7 @@ class _FeedEditState extends State<FeedEdit> {
       widget.model.id,
       _titleController.text,
       _contentController.text,
-      imageId,
+      newImageId,
       widget.model.category,
       _nameController.text,
     );
@@ -232,21 +238,31 @@ class _FeedEditState extends State<FeedEdit> {
           ),
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
-              child: SizedBox(
+
+            child: Obx(
+                  () => SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _submit,
+                  onPressed:
+                  feedController.isLoading.value ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(10.0),
-                     ),
-                     backgroundColor: PRIMARY_COLOR,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    backgroundColor: PRIMARY_COLOR,
                   ),
                   child: feedController.isLoading.value
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('수정 완료', style: TextStyle(color: Colors.white)),
+                      ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                      : const Text('수정 완료',
+                      style: TextStyle(color: Colors.white)),
                 ),
-          ),
+              ),
+            ),
           ),
         ],
       ),

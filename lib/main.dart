@@ -10,9 +10,7 @@ import 'package:lifefit/screen/auth/intro.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'shared/global.dart';
 import 'dart:developer';
-import 'package:lifefit/provider/auth_provider.dart';
 import 'package:lifefit/controller/home_controller.dart';
-
 
 
 void main() async {
@@ -37,11 +35,6 @@ void main() async {
   Get.put(AuthController(), permanent: true); // 영속 인스턴스
   Get.lazyPut(() => AuthController(), fenix: true);
   Get.lazyPut(() => HomeScreenController(), fenix: true);
-
-  // 초기화 확인을 위한 디버깅 로그
-  log('AuthProvider initialized: ${Get.isRegistered<AuthProvider>()}');
-  log('AuthController initialized: ${Get.isRegistered<AuthController>()}');
-  log('HomeScreenController initialized: ${Get.isRegistered<HomeScreenController>()}');
 
 
   // Firebase 인증 상태 확인

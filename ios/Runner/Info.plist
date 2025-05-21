@@ -49,5 +49,7 @@
     <true/>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>갤러리에서 사진을 선택하기 위해 접근 권한이 필요합니다.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>애플리케이션에서 사진을 찍어 업로드하거나 프로필을 설정할 수 있게 허용합니다.</string>
 </dict>
 </plist>

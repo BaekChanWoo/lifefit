@@ -12,7 +12,7 @@ class PostList extends StatefulWidget {
   final VoidCallback onMorePressed;
   final bool hasMore;
 
-  final VoidCallback? onRefreshRequested; // ← 콜백 추가
+  final VoidCallback? onRefreshRequested; // 콜백 추가
 
   const PostList({
     Key? key,
@@ -56,19 +56,30 @@ class _PostListState extends State<PostList> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 제목 표시
-                      Text(
-                        post.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          // 제목
+                          Text(
+                            post.title,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          Text(
+                            '작성자: ${post.authorName}',
+                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                        ],
                       ),
 
-                      const SizedBox(height: 3),
 
+                      const SizedBox(height: 5),
                       // 설명 표시
-                      Text(post.description),
+                      //Text(post.description),
 
                       // 위치 및 시간 표시
                       Row(
@@ -96,7 +107,7 @@ class _PostListState extends State<PostList> {
 
                           // 신청 버튼
                           ApplyButton(
-                            isApplied: post.applicants.contains(currentUserId), // ← 현재 로그인 사용자 기준
+                            isApplied: post.applicants.any((a) => a['uid'] == currentUserId),
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
@@ -107,12 +118,13 @@ class _PostListState extends State<PostList> {
                                 builder: (_) => ApplySheet(
                                   post: post,
                                   onApplied: () {
-                                    setState(() {}); // ← 버튼 UI 갱신
+                                    widget.onRefreshRequested?.call(); // 전체 리스트 새로고침
                                   },
                                 ),
                               );
                             },
                           ),
+
 
 
                         ],
