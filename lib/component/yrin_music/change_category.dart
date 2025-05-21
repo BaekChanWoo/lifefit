@@ -71,6 +71,7 @@ class ChangeCategory extends StatelessWidget {
                       color: isSelected ? Colors.black : Colors.grey.shade700,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'NanumSquareRound',
                     ),
                   ),
                 ],

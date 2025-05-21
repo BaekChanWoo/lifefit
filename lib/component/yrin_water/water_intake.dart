@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
 class WaterIntake extends StatefulWidget {
-  final Function(int) onAmountChanged;
+  final Function(int) onAmountChanged; // 이제 이 함수는 '변화량'을 받습니다.
+  final int initialWaterAmount; // 컵의 초기 표시량 (사용되지 않을 수도 있음)
+  final int currentTotalAmount; // 오늘의 총 섭취량을 표시하기 위한 값
 
   const WaterIntake({
     super.key,
     required this.onAmountChanged,
+    this.initialWaterAmount = 0, // 초기값 0 설정
+    this.currentTotalAmount = 0, // 오늘의 총 섭취량
   });
 
   @override
@@ -13,14 +17,28 @@ class WaterIntake extends StatefulWidget {
 }
 
 class _WaterIntakeState extends State<WaterIntake> {
-  int _currentWaterAmount = 0;
+  // 이 변수는 이제 WaterIntake 위젯 내에서 '컵의 현재 양'을 시각적으로 표시하는 용도로만 사용됩니다.
+  // 이 값이 Firestore에 직접 저장되는 '추가량'이 아닙니다.
+  int _displayWaterAmount = 0; // 컵에 표시될 물 양
 
-  // 로컬 waterAmount 상태를 업데이트하는 함수
-  void _incrementWaterAmount() {
+  @override
+  void initState() {
+    super.initState();
+    // 초기화 시 부모로부터 받은 initialWaterAmount를 사용하여 컵의 초기 상태를 설정할 수 있습니다.
+    // 여기서는 0으로 시작하는 것이 더 직관적일 수 있습니다.
+    _displayWaterAmount = widget.initialWaterAmount;
+  }
+
+  // 로컬 waterAmount 상태를 업데이트하고, 부모 위젯에 '변화량'을 전달하는 함수
+  void _addOrSubtractWater(int amount) {
     setState(() {
-      _currentWaterAmount += 250;
-      widget.onAmountChanged(_currentWaterAmount); // 부모 위젯에 변경된 값 전달
+      _displayWaterAmount += amount;
+      if (_displayWaterAmount < 0) {
+        _displayWaterAmount = 0; // 물 양 음수 방지
+      }
     });
+    // ⭐️ 부모 위젯에 'amount' (즉, +250ml 또는 -50ml) 자체를 전달
+    widget.onAmountChanged(amount);
   }
 
 
@@ -38,7 +56,7 @@ class _WaterIntakeState extends State<WaterIntake> {
             style: TextStyle(
               color: Colors.black,
               fontSize: 22,
-              fontFamily: 'Padauk',
+              fontFamily: 'NanumSquareRound',
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -49,98 +67,112 @@ class _WaterIntakeState extends State<WaterIntake> {
       // 물 바디.
       body: Stack(
         children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                  width: 400,
-                  height: 250,
-
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), //수정필요
-                  margin: const EdgeInsets.all(28),
+          Positioned(
+            top: -20,
+            left: 10,
+            right: 10,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 500,
+                  height: 240,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  margin: const EdgeInsets.all(20),
 
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.5), // 그림자 색상 (연두색, 투명도 조절)
-                        spreadRadius: 2, // 그림자 퍼짐 정도
-                        blurRadius: 5, // 그림자 흐림 정도
-                        offset: const Offset(0, 5), // 그림자 위치 (가로, 세로)
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
-
                   child: Column(
-                    children: [ //물 이미지
+                    children: [
+                      // 물 이미지
                       Padding(
-                        padding: const EdgeInsets.only(top: 25),
+                        padding: const EdgeInsets.only(top: 30),
                         child: Align(
                           alignment: Alignment.topCenter,
                           child: Image.asset(
                             'assets/img/cup.png',
-                            width:95,
+                            width: 95,
                             height: 95,
-                            fit: BoxFit.contain,),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
-
-                      SizedBox(height: 10),
-
+                      const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.only(left: 100, top: 5,),
-                        child:  Row(
+                        padding: const EdgeInsets.only(left: 100, top: 5),
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            //플러스 버튼 이벤트
+                            // 플러스 버튼 이벤트
                             GestureDetector(
-                              onTap: _incrementWaterAmount,
-                              child: Image.asset('assets/img/plus_button.png',
+                              onTap: () {
+                                _addOrSubtractWater(250); // 250ml 증가
+                              },
+                              child: Image.asset(
+                                'assets/img/plus.png',
                                 width: 25,
                                 height: 25,
                                 fit: BoxFit.contain,
                               ),
                             ),
-
-
-                            SizedBox(width: 15),
-
+                            const SizedBox(width: 15),
                             Text(
-                                '250 mL',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontFamily: 'Padauk',
-                                  fontWeight: FontWeight.w700,)
-                            )
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 13,),
-
-                      Padding(
-                        padding: const  EdgeInsets.only(left: 50),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('총 섭취량',
-                              style: TextStyle(
+                              '250 mL',
+                              style: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontFamily: 'Padauk',
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-
-                            SizedBox(width: 5,),
-
+                            const SizedBox(width: 15),
+                            // 마이너스 버튼 이벤트
+                            GestureDetector(
+                              onTap: () {
+                                _addOrSubtractWater(-50); // 50ml 감소
+                              },
+                              child: Image.asset(
+                                'assets/img/substract.png',
+                                width: 25,
+                                height: 25,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 13),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 50),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              '총 섭취량',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontFamily: 'NanumSquareRound',
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
                             Stack(
                               alignment: Alignment.center,
                               children: [
-                                Container(  //결과 표시 상자
+                                Container(
+                                  // 결과 상자
                                   width: 100,
                                   height: 35,
                                   decoration: BoxDecoration(
@@ -148,42 +180,43 @@ class _WaterIntakeState extends State<WaterIntake> {
                                     color: const Color(0xFFF5F3F3),
                                   ),
                                 ),
-                                Padding(  // 물 누적 값
+                                Padding(
+                                  // 물 누적 값
                                   padding: const EdgeInsets.only(right: 20, top: 0),
                                   child: Text(
-                                    '$_currentWaterAmount',
-                                    style: TextStyle(
+                                    '$_displayWaterAmount',
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 18,
-                                      fontFamily: 'Padauk',
+                                      fontFamily: 'NanumSquareRound',
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 14,),
-
+                                const SizedBox(width: 14),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 58, top: 0),
-                                  child: Text('mL',
+                                  child: const Text(
+                                    'mL',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 18,
-                                      fontFamily: 'Padauk',
+                                      fontFamily: 'NanumSquareRound',
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 )
                               ],
                             ),
-                            SizedBox(width: 10,),
-
+                            const SizedBox(width: 10),
                             Padding(
-                              padding: const EdgeInsets.only(left:0, top: 10),
-                              child: Text('/ 2,000mL',
+                              padding: const EdgeInsets.only(left: 0, top: 10),
+                              child: const Text(
+                                '/ 2,000mL',
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 12,
-                                  fontFamily: 'Padauk',
+                                  fontFamily: 'NanumSquareRound',
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -192,10 +225,11 @@ class _WaterIntakeState extends State<WaterIntake> {
                         ),
                       ),
                     ],
-                  )
-              )
-            ],
-          )
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

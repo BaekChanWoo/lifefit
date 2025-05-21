@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lifefit/component/yrin_music/music_youtube.dart';
+import 'package:lifefit/component/yrin_music/youtube_search.dart';
 
 class MusicPage extends StatelessWidget {
   final String categoryImages;
@@ -81,7 +81,7 @@ class MusicPage extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
-            child: MusicYoutube(searchKeyword: searchKeyword),
+            child:YoutubeSearch(searchKeyword: searchKeyword),
           ),
         ],
       ),

@@ -22,10 +22,10 @@ class CategoryImages extends StatelessWidget {
         ];
       case '클라이밍':
         return [
-          {'path': 'assets/img/climb.png', 'keyword': '클라이밍 등반 음악 모음 playlsit'},
+          {'path': 'assets/img/climb.png', 'keyword': '클라이밍 음악 playlist 도전'},
           {'path': 'assets/img/climbing_break.png', 'keyword': '클라이밍 휴식 음악 모음 playlsit'},
-          {'path': 'assets/img/climbing_stretching.png', 'keyword': '클라이밍 스트레칭 음악 playlsit'},
-          {'path': 'assets/img/climbing_together.png', 'keyword': '클라이밍 신나는 음악 playlsit'},
+          {'path': 'assets/img/climbing_stretching.png', 'keyword': '클라이밍 climbing 음악 playlsit'},
+          {'path': 'assets/img/climbing_together.png', 'keyword': '클라이밍 할 때 듣는 음악 playlsit'},
         ];
       case '사이클':
         return [
@@ -44,7 +44,7 @@ class CategoryImages extends StatelessWidget {
       case '러닝':
         return [
           {'path': 'assets/img/run.png', 'keyword': '러닝 외힙 음악 playlsit'},
-          {'path': 'assets/img/run_rest.png', 'keyword': '러닝 휴식 음악 playlsit'},
+          {'path': 'assets/img/run_rest.png', 'keyword': '러닝 산책 음악 playlsit'},
           {'path': 'assets/img/run_stretching.png', 'keyword': '스트레칭 음악 playlsit'},
           {'path': 'assets/img/run_together.png', 'keyword': '러닝 빡센 음악 playlsit'},
         ];

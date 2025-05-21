@@ -33,7 +33,7 @@ class _TimeDisplayState extends State<TimeDisplay> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 20, top: 370,
+      left: 28, top: 350,
       child: Container(
           width: 100,
           height: 35,
@@ -47,7 +47,7 @@ class _TimeDisplayState extends State<TimeDisplay> {
               _formattedDate,
               style: const TextStyle
                 (fontSize: 14,
-                  fontFamily: 'Padauk',
+                  fontFamily: 'FontWeight.w500',
                   color: Colors.black,
                   fontWeight: FontWeight.w400),
             ),

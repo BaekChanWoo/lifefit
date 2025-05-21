@@ -22,7 +22,9 @@ class _YoutubeSearchState extends State<YoutubeSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<SearchVideoItem>>(
+    return Scaffold(
+        backgroundColor: Colors.black,
+      body : FutureBuilder<List<SearchVideoItem>>(
       future: _searchResultsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -81,11 +83,13 @@ class _YoutubeSearchState extends State<YoutubeSearch> {
                             children: [
                               Text(
                                 videoItem.title,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              Text(videoItem.channelName),
+                              Text(videoItem.channelName,
+                                style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -100,6 +104,7 @@ class _YoutubeSearchState extends State<YoutubeSearch> {
           return const Center(child: Text('검색 결과가 없습니다.'));
         }
       },
+      )
     );
   }
 }
@@ -114,7 +119,11 @@ class YoutubeVideoPlayerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor:  Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Center(
         child: YoutubePlayer(
           controller: YoutubePlayerController(

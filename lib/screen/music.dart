@@ -49,9 +49,9 @@ class _MusicState extends State< Music> {
               child: Transform.translate(
                 offset: const Offset(0, -30),
                 child: Image.asset(
-                'assets/img/musicno.png',
+                '',
                 width: 200,
-                height: 200,
+                height: 150,
               ),
             ),
             )
