@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/component/community/feed_edit.dart';
-
+import 'package:lifefit/controller/auth_controller.dart';
+import 'dart:developer' as developer;
 
 class FeedShow extends StatefulWidget {
   final int feedId;
@@ -15,11 +16,36 @@ class FeedShow extends StatefulWidget {
 
 class _FeedShowState extends State<FeedShow> {
   final FeedController feedController = Get.find<FeedController>();
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   void initState() {
     super.initState();
     feedController.feedShow(widget.feedId);
+  }
+
+  // 현재 사용자가 게시물 작성자인지 확인
+  bool isCurrentUserAuthor() {
+    final feed = feedController.currentFeed.value;
+    if (feed == null) return false;
+
+    try {
+      // 디버깅 로그 추가
+      developer.log(
+          'isCurrentUserAuthor check - isMe: ${feed.isMe}, '
+              'writerId: ${feed.writer?.id}, '
+              'currentUserId: ${authController.currentUserId}',
+          name: 'FeedShow'
+      );
+
+      // 로그인한 사용자 ID와 피드 작성자 ID 직접 비교
+      int currentUserId = authController.currentUserId; // 현재 로그인한 사용자 ID
+      // 작성자 ID가 있고 현재 로그인한 사용자 ID와 일치할 경우에만 true 반환
+      return feed.writer != null && feed.writer!.id == currentUserId;
+    } catch (e) {
+      developer.log('Error in isCurrentUserAuthor: $e', name: 'FeedShow');
+      return false;
+    }
   }
 
   @override
@@ -31,7 +57,10 @@ class _FeedShowState extends State<FeedShow> {
           // 본인 게시물인 경우 수정/삭제 버튼 표시
           Obx(() {
             final feed = feedController.currentFeed.value;
-            if (feed != null && feed.isMe) {
+            final isAuthor = feed != null && isCurrentUserAuthor();
+
+            // 작성자 ID와 로그인한 사용자 ID가 일치할 때만 수정/삭제 버튼이 표시
+            if (isAuthor) {
               return Row(
                 children: [
                   IconButton(
@@ -94,27 +123,59 @@ class _FeedShowState extends State<FeedShow> {
                   child: Image.network(
                     'http://10.0.2.2:3000${feed.imagePath}', // 실제 서버 URL
                     width: double.infinity,
-                    height: 200,
+                    height: 250,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Image.asset(
                       'assets/img/mypageimg.jpg',
                       width: double.infinity,
-                      height: 200,
+                      height: 250,
                       fit: BoxFit.cover,
                     ),
                   ),
                 )
               else
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(6.0),
                   child: Image.asset(
                     'assets/img/mypageimg.jpg',
                     width: double.infinity,
-                    height: 200,
+                    height: 250,
                     fit: BoxFit.cover,
                   ),
                 ),
               const SizedBox(height: 16),
+              // 사용자 프로필 정보 (사진과 이름)
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundImage: feed.imagePath != null
+                        ? NetworkImage('http://10.0.2.2:3000${feed.imagePath}')
+                        : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
+                    onBackgroundImageError: feed.imagePath != null
+                        ? (exception, stackTrace) {
+                      developer.log('Profile image load failed: $exception', name: 'FeedShow');
+                    }
+                        : null,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    feed.writer?.name ?? '익명',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.0), // 위쪽 여백만 설정
+                child: Divider(
+                  color: Colors.grey,
+                  thickness: 2.0,
+                ),
+              ),
+              const SizedBox(height: 12),
               // 제목
               Text(
                 feed.title,
@@ -141,7 +202,7 @@ class _FeedShowState extends State<FeedShow> {
                 feed.name,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 32),
               // 설명
               Text(
                 feed.content,
@@ -149,6 +210,7 @@ class _FeedShowState extends State<FeedShow> {
               ),
               const SizedBox(height: 16),
               // 좋아요 및 댓글 (더미 데이터)
+
               Row(
                 children: [
                   const Icon(Icons.favorite_border, color: Colors.grey, size: 20),
@@ -160,6 +222,7 @@ class _FeedShowState extends State<FeedShow> {
                   const Text('1', style: TextStyle(color: Colors.grey)),
                 ],
               ),
+
             ],
           ),
         );

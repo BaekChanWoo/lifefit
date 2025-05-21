@@ -18,6 +18,10 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:lifefit/controller/auth_controller.dart';
 import 'package:lifefit/controller/home_controller.dart';
 
+import '../component/pedometer/daily_challenge.dart';
+import '../component/pedometer/step_progress_bar.dart';
+import '../component/sleep/sleep_card.dart';
+
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -130,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     size: 40,
                   ),
                   onPressed: (){
-                    print("클릭됨");
                     Scaffold.of(context).openEndDrawer(); // 오른쪽 Drawer 열기
                   },
                 );
@@ -368,6 +371,7 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
+  final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
 
@@ -437,27 +441,29 @@ class _HomeContentState extends State<HomeContent> {
                     width: 1.0,
                   ),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("일일 챌린지",
+                      const Text("일일 챌린지",
                         style: TextStyle(
                           fontSize: 15.0,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                       SizedBox(height: 5.0,),
-                       Text("10000 걸음 걷기",
+                      const SizedBox(height: 5.0),
+                      const Text("10000 걸음 목표!",
                         style: TextStyle(
                           fontSize: 12.0,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const DailyChallenge(),
                     ],
                   ),
                 ),
+
               ),
             )
         ),
@@ -560,50 +566,18 @@ class _HomeContentState extends State<HomeContent> {
         Positioned(
           top: 395,
           right: 0,
-          child: GestureDetector(
-            onTap: (){
+          child: SleepCard(
+            key: sleepCardKey, // key 추가!
+            onTap: () {
               widget.onContainerTapped();
-              Navigator.of(context).pushNamed('sleep_time');
+              Navigator.of(context).pushNamed('sleep_time').then((_) {
+                // 수면 기록하고 돌아왔을 때 다시 불러오기
+                sleepCardKey.currentState?.refreshData();
+              });
             },
-            child: Container(
-              height: 120,
-              width: MediaQuery.of(context).size.width-240,
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text( "수면시간",
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Icon(Icons.dark_mode,
-                          color: Colors.yellow,
-                          size: 20.0,
-                        )
-                      ],
-                    )
-
-                  ],
-                ),
-              ),
-            ),
           ),
         ),
+
         // 수면 시간
         Positioned(
           top: 395,

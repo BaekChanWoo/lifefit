@@ -1,5 +1,7 @@
 import 'provider.dart';
-
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // Node.js 서버와의 인증 관련 http 요청
 class AuthProvider extends Provider{
@@ -63,4 +65,30 @@ class AuthProvider extends Provider{
       };
     }
   }
+
+  // 프로필(이름/프로필ID) 업데이트
+  Future<Map> updateProfile(String name, {int? profileId}) async {
+    try {
+      final body = {
+        'name': name,
+        if (profileId != null) 'profile_id': profileId,
+      };
+      // POST /api/user/my 로 업데이트 요청
+      final response = await post('/api/user/my', body);
+      if (response == null || response.body == null) {
+        return {
+          'result': 'error',
+          'message': '서버 응답이 없습니다',
+        };
+      }
+      return response.body; // { result: 'ok', data: {...} } 형태
+    } catch (e) {
+      return {
+        'result': 'error',
+        'message': '통신 에러: $e',
+      };
+    }
+  }
+
+
 }

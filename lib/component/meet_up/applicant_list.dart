@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/model/meetup_model.dart';
 
-//신청자 명단 바텀시트
+// 신청자 명단 바텀시트
 class ApplicantList extends StatelessWidget {
-  final Post post; //해당 모집글 정보
+  final Post post; // 해당 모집글 정보
 
   const ApplicantList({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
-    //실제 신청자 리스트 사용 (없으면 기본 메시지)
-    final List<String> applicants = post.applicants;
+    final applicants = post.applicants;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.4,
@@ -34,10 +33,13 @@ class ApplicantList extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              ...applicants.map((name) => ListTile(
-                leading: const Icon(Icons.person_outline),
-                title: Text(name),
-              )),
+              ...applicants.map((applicant) {
+                final name = applicant['name'] ?? '익명';
+                return ListTile(
+                  leading: const Icon(Icons.person_outline),
+                  title: Text(name),
+                );
+              }).toList(),
             ],
           ),
         );

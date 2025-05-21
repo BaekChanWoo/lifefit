@@ -90,15 +90,16 @@ class Weather {
   }
 }
 
-class MainWeatherInfo { // 'Main' 대신 'MainWeatherInfo'로 클래스명 변경 (충돌 방지)
+class MainWeatherInfo {
   final double temp;
   final double feelsLike;
   final double tempMin;
   final double tempMax;
   final int pressure;
   final int humidity;
-  final int? seaLevel; // API 응답에 따라 null일 수 있음
-  final int? grndLevel; // API 응답에 따라 null일 수 있음
+  final int? seaLevel;
+  final int? grndLevel;
+  final double? tempKf; // Added for forecast
 
   MainWeatherInfo({
     required this.temp,
@@ -109,6 +110,7 @@ class MainWeatherInfo { // 'Main' 대신 'MainWeatherInfo'로 클래스명 변�
     required this.humidity,
     this.seaLevel,
     this.grndLevel,
+    this.tempKf, // Added for forecast
   });
 
   factory MainWeatherInfo.fromJson(Map<String, dynamic> json) {
@@ -121,6 +123,7 @@ class MainWeatherInfo { // 'Main' 대신 'MainWeatherInfo'로 클래스명 변�
       humidity: json['humidity'] as int,
       seaLevel: json['sea_level'] as int?,
       grndLevel: json['grnd_level'] as int?,
+      tempKf: (json['temp_kf'] as num?)?.toDouble(), // Added for forecast
     );
   }
 }
@@ -128,7 +131,7 @@ class MainWeatherInfo { // 'Main' 대신 'MainWeatherInfo'로 클래스명 변�
 class Wind {
   final double speed;
   final int deg;
-  final double? gust; // API 응답에 따라 null일 수 있음
+  final double? gust;
 
   Wind({
     required this.speed,
@@ -160,19 +163,14 @@ class Clouds {
 }
 
 class Sys {
-  final String? country; // API 응답에 따라 null일 수 있음
+  final String? country;
   final int sunrise;
   final int sunset;
-  // API에 따라 type, id 등이 추가될 수 있음
-  // final int? type;
-  // final int? id;
 
   Sys({
     this.country,
     required this.sunrise,
     required this.sunset,
-    // this.type,
-    // this.id,
   });
 
   factory Sys.fromJson(Map<String, dynamic> json) {
@@ -180,8 +178,6 @@ class Sys {
       country: json['country'] as String?,
       sunrise: json['sunrise'] as int,
       sunset: json['sunset'] as int,
-      // type: json['type'] as int?,
-      // id: json['id'] as int?,
     );
   }
 }
@@ -261,6 +257,131 @@ class Components {
       pm2_5: (json['pm2_5'] as num).toDouble(),
       pm10: (json['pm10'] as num).toDouble(),
       nh3: (json['nh3'] as num).toDouble(),
+    );
+  }
+}
+
+// OpenWeatherMap 5일 예보 API 응답을 위한 새로운 모델들
+class FiveDayForecastModel {
+  final String cod;
+  final int message;
+  final int cnt;
+  final List<ForecastItem> list;
+  final City city;
+
+  FiveDayForecastModel({
+    required this.cod,
+    required this.message,
+    required this.cnt,
+    required this.list,
+    required this.city,
+  });
+
+  factory FiveDayForecastModel.fromJson(Map<String, dynamic> json) {
+    return FiveDayForecastModel(
+      cod: json['cod'] as String,
+      message: json['message'] as int,
+      cnt: json['cnt'] as int,
+      list: (json['list'] as List<dynamic>)
+          .map((item) => ForecastItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      city: City.fromJson(json['city'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class ForecastItem {
+  final int dt;
+  final MainWeatherInfo main;
+  final List<Weather> weather;
+  final Clouds clouds;
+  final Wind wind;
+  final int visibility;
+  final double pop;
+  final SysForecast sys;
+  final String dtTxt;
+  // rain, snow 필드는 선택적이므로, 해당 필드가 있을 때만 파싱하도록 처리
+  final Map<String, dynamic>? rain;
+  final Map<String, dynamic>? snow;
+
+  ForecastItem({
+    required this.dt,
+    required this.main,
+    required this.weather,
+    required this.clouds,
+    required this.wind,
+    required this.visibility,
+    required this.pop,
+    required this.sys,
+    required this.dtTxt,
+    this.rain,
+    this.snow,
+  });
+
+  factory ForecastItem.fromJson(Map<String, dynamic> json) {
+    return ForecastItem(
+      dt: json['dt'] as int,
+      main: MainWeatherInfo.fromJson(json['main'] as Map<String, dynamic>),
+      weather: (json['weather'] as List<dynamic>)
+          .map((item) => Weather.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      clouds: Clouds.fromJson(json['clouds'] as Map<String, dynamic>),
+      wind: Wind.fromJson(json['wind'] as Map<String, dynamic>),
+      visibility: json['visibility'] as int,
+      pop: (json['pop'] as num).toDouble(),
+      sys: SysForecast.fromJson(json['sys'] as Map<String, dynamic>),
+      dtTxt: json['dt_txt'] as String,
+      rain: json['rain'] as Map<String, dynamic>?,
+      snow: json['snow'] as Map<String, dynamic>?,
+    );
+  }
+}
+
+class City {
+  final int id;
+  final String name;
+  final Coord coord;
+  final String country;
+  final int population;
+  final int timezone;
+  final int sunrise;
+  final int sunset;
+
+  City({
+    required this.id,
+    required this.name,
+    required this.coord,
+    required this.country,
+    required this.population,
+    required this.timezone,
+    required this.sunrise,
+    required this.sunset,
+  });
+
+  factory City.fromJson(Map<String, dynamic> json) {
+    return City(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      coord: Coord.fromJson(json['coord'] as Map<String, dynamic>),
+      country: json['country'] as String,
+      population: json['population'] as int,
+      timezone: json['timezone'] as int,
+      sunrise: json['sunrise'] as int,
+      sunset: json['sunset'] as int,
+    );
+  }
+}
+
+class SysForecast {
+  final String pod;
+
+  SysForecast({
+    required this.pod,
+  });
+
+  factory SysForecast.fromJson(Map<String, dynamic> json) {
+    return SysForecast(
+      pod: json['pod'] as String,
     );
   }
 }
