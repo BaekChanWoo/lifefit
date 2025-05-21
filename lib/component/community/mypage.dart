@@ -4,7 +4,7 @@ import 'package:lifefit/component/community/mypage_button.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/mypage_feed_number.dart';
 import 'package:lifefit/controller/home_controller.dart';
-
+import 'package:lifefit/screen/my/my_edit.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -158,12 +158,19 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: MyPageButton(
-                  onTap: () {},
-                  label: '프로필 수정',
+            Expanded(
+              child: MyPageButton(
+                onTap: () {
+                  // 현재 사용자 이름을 인자로 넘겨서 MyEdit로 이동
+                  Get.to(() => const MyEdit(),
+                        arguments: {
+                          'name': Get.find<HomeScreenController>().userName.value,
+                        },
+                      );
+                    },
+                        label: '프로필 수정',
+                      ),
                 ),
-              ),
               const SizedBox(width: 16.0),
               Expanded(
                 child: MyPageButton(

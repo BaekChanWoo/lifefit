@@ -26,17 +26,9 @@ class _MainMyPageState extends State<MainMyPage> {
   @override
   void initState() {
     super.initState();
-    // 이 페이지가 로드될 때, 모든 카테고리의 게시물을 가져오도록 feedIndex 호출
-    // WidgetsBinding.instance.addPostFrameCallback을 사용하여 build가 완료된 후 안전하게 호출합니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // category를 null로 전달하여 모든 카테고리의 게시물을 요청합니다.
-      // page: 1은 첫 페이지의 데이터를 가져옴을 의미합니다.
-      // 만약 사용자의 모든 게시물을 한 번에 가져와야 하고 서버가 이를 지원한다면,
-      // 페이지네이션 없이 모든 데이터를 가져오는 별도의 메소드나 파라미터가 필요할 수 있습니다.
-      // 현재는 feedIndex를 활용하여 첫 페이지의 전체 게시물을 가져옵니다.
+
       feedController.feedIndex(page: 1, category: null).then((_) {
-        // 데이터 로드가 완료된 후 UI가 올바르게 업데이트되도록 setState를 호출할 수 있으나,
-        // GetX의 Obx가 feedList의 변경을 감지하므로 명시적인 setState는 필요 없을 수 있습니다.
         if (mounted) {
           setState(() {}); // Obx가 반응하도록 강제 업데이트 (필요에 따라 사용)
         }
