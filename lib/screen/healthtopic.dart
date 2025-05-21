@@ -19,10 +19,6 @@ class _HealthtopicState extends State<Healthtopic> {
   List<NewsArticle> _newsSliderArticles = []; // 카드 슬라이더 뉴스
   List<ArticleItem> _realTimeTopicArticles = []; // 실시간 토픽
   List<SearchResult> _youtubeVideos = [];
-  List<Map<String, dynamic>> _recipeData = [];
-
-  // 테스트 이미지 에셋 경로
-  final String test1Image = 'assets/img/test1.png';
 
   // 최상단 이미지 슬라이더/인디케이터 요소
   final List<int> pages = List.generate(4, (index) => index); //카드 인덱스
@@ -56,11 +52,6 @@ class _HealthtopicState extends State<Healthtopic> {
     _fetchYoutubeVideos().then((videos) {
       setState(() {
         _youtubeVideos = videos;
-      });
-    });
-    _fetchRecipeData().then((recipes) {
-      setState(() {
-        _recipeData = recipes;
       });
     });
   }
@@ -100,31 +91,6 @@ class _HealthtopicState extends State<Healthtopic> {
     controller.dispose();
     super.dispose();
   }
-
-  // 데이터 리스트 정의 (순차 삭제)
-  final List<Map<String, dynamic>> mealRecommendations = [
-    {
-      'image': 'assets/img/test1.png',
-      'title': '상큼한 샐러드 레시피',
-      'recipe': 'XXX 레시피',
-    },
-    {
-      'image': 'assets/img/test1.png',
-      'title': '건강한 스무디',
-      'recipe': 'YYY 레시피',
-    },
-    {
-      'image': 'assets/img/test1.png',
-      'title': '건강한 스무디',
-      'recipe': 'YYY 레시피',
-    },
-    {
-      'image': 'assets/img/test1.png',
-      'title': '건강한 스무디',
-      'recipe': 'YYY 레시피',
-    },
-    // ... 더 많은 식사 추천 데이터
-  ]; // 식사 추천
 
   // 공통 위젯 생성 함수 정의
   Widget _buildContentCard(Map<String, dynamic> data, String contentType , [int index = 0]) {
@@ -184,47 +150,6 @@ class _HealthtopicState extends State<Healthtopic> {
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        );
-      case 'mealRecommendation': // 레시피 섹션
-        return Card(
-          shape: ContinuousRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          elevation: 4.0,
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.network( // Image.network 사용
-                    data['image'],
-                    width: 154.0,
-                    height: 154.0,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, object, stackTrace) {
-                      return Center(child: Icon(Icons.error_outline));
-                    },
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Text(data['title'], textAlign: TextAlign.left),
-                SizedBox(height: 8.0),
-                Text(data['recipe']),
               ],
             ),
           ),
@@ -486,38 +411,6 @@ class _HealthtopicState extends State<Healthtopic> {
             ),
             SizedBox(height: 48.0),
 
-            // 레시피 섹션(공공 db 예정)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text('식사로 챙기는 건강!',
-                  style:
-                  TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
-            ),
-            SizedBox(
-              height: 250.0,
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _fetchRecipeData(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    final recipeData = snapshot.data!;
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: recipeData.length,
-                      itemBuilder: (context, index) {
-                        return _buildContentCard(recipeData[index], 'mealRecommendation');
-                      },
-                    );
-                  } else {
-                    return Center(child: Text('No data'));
-                  }
-                },
-              ),
-            ),
-            SizedBox(height: 48.0),
 
             // 영상 섹션 (유튜브 적용)
             Padding(
