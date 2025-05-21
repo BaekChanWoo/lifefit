@@ -6,6 +6,7 @@ import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/calendar/schedule_bottom_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lifefit/model/schedule_model.dart';
+import 'package:lifefit/component/banner/banner_ad_widget.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -99,8 +100,14 @@ class _CalendarState extends State<Calendar> {
                               (json: (e.data() as Map<String , dynamic>)),
                         ).toList();
 
-                        return ListView.builder(
+                        // 리스트 내부의 위젯 사이사이에 또 다른 위젯을 입력하고 싶을 때 사용
+                        return ListView.separated(
                             itemCount: schedules.length,
+
+                            // 일정 중간중간에 실행될 함수
+                            separatorBuilder: (context , index){
+                              return BannerAdWidget();
+                            },
                             itemBuilder: (context , index) {
                               final schedule = schedules[index];
 

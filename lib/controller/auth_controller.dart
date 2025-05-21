@@ -22,7 +22,7 @@ class AuthController extends GetxController {
         log('Auth state restored: UID=${user.uid}', name: 'AuthController');
         if (Global.accessToken == null) {
           await Global.updateAccessToken();
-          log('Restored accessToken: ${Global.accessToken}', name: 'AuthController');
+          // log('Restored accessToken: ${Global.accessToken}', name: 'AuthController');
         }
         await _syncUserProfile();
         log('User profile synced: user_id=${_userId.value}', name: 'AuthController');

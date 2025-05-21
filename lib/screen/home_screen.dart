@@ -134,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     size: 40,
                   ),
                   onPressed: (){
-                    print("클릭됨");
                     Scaffold.of(context).openEndDrawer(); // 오른쪽 Drawer 열기
                   },
                 );

@@ -11,11 +11,16 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'shared/global.dart';
 import 'dart:developer';
 import 'package:lifefit/controller/home_controller.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+
 
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
+
+  MobileAds.instance.initialize();
 
   // Firebase 초기화
   try {

@@ -18,7 +18,7 @@ class Global {
       }
       _accessToken = await user.getIdToken(); // 사용자가 있으면 최신 ID 토큰을 가져옴
       userId = int.tryParse(user.uid) ?? 0; // 서버 user_id와 동기화 필요
-      log('Updated accessToken: $accessToken, userId: $userId', name: 'Global');
+      // log('Updated accessToken: $accessToken, userId: $userId', name: 'Global');
       if (_accessToken == null) {
         throw Exception('Failed to retrieve ID token');
       }
