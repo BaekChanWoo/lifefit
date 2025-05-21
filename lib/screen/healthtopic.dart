@@ -493,27 +493,6 @@ class _HealthtopicState extends State<Healthtopic> {
     }
   }
 
-  // 레시피 데이터 가져오는 함수
-  Future<List<Map<String, dynamic>>> _fetchRecipeData() async {
-    final String apiKey = 'YOUR_RECIPE_API_KEY';
-    final String apiUrl = 'YOUR_RECIPE_API_URL';
-
-    final Uri uri = Uri.parse(apiUrl);
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      final List<dynamic> results = jsonResponse['results'];
-      return results.map((result) => {
-        'title': result['title'],
-        'image': result['image'],
-        'recipe': result['recipe'],
-      }).toList();
-    } else {
-      throw Exception('Failed to load recipe data: ${response.statusCode}');
-    }
-  }
-
   // 유튜브 건강 관련 영상 데이터 함수
   Future<List<SearchResult>> _fetchYoutubeVideos() async {
     final String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs';
