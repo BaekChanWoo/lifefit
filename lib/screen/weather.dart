@@ -133,9 +133,6 @@ class _WeatherState extends State<Weather> {
 
   // 미세먼지 상태에 따른 이미지 경로 반환 함수
   String _getAirQualityImagePath(String status) {
-    // 현재는 weather_good.png만 있으므로, 모든 상태에 대해 이 이미지를 반환
-    // 나중에 다른 이미지가 추가되면 switch-case 문으로 변경
-    /*
     switch (status) {
       case '좋음':
         return 'assets/img/weather_good.png';
@@ -148,8 +145,6 @@ class _WeatherState extends State<Weather> {
       default:
         return 'assets/img/weather_good.png'; // 기본 이미지
     }
-    */
-    return 'assets/img/weather_good.png'; // 현재는 항상 good 이미지를 반환
   }
 
   @override
