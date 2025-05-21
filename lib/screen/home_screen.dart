@@ -20,6 +20,7 @@ import 'package:lifefit/controller/home_controller.dart';
 
 import '../component/pedometer/daily_challenge.dart';
 import '../component/pedometer/step_progress_bar.dart';
+import '../component/sleep/sleep_card.dart';
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
@@ -371,6 +372,7 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
+  final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
 
@@ -565,50 +567,18 @@ class _HomeContentState extends State<HomeContent> {
         Positioned(
           top: 395,
           right: 0,
-          child: GestureDetector(
-            onTap: (){
+          child: SleepCard(
+            key: sleepCardKey, // key 추가!
+            onTap: () {
               widget.onContainerTapped();
-              Navigator.of(context).pushNamed('sleep_time');
+              Navigator.of(context).pushNamed('sleep_time').then((_) {
+                // 수면 기록하고 돌아왔을 때 다시 불러오기
+                sleepCardKey.currentState?.refreshData();
+              });
             },
-            child: Container(
-              height: 120,
-              width: MediaQuery.of(context).size.width-240,
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text( "수면시간",
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Icon(Icons.dark_mode,
-                          color: Colors.yellow,
-                          size: 20.0,
-                        )
-                      ],
-                    )
-
-                  ],
-                ),
-              ),
-            ),
           ),
         ),
+
         // 수면 시간
         Positioned(
           top: 395,
