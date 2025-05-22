@@ -7,7 +7,7 @@ class SleepCard extends StatefulWidget {
   const SleepCard({super.key, required this.onTap});
 
   @override
-  SleepCardState createState() => SleepCardState(); // ✅ 이름을 공개형으로 바꿈
+  SleepCardState createState() => SleepCardState(); //이름을 공개형으로 바꿈
 }
 
 
