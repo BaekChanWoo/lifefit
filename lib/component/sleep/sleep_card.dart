@@ -48,9 +48,9 @@ class SleepCardState extends State<SleepCard> {
 
     if (snapshot.docs.isEmpty) {
       setState(() {
-        todaySleepText = '오늘 수면 기록이 없습니다';
+        todaySleepText = '수면 기록이 없습니다';
         statusMessage = '';
-        backgroundColor = Colors.grey.shade100;
+        //backgroundColor = Colors.grey.shade100;
       });
       return;
     }
