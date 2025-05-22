@@ -21,6 +21,8 @@ import 'package:lifefit/controller/home_controller.dart';
 import '../component/pedometer/daily_challenge.dart';
 import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
@@ -167,15 +169,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundImage: AssetImage('assets/img/mypageimg.jpg'),
                   ),
                   otherAccountsPictures: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.access_time , color: Colors.black, size: 23,),
-                        Text('4시간전 ',
-                          style: TextStyle(fontSize: 10 , color: Colors.black),
-                        ),
-                      ],
-                    )
+                    Obx(() {
+                          final last = Get.find<HomeScreenController>().lastLoginTime.value;
+                          return Column(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             children: [
+                               const Icon(Icons.access_time, color: Colors.black, size: 23),
+                               Text(
+                                 timeago.format(last),
+                                 style: const TextStyle(fontSize: 10, color: Colors.black),
+                               ),
+                             ],
+                           );
+                         }),
                   ],
                   decoration: BoxDecoration(
                     color: PRIMARY_COLOR,

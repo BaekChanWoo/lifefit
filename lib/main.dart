@@ -12,6 +12,7 @@ import 'shared/global.dart';
 import 'dart:developer';
 import 'package:lifefit/controller/home_controller.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 
 
@@ -35,6 +36,10 @@ void main() async {
   }
 
   await initializeDateFormatting('ko_KR', null);
+  // 한국어 메시지 등록
+  timeago.setLocaleMessages('ko', timeago.KoMessages());
+  // (선택) 한 번만 등록하면 매번 locale 파라미터를 생략
+  timeago.setDefaultLocale('ko');
 
   // GetX 의존성 초기화
   Get.put(AuthController(), permanent: true); // 영속 인스턴스
