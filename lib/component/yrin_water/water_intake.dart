@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
 class WaterIntake extends StatefulWidget {
-  final Function(int) onAmountChanged; // 이제 이 함수는 '변화량'을 받습니다.
-  final int initialWaterAmount; // 컵의 초기 표시량 (사용되지 않을 수도 있음)
-  final int currentTotalAmount; // 오늘의 총 섭취량을 표시하기 위한 값
-
+  final Function(int) onAmountChanged;
+  final int initialWaterAmount;
+  final int currentTotalAmount;
   const WaterIntake({
     super.key,
     required this.onAmountChanged,
-    this.initialWaterAmount = 0, // 초기값 0 설정
-    this.currentTotalAmount = 0, // 오늘의 총 섭취량
+    this.initialWaterAmount = 0,
+    this.currentTotalAmount = 0,
   });
 
   @override
@@ -17,19 +16,14 @@ class WaterIntake extends StatefulWidget {
 }
 
 class _WaterIntakeState extends State<WaterIntake> {
-  // 이 변수는 이제 WaterIntake 위젯 내에서 '컵의 현재 양'을 시각적으로 표시하는 용도로만 사용됩니다.
-  // 이 값이 Firestore에 직접 저장되는 '추가량'이 아닙니다.
   int _displayWaterAmount = 0; // 컵에 표시될 물 양
 
   @override
   void initState() {
     super.initState();
-    // 초기화 시 부모로부터 받은 initialWaterAmount를 사용하여 컵의 초기 상태를 설정할 수 있습니다.
-    // 여기서는 0으로 시작하는 것이 더 직관적일 수 있습니다.
     _displayWaterAmount = widget.initialWaterAmount;
   }
 
-  // 로컬 waterAmount 상태를 업데이트하고, 부모 위젯에 '변화량'을 전달하는 함수
   void _addOrSubtractWater(int amount) {
     setState(() {
       _displayWaterAmount += amount;
@@ -37,7 +31,7 @@ class _WaterIntakeState extends State<WaterIntake> {
         _displayWaterAmount = 0; // 물 양 음수 방지
       }
     });
-    // ⭐️ 부모 위젯에 'amount' (즉, +250ml 또는 -50ml) 자체를 전달
+
     widget.onAmountChanged(amount);
   }
 
@@ -57,7 +51,7 @@ class _WaterIntakeState extends State<WaterIntake> {
               color: Colors.black,
               fontSize: 22,
               fontFamily: 'NanumSquareRound',
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -132,7 +126,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
-                                fontFamily: 'Padauk',
+                                fontFamily: 'NanumSquareRound',
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
