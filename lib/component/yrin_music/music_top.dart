@@ -32,7 +32,7 @@ class _MusicTopState extends State<MusicTop> {
               Text('운동 플레이리스트',
                 style: TextStyle(
                   fontSize: 22,
-                  fontFamily: 'padauk',
+                  fontFamily: 'NanumSquareRound',
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
@@ -61,6 +61,7 @@ class _MusicTopState extends State<MusicTop> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'NanumSquareRound',
                           ),
                         ),
 
