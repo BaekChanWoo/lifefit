@@ -85,6 +85,7 @@ void main() async {
           '/register' : (context) => const Register(),
         },
       theme: ThemeData(
+        fontFamily: 'NanumSquareRound',
         useMaterial3: true,
         inputDecorationTheme: const InputDecorationTheme(
           hintStyle: TextStyle(fontSize: 16 , color: Colors.grey),
