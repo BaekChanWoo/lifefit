@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../model/weather_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart'; // 날짜 포맷을 위해 추가
+import 'package:intl/intl.dart';
 
 class Weather extends StatefulWidget {
   const Weather({Key? key}) : super(key: key);
