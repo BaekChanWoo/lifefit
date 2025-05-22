@@ -6,6 +6,7 @@ class SleepCard extends StatefulWidget {
   final VoidCallback onTap;
   const SleepCard({super.key, required this.onTap});
 
+
   @override
   SleepCardState createState() => SleepCardState(); //이름을 공개형으로 바꿈
 }
@@ -60,11 +61,11 @@ class SleepCardState extends State<SleepCard> {
     String message;
     Color color;
     if (sleepHours < 6) {
-      message = '😴 수면이 부족해요';
+      message = '😵 피곤해요';
     } else if (sleepHours <= 8) {
-      message = '😌 적절한 수면을 취했어요';
+      message = '🙂 괜찮아요';
     } else {
-      message = '😄 푹 주무셨어요';
+      message = '🌞 에너지 충전 완료';
     }
 
     setState(() {
@@ -119,7 +120,7 @@ class SleepCardState extends State<SleepCard> {
               const SizedBox(height: 2),
               Text(
                 statusMessage,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ],
           ),
