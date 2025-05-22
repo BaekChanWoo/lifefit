@@ -7,11 +7,17 @@ class HomeScreenController extends GetxController {
   final AuthProvider authProvider = Get.find<AuthProvider>();
   var userName = ''.obs; // 사용자 이름을 저장하는 반응형 변수
   var isFetching = false; // 중복 호출 방지 플래그
+  var lastLoginTime = DateTime.now().obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchUserName(); // 화면 초기화 시 사용자 이름 가져오기
+
+    // TODO: 서버로부터 실제 lastLoginTime을 받아서 세팅하거나,
+    // 로그인 성공 직후에 아래처럼 현재 시간으로 설정.
+    // lastLoginTime.value = fetchedLastLogin;
+
   }
 
   // 서버에서 사용자 이름을 가져오는 메서드

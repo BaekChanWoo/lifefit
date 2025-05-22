@@ -7,7 +7,7 @@ class SleepCard extends StatefulWidget {
   const SleepCard({super.key, required this.onTap});
 
   @override
-  SleepCardState createState() => SleepCardState(); // ✅ 이름을 공개형으로 바꿈
+  SleepCardState createState() => SleepCardState(); //이름을 공개형으로 바꿈
 }
 
 
@@ -48,9 +48,9 @@ class SleepCardState extends State<SleepCard> {
 
     if (snapshot.docs.isEmpty) {
       setState(() {
-        todaySleepText = '오늘 수면 기록이 없습니다';
+        todaySleepText = '수면 기록이 없습니다';
         statusMessage = '';
-        backgroundColor = Colors.grey.shade100;
+        //backgroundColor = Colors.grey.shade100;
       });
       return;
     }

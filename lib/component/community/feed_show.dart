@@ -5,6 +5,8 @@ import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/component/community/feed_edit.dart';
 import 'package:lifefit/controller/auth_controller.dart';
 import 'dart:developer' as developer;
+import 'package:timeago/timeago.dart' as timeago;
+
 
 class FeedShow extends StatefulWidget {
   final int feedId;
@@ -112,27 +114,43 @@ class _FeedShowState extends State<FeedShow> {
           return const Center(child: CircularProgressIndicator());
         }
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 이미지
               if (feed.imageId != null)
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: Image.network(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
                     'http://10.0.2.2:3000${feed.imagePath}', // 실제 서버 URL
                     width: double.infinity,
-                    height: 250,
+                   // height: 250,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Image.asset(
                       'assets/img/mypageimg.jpg',
                       width: double.infinity,
-                      height: 250,
+                    //  height: 250,
                       fit: BoxFit.cover,
                     ),
                   ),
-                )
+                ),
+              )
               else
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6.0),
@@ -148,7 +166,7 @@ class _FeedShowState extends State<FeedShow> {
               Row(
                 children: [
                   CircleAvatar(
-                    radius: 22,
+                    radius: 20,
                     backgroundImage: feed.imagePath != null
                         ? NetworkImage('http://10.0.2.2:3000${feed.imagePath}')
                         : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
@@ -158,7 +176,7 @@ class _FeedShowState extends State<FeedShow> {
                     }
                         : null,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Text(
                     feed.writer?.name ?? '익명',
                     style: const TextStyle(
@@ -171,32 +189,35 @@ class _FeedShowState extends State<FeedShow> {
               Padding(
                 padding: EdgeInsets.only(top: 10.0), // 위쪽 여백만 설정
                 child: Divider(
-                  color: Colors.grey,
-                  thickness: 2.0,
+                  color: Colors.grey[300],
+                  thickness: 1.0,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               // 제목
               Text(
                 feed.title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                Theme.of(context).textTheme.headlineSmall
+                //TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               // 카테고리 및 작성 시간
               Row(
                 children: [
-                  Text(
-                    feed.category,
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
+                  Chip(label: Text(feed.category)),
                   const SizedBox(width: 8),
                   Text(
-                    '${(DateTime.now().difference(feed.createdAt!).inMinutes)}분 전',
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    timeago.format(
+                        feed.createdAt!
+                    ), // 시간ago 패키지 활용 추천
+                    //'${(DateTime.now().difference(feed.createdAt!).inMinutes)}분 전',
+                    style: const TextStyle(color: Colors.grey, fontSize: 14
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               // 별명
               Text(
                 feed.name,
@@ -207,8 +228,9 @@ class _FeedShowState extends State<FeedShow> {
               Text(
                 feed.content,
                 style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.justify,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               // 좋아요 및 댓글 (더미 데이터)
 
               Row(
@@ -224,6 +246,8 @@ class _FeedShowState extends State<FeedShow> {
               ),
 
             ],
+
+          ),
           ),
         );
       }),
