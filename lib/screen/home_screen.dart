@@ -577,8 +577,9 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
         ),
-
         // 수면 시간
+
+
         Positioned(
           top: 395,
           child: GestureDetector(
