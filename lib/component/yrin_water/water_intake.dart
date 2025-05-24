@@ -127,7 +127,7 @@ class _WaterIntakeState extends State<WaterIntake> {
                                 color: Colors.black,
                                 fontSize: 20,
                                 fontFamily: 'NanumSquareRound',
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             const SizedBox(width: 15),

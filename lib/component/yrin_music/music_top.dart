@@ -33,7 +33,7 @@ class _MusicTopState extends State<MusicTop> {
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'NanumSquareRound',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
               ), // 왼쪽 여백 추가,
