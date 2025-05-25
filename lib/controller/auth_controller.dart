@@ -320,6 +320,7 @@ class AuthController extends GetxController {
   }
 
 
+
   // 로그아웃 처리 메서드
   // 반환: 로그아웃 성공 시 true, 실패 시 false
   Future<bool> logout() async {

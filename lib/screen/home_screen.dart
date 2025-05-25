@@ -369,8 +369,11 @@ class HomeContentWithNavigation extends StatelessWidget {
 
 // 컨테이너 5개는 다 세부페이지
 class HomeContent extends StatefulWidget {
+
+
   final VoidCallback onContainerTapped;
   const HomeContent({super.key , required this.onContainerTapped});
+
 
   @override
   State<HomeContent> createState() => _HomeContentState();
@@ -378,6 +381,7 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent> {
   final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
 
@@ -393,7 +397,10 @@ class _HomeContentState extends State<HomeContent> {
                 color: PRIMARY_COLOR
             ),
             child: Container(
-              padding: EdgeInsets.only(top: 25 , left: 25),
+              padding: EdgeInsets.only(
+                  top: 25 ,
+                  left: 25
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,

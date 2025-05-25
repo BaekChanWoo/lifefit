@@ -205,7 +205,7 @@ class _FeedShowState extends State<FeedShow> {
               // 카테고리 및 작성 시간
               Row(
                 children: [
-                  Chip(label: Text(feed.category)),
+                  Text(feed.category),
                   const SizedBox(width: 8),
                   Text(
                     timeago.format(
