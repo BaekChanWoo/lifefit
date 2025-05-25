@@ -7,10 +7,13 @@ import 'dart:developer' as developer;
 
 class FeedController extends GetxController{
   final feedProvider = Get.put(FeedProvider());
-  RxList<FeedModel> feedList = <FeedModel>[].obs;
+
+  final RxList<FeedModel> feedList = <FeedModel>[].obs;
   final Rx<FeedModel?> currentFeed = Rx<FeedModel?>(null);
   final RxString selectedCategory = ''.obs; // 빈 문자열로 초기화 (전체 보기)
   final RxBool isLoading = false.obs;
+  final RxList<FeedModel> searchList = <FeedModel>[].obs;
+
 
 
   @override
@@ -57,6 +60,14 @@ class FeedController extends GetxController{
       //_handleError(page, '서버에 연결할 수 없습니다: $e');
       Get.snackbar('네트워크 에러', '서버에 연결할 수 없습니다: $e', snackPosition: SnackPosition.BOTTOM);
     }
+  }
+
+
+  searchIndex(String keyword , {int page = 1 }) async{
+    Map json = await feedProvider.index(page : page , keyword: keyword);
+    List<FeedModel> tmp =
+        json['data'].map<FeedModel>((m) => FeedModel.parse(m)).toList();
+    (page == 1) ? searchList.assignAll(tmp) : searchList.addAll(tmp);
   }
 
 

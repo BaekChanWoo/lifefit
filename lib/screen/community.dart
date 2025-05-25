@@ -7,6 +7,7 @@ import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/main_mypage.dart';
 import 'package:lifefit/component/community/feed.dart';
 import 'package:lifefit/controller/home_controller.dart';
+import 'package:lifefit/component/community/feed_search_form.dart';
 
 // 커뮤니티 메인 페이지
 class Community extends StatefulWidget {
@@ -76,14 +77,19 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
             children: [
             Obx(() =>  Text(
               Get.find<HomeScreenController>().userName.value,
-              style: TextStyle(fontSize: 25 , fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 22 , fontWeight: FontWeight.w600),
             ),
             ),
           ],
           ),
           actions: [
             Padding(padding: const EdgeInsets.all(14.0),
-              child: Icon(CupertinoIcons.search , size: 25,),
+              child: IconButton(
+                onPressed: (){
+                  Get.to(() => const FeedSearchForm());
+                },
+                icon : const Icon(CupertinoIcons.search , size: 25,),
+              ),
             ),
             Padding(padding: const EdgeInsets.all(14.0),
               child: Icon(Icons.favorite , size: 25,),
