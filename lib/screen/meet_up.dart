@@ -76,7 +76,7 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFFFFFF),
         title: const Text(
-            '번개', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
+            '번개', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
