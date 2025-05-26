@@ -24,6 +24,7 @@ import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 
+
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -370,7 +371,6 @@ class HomeContentWithNavigation extends StatelessWidget {
 // 컨테이너 5개는 다 세부페이지
 class HomeContent extends StatefulWidget {
 
-
   final VoidCallback onContainerTapped;
   const HomeContent({super.key , required this.onContainerTapped});
 
@@ -590,7 +590,6 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
         ),
-
         // 수면 시간
         Positioned(
           top: 395,
@@ -600,7 +599,7 @@ class _HomeContentState extends State<HomeContent> {
               Navigator.of(context).pushNamed('water');
             },
             child: Container(
-              height: 120,
+              height: 140,
               width: MediaQuery.of(context).size.width-240,
               margin: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
