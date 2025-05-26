@@ -187,7 +187,7 @@ class _SleepScreenState extends State<SleepScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              const Text('수면 시간', style: TextStyle(fontSize: 22,fontFamily: 'NanumSquareRound', fontWeight: FontWeight.w100)),
+              const Text('수면 시간', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
