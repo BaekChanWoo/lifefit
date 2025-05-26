@@ -109,7 +109,7 @@ class FeedController extends GetxController{
         return false;
       }
     } catch (e) {
-      Get.snackbar('네트워크 에러', '서버에 연결할 수 없습니다: $e', snackPosition: SnackPosition.BOTTOM);
+      // Get.snackbar('네트워크 에러', '서버에 연결할 수 없습니다: $e', snackPosition: SnackPosition.BOTTOM);
       return false;
     }
   }
