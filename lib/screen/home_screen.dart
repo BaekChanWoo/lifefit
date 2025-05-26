@@ -469,7 +469,7 @@ class _HomeContentState extends State<HomeContent> {
                       const Text("10000 걸음 목표!",
                         style: TextStyle(
                           fontSize: 12.0,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const DailyChallenge(),

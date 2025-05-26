@@ -69,12 +69,12 @@ class _StepProgressBarState extends State<StepProgressBar>
         //걸음 수 진행도 막대
         LinearProgressIndicator(
           value: progress,
-          minHeight: 10,
+          minHeight: 15,
           backgroundColor: Colors.grey[300],
           color: Colors.green,
         ),
 
-        const SizedBox(height: 5),
+        const SizedBox(height: 7),
 
         //목표 달성 표시
         Row(
