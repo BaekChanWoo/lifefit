@@ -5,10 +5,14 @@ class FeedProvider extends Provider{
   static const String _baseFeedPath = '/api/feed';
 
   // 피드 목록 조회
-  Future<Map<String, dynamic>> index({int page = 1, String? category}) async{
+  Future<Map<String, dynamic>> index({int page = 1, String? category , String? keyword}) async{
     final query = {'page': page.toString()};
     if (category != null && category.isNotEmpty) {
       query['category'] = category;
+    }
+
+    if(keyword != null){
+      query['keyword'] = keyword;
     }
     final response = await get('$_baseFeedPath', query: query);
     // 응답 바디가 Map<String, dynamic>이 아닌 경우 빈 맵 반환
