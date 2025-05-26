@@ -22,7 +22,7 @@ import '../component/pedometer/daily_challenge.dart';
 import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
+import 'package:lifefit/component/yrin_water/water_box.dart';
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
@@ -588,46 +588,29 @@ class _HomeContentState extends State<HomeContent> {
 
         Positioned(
           top: 395,
+          left: 0, // 물 박스가 왼쪽에 오도록 설정 (SleepCard와 겹치지 않게)
           child: GestureDetector(
             onTap: (){
               widget.onContainerTapped();
+              // 'water' 라우트로 이동하는 것은 물 섭취량 추가/수정 화면으로 연결됩니다.
+              // WaterProgressChart는 Firebase Stream을 통해 실시간 업데이트되므로
+              // waterProgressChartKey.currentState?.refreshData(); 호출은 필요 없습니다.
               Navigator.of(context).pushNamed('water');
             },
             child: Container(
-              height: 120,
-              width: MediaQuery.of(context).size.width-240,
-              margin: const EdgeInsets.symmetric(horizontal: 30),
+              height: 120, // 기존 높이 유지
+              width: MediaQuery.of(context).size.width - 240, // 기존 너비 유지
+              margin: const EdgeInsets.symmetric(horizontal: 30), // 기존 마진 유지
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
                   color: Colors.grey,
-                  width: 1.0,
+                  width: 1.0
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                         Text( "물",
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                         Icon(Icons.water_drop,
-                          color: Colors.blue,
-                          size: 20.0,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              // ⭐️ 여기 자식으로 WaterProgressChart 위젯을 추가합니다.
+              child: const WaterBox(dailyTarget: 2000), // dailyTarget을 필요에 따라 조절
             ),
           ),
         ),

@@ -10,18 +10,19 @@ class FirebaseWaterService {
   // 물 섭취 기록 추가
   Future<void> addWaterIntake(String userId, int amount, DateTime intakeTime) async {
     try {
-      final dailyDate = DateTime(intakeTime.year, intakeTime.month, intakeTime.day);
+      final dailyDate = DateTime(intakeTime.year, intakeTime.month, intakeTime.day); // 문서 ID용 순수 날짜
 
       final dateKey = '${dailyDate.year}-${dailyDate.month.toString().padLeft(2, '0')}-${dailyDate.day.toString().padLeft(2, '0')}';
       final docRef = waterCollection.doc(userId).collection('daily_intake').doc(dateKey);
-      final newDetail = WaterIntakeDetail(amount: amount, intakeTime: dailyDate);
+      // ⭐️ WaterIntakeDetail의 intakeTime에 시간 정보가 포함된 intakeTime을 그대로 전달
+      final newDetail = WaterIntakeDetail(amount: amount, intakeTime: intakeTime);
 
       final docSnapshot = await docRef.get();
 
       if (!docSnapshot.exists) {
         final newDailyIntake = DailyIntake(
           userId: userId,
-          date: dailyDate,
+          date: dailyDate, // DailyIntake 문서의 'date' 필드는 순수 날짜
           totalAmount: amount,
           intakeDetails: [newDetail],
         );
@@ -31,7 +32,7 @@ class FirebaseWaterService {
         await docRef.update({
           'totalAmount': FieldValue.increment(amount),
           'intakeDetails': FieldValue.arrayUnion([newDetail.toJson()]),
-          'date': Timestamp.fromDate(dailyDate), // DailyIntake 문서 자체의 date 필드도 순수 날짜로 업데이트
+          'date': Timestamp.fromDate(dailyDate),
         });
         log('Firebase에 기존 일별 기록 문서 업데이트 (userId: $userId, date: $dateKey)', name: 'FirebaseWaterService');
       }
