@@ -79,7 +79,7 @@ class SleepCardState extends State<SleepCard> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        height: 140,
+        height: 145,
         width: MediaQuery.of(context).size.width - 240,
         margin: const EdgeInsets.symmetric(horizontal: 30),
         decoration: BoxDecoration(

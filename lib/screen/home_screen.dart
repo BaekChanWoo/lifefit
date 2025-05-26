@@ -392,13 +392,13 @@ class _HomeContentState extends State<HomeContent> {
           right: 0,
           left: 0,
           child: Container(
-            height: 305,
+            height: 345,
             decoration: BoxDecoration(
                 color: PRIMARY_COLOR
             ),
             child: Container(
               padding: EdgeInsets.only(
-                  top: 25 ,
+                  top: 35 ,
                   left: 25
               ),
               child: Column(
@@ -436,14 +436,14 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 안녕하세요 SKHU님
         Positioned(
-            top: 80,
+            top: 100,
             child: GestureDetector(
               onTap: (){
                 widget.onContainerTapped();
                 Navigator.of(context).pushNamed('daily_challenge');
               },
               child: Container(
-                height: 120,
+                height: 130,
                 width: MediaQuery.of(context).size.width-60,
                 margin: const EdgeInsets.symmetric(horizontal: 30),
                 decoration: BoxDecoration(
@@ -482,7 +482,7 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 일일 챌린지
         Positioned(
-          top: 210,
+          top: 240,
           child: GestureDetector(
             onTap: (){
               widget.onContainerTapped();
@@ -529,7 +529,7 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 건강 정보 기사
         Positioned(
-          top: 210,
+          top: 240,
           right: 0,
           child: GestureDetector(
             onTap: (){
@@ -577,7 +577,7 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 미세먼지/
         Positioned(
-          top: 395,
+          top: 425,
           right: 0,
           child: SleepCard(
             key: sleepCardKey, // key 추가!
@@ -592,14 +592,14 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 수면 시간
         Positioned(
-          top: 395,
+          top: 425,
           child: GestureDetector(
             onTap: (){
               widget.onContainerTapped();
               Navigator.of(context).pushNamed('water');
             },
             child: Container(
-              height: 140,
+              height: 145,
               width: MediaQuery.of(context).size.width-240,
               margin: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
