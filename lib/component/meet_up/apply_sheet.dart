@@ -33,7 +33,7 @@ class _ApplySheetState extends State<ApplySheet> {
     final user = FirebaseAuth.instance.currentUser;
     currentUserId = user?.uid ?? 'guest';
 
-    // 🔥 이름은 HomeScreenController에서 가져오기
+    //이름은 HomeScreenController에서 가져오기
     final homeController = Get.find<HomeScreenController>();
     final rawName = homeController.userName.value;
     currentUserName = rawName.trim().isNotEmpty ? rawName : '익명';
@@ -55,7 +55,7 @@ class _ApplySheetState extends State<ApplySheet> {
     final docRef = FirebaseFirestore.instance.collection('meetups').doc(docId);
 
     if (isApplied) {
-      // 신청 취소: uid 일치하는 항목 제거
+      // 신청 취소 . uid 일치하는 항목 제거
       widget.post.applicants.removeWhere((applicant) => applicant['uid'] == currentUserId);
       widget.post.currentPeople--;
 
@@ -106,10 +106,13 @@ class _ApplySheetState extends State<ApplySheet> {
         children: [
           Text(widget.post.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
-          Text(widget.post.location, style: const TextStyle(fontSize: 16)),
-          const SizedBox(height: 4),
-          Text(widget.post.dateTime, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          const SizedBox(height: 5),
+          Row(
+            children: [Text(widget.post.location, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 10),
+              Text(widget.post.dateTime, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+              const SizedBox(height: 5)
+            ],
+          ),
           Text(widget.post.description, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           const SizedBox(height: 4),
           Text(
