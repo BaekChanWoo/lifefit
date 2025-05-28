@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:lifefit/screen/my/mypage.dart';
 import 'package:lifefit/screen/music.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:provider/provider.dart';
 
 import 'package:lifefit/controller/auth_controller.dart';
 import 'package:lifefit/controller/home_controller.dart';
@@ -23,6 +24,7 @@ import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:lifefit/component/yrin_water/water_box.dart';
+import 'package:lifefit/provider/water_provider.dart';
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
@@ -585,35 +587,47 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 수면 시간
 
-
         Positioned(
-          top: 395,
-          left: 0, // 물 박스가 왼쪽에 오도록 설정 (SleepCard와 겹치지 않게)
+          top: 395, // UI에 맞게 위치 조정
+          left: 0,
+          // right: 0, // width를 지정했으므로 없어도 됨
           child: GestureDetector(
-            onTap: (){
-              widget.onContainerTapped();
-              // 'water' 라우트로 이동하는 것은 물 섭취량 추가/수정 화면으로 연결됩니다.
-              // WaterProgressChart는 Firebase Stream을 통해 실시간 업데이트되므로
-              // waterProgressChartKey.currentState?.refreshData(); 호출은 필요 없습니다.
-              Navigator.of(context).pushNamed('water');
+            onTap: () {
+              // widget.onContainerTapped(); // 이 콜백이 필요 없다면 제거하세요.
+              Navigator.of(context).pushNamed('water_route'); // WaterHome으로 이동
             },
-            child: Container(
-              height: 120, // 기존 높이 유지
-              width: MediaQuery.of(context).size.width - 240, // 기존 너비 유지
-              margin: const EdgeInsets.symmetric(horizontal: 30), // 기존 마진 유지
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.0
-                ),
-              ),
-              // ⭐️ 여기 자식으로 WaterProgressChart 위젯을 추가합니다.
-              child: const WaterBox(dailyTarget: 2000), // dailyTarget을 필요에 따라 조절
+            // 여기에 Consumer 위젯을 추가하여 WaterProvider의 데이터에 접근합니다.
+            child: Consumer<WaterProvider>(
+              builder: (context, manager, child) {
+                // manager 객체를 통해 WaterProvider의 weeklyIntake와 dailyWaterGoal에 접근
+                final Map<int, double> weeklyIntakeData = manager.weeklyIntake;
+                final double dailyGoalAsMaxIntake = manager.dailyWaterGoal.toDouble();
+
+                double containerWidth = MediaQuery.of(context).size.width - 240;
+
+                return Container(
+                  height: 120,
+                  width: containerWidth,
+                  margin: const EdgeInsets.symmetric(horizontal: 30),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
+                    ),
+                  ),
+                  // WaterBox에 WaterProvider에서 가져온 데이터를 전달
+                  child: WaterBox(
+                    weeklyIntake: weeklyIntakeData, // WaterProvider에서 가져온 weeklyIntake 사용
+                    maxIntake: dailyGoalAsMaxIntake, // WaterProvider의 dailyWaterGoal 사용
+                  ),
+                );
+              },
             ),
           ),
         ),
+
         // 물
     ],
     );

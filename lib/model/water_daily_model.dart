@@ -21,7 +21,6 @@ class DailyIntake {
     detailsList.map((item) =>
         WaterIntakeDetail.fromJson(item as Map<String, dynamic>)).toList();
 
-    // ⭐️ DailyIntake 문서의 'date' 필드는 Timestamp로 저장되므로,
     // Timestamp에서 DateTime으로 파싱해야 합니다.
     // 만약 문서 ID(dateKey)를 date 필드로 읽어오고 싶다면, FireStore 쿼리에서 'date': doc.id 로 매핑해야 합니다.
     // 현재 FirebaseWaterService의 addWaterIntake에서 'date': Timestamp.fromDate(dailyDate)로 저장하고 있으므로 아래처럼 파싱합니다.

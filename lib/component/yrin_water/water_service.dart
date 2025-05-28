@@ -43,20 +43,29 @@ class FirebaseWaterService {
   }
 
   // 특정 날짜의 개별 물 섭취 기록
-  Future<List<WaterIntakeDetail>> getWaterIntakeRecordsForDate(String userId, DateTime date) async {
+  Future<List<WaterIntakeDetail>> getWaterIntakeRecordsForDate(
+      String userId, DateTime date) async {
     try {
-      final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-      final docSnapshot = await waterCollection.doc(userId).collection('daily_intake').doc(dateKey).get();
+      final dateKey =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final docSnapshot = await waterCollection
+          .doc(userId)
+          .collection('daily_intake')
+          .doc(dateKey)
+          .get();
 
       if (docSnapshot.exists) {
-        final dailyIntake = DailyIntake.fromJson(docSnapshot.data() as Map<String, dynamic>);
-        log('Firebase에서 특정 날짜 개별 물 섭취 기록 불러오기 성공: ${dailyIntake.intakeDetails.length}개', name: 'FirebaseWaterService');
+        final dailyIntake = DailyIntake.fromJson(docSnapshot.data()!); // Removed `as Map<String, dynamic>`
+        log(
+            'Firebase에서 특정 날짜 개별 물 섭취 기록 불러오기 성공: ${dailyIntake.intakeDetails.length}개',
+            name: 'FirebaseWaterService');
         return dailyIntake.intakeDetails;
       }
       log('Firebase에서 특정 날짜 개별 물 섭취 기록 없음', name: 'FirebaseWaterService');
       return [];
     } catch (e) {
-      log('Firebase에서 특정 날짜 개별 물 섭취 기록 불러오기 실패: $e', error: e, name: 'FirebaseWaterService');
+      log('Firebase에서 특정 날짜 개별 물 섭취 기록 불러오기 실패: $e',
+          error: e, name: 'FirebaseWaterService');
       return [];
     }
   }
@@ -83,41 +92,47 @@ class FirebaseWaterService {
   }
 
   // 일주일 그래프 보임
-  Future<List<DailyIntake>> getDailyIntakeForPeriod(String userId, DateTime startDate, DateTime endDate) async {
-    try {
-      // startDate와 endDate도 시간 정보를 제거하여 순수한 날짜로 만듭니다.
-      final startOnlyDate = DateTime(startDate.year, startDate.month, startDate.day);
-      final endOnlyDate = DateTime(endDate.year, endDate.month, endDate.day);
+  Stream<List<DailyIntake>> getDailyIntakeStreamForPeriod(
+      String userId, DateTime startDate, DateTime endDate) {
+    // startDate와 endDate도 시간 정보를 제거하여 순수한 날짜로 만듭니다.
+    final startOnlyDate = DateTime(startDate.year, startDate.month, startDate.day);
+    final endOnlyDate = DateTime(endDate.year, endDate.month, endDate.day);
 
-      final startKey = '${startOnlyDate.year}-${startOnlyDate.month.toString().padLeft(2, '0')}-${startOnlyDate.day.toString().padLeft(2, '0')}';
-      final endKey = '${endOnlyDate.year}-${endOnlyDate.month.toString().padLeft(2, '0')}-${endOnlyDate.day.toString().padLeft(2, '0')}';
+    final startKey =
+        '${startOnlyDate.year}-${startOnlyDate.month.toString().padLeft(2, '0')}-${startOnlyDate.day.toString().padLeft(2, '0')}';
+    final endKey =
+        '${endOnlyDate.year}-${endOnlyDate.month.toString().padLeft(2, '0')}-${endOnlyDate.day.toString().padLeft(2, '0')}';
 
-      final QuerySnapshot snapshot = await waterCollection
-          .doc(userId)
-          .collection('daily_intake')
-          .where(FieldPath.documentId, isGreaterThanOrEqualTo: startKey)
-          .where(FieldPath.documentId, isLessThanOrEqualTo: endKey)
-          .orderBy(FieldPath.documentId)
-          .get();
-
+    return waterCollection
+        .doc(userId)
+        .collection('daily_intake')
+        .where(FieldPath.documentId, isGreaterThanOrEqualTo: startKey)
+        .where(FieldPath.documentId, isLessThanOrEqualTo: endKey)
+        .orderBy(FieldPath.documentId)
+        .snapshots() // 실시간 업데이트를 위해 snapshots() 사용
+        .map((snapshot) {
       final dailyIntakes = snapshot.docs.map((doc) => DailyIntake.fromJson({
-        ...(doc.data() as Map<String, dynamic>),
-        'date': doc.id
+        ...(doc.data()), // Removed `as Map<String, dynamic>`
+        'date': doc.id // documentId를 'date' 필드로 사용
       })).toList();
-      log('Firebase에서 특정 기간 일별 섭취량 불러오기 성공: ${dailyIntakes.length}개', name: 'FirebaseWaterService');
+      log('Firebase에서 특정 기간 일별 섭취량 스트림 업데이트: ${dailyIntakes.length}개',
+          name: 'FirebaseWaterService.Stream');
       return dailyIntakes;
-    } catch (e) {
-      log('Firebase에서 특정 기간 일별 섭취량 불러오기 실패: $e', error: e, name: 'FirebaseWaterService');
-      return [];
-    }
+    }).handleError((e) {
+      log('Firebase에서 특정 기간 일별 섭취량 스트림 오류: $e',
+          error: e, name: 'FirebaseWaterService.StreamError');
+      return <DailyIntake>[]; // 오류 발생 시 빈 리스트 반환
+    });
   }
 
   // 매일 자정에 일별 섭취량 0 초기화
   Future<void> resetDailyIntake(String userId, DateTime date) async {
     try {
       final dailyDate = DateTime(date.year, date.month, date.day); // 순수 날짜 사용
-      final dateKey = '${dailyDate.year}-${dailyDate.month.toString().padLeft(2, '0')}-${dailyDate.day.toString().padLeft(2, '0')}';
-      final docRef = waterCollection.doc(userId).collection('daily_intake').doc(dateKey);
+      final dateKey =
+          '${dailyDate.year}-${dailyDate.month.toString().padLeft(2, '0')}-${dailyDate.day.toString().padLeft(2, '0')}';
+      final docRef =
+      waterCollection.doc(userId).collection('daily_intake').doc(dateKey);
 
       await docRef.set({
         'userId': userId,
@@ -126,9 +141,11 @@ class FirebaseWaterService {
         'intakeDetails': [],
       }, SetOptions(merge: true));
 
-      log('Firebase 일별 섭취량 초기화 성공 (userId: $userId, date: $date)', name: 'FirebaseWaterService');
+      log('Firebase 일별 섭취량 초기화 성공 (userId: $userId, date: $date)',
+          name: 'FirebaseWaterService');
     } catch (e) {
-      log('Firebase 일별 섭취량 초기화 실패: $e', error: e, name: 'FirebaseWaterService');
+      log('Firebase 일별 섭취량 초기화 실패: $e',
+          error: e, name: 'FirebaseWaterService');
     }
   }
 }
