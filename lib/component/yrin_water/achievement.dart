@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lifefit/component/yrin_water/water_service.dart';
 
-
+//
 class Achievement extends StatefulWidget {
   final int waterAmount;
   final int dailyWaterGoal;

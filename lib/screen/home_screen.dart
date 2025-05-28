@@ -593,7 +593,7 @@ class _HomeContentState extends State<HomeContent> {
           top: 395,
           left: 0,
           child: WaterBox(
-            key: waterBoxKey,  // key를 만들어서 refreshData 호출 가능하게
+            key: waterBoxKey,  //
             onContainerTapped: () {
               widget.onContainerTapped();
             },

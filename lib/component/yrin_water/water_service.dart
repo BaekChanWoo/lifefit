@@ -3,6 +3,7 @@ import 'package:lifefit/model/water_intake_detail.dart';
 import 'package:lifefit/model/water_daily_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+//
 class WaterService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 

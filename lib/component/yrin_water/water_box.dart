@@ -41,7 +41,7 @@ class WaterBoxState extends State<WaterBox> {
       onTap: () {
         widget.onContainerTapped();
         Navigator.of(context).pushNamed('water').then((_) {
-          refreshData(); // 물 페이지에서 돌아왔을 때 새로고침
+          refreshData(); // 물 페이지에서 돌아왔을 때 새로고침/
         });
       },
       child: Container(

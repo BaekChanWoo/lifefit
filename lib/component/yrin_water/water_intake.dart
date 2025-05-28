@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//
 class WaterIntake extends StatelessWidget {
   final Function(int) onAmountChanged;
   final int currentTotalAmount;
