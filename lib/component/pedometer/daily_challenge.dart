@@ -1,4 +1,57 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:lifefit/component/pedometer/step_progress_bar.dart';
+
+class DailyChallenge extends StatefulWidget {
+  const DailyChallenge({super.key});
+
+  @override
+  State<DailyChallenge> createState() => _DailyChallengeState();
+}
+
+class _DailyChallengeState extends State<DailyChallenge> {
+  int _todaySteps = 0;
+  bool isMock = true; //true일 때는 테스트 모드 (더미 데이터)
+  Timer? _mockTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (isMock) {
+      startMockSteps();
+    } else {
+      initPedometer(); // 실제 연결 시 이 함수 사용
+    }
+  }
+
+  void startMockSteps() {
+    _mockTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      setState(() {
+        _todaySteps += 123; //걸음 수 증가 (테스트용)
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _mockTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StepProgressBar(currentSteps: _todaySteps);
+  }
+
+  //Pedometer 연결 (지금은 사용 안 함)
+  void initPedometer() {
+
+  }
+}
+
+
+/*import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -111,5 +164,5 @@ void saveStepsToFirebase(int todaySteps) async {
     'date': Timestamp.fromDate(today),
     'updatedAt': FieldValue.serverTimestamp(),
   });
-}
+}*/
 

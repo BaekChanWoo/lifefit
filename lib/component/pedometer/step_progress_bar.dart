@@ -69,7 +69,7 @@ class _StepProgressBarState extends State<StepProgressBar>
         //걸음 수 진행도 막대
         LinearProgressIndicator(
           value: progress,
-          minHeight: 15,
+          minHeight: 17,
           backgroundColor: Colors.grey[300],
           color: Colors.green,
         ),
@@ -82,7 +82,7 @@ class _StepProgressBarState extends State<StepProgressBar>
           children: [
             Text(
               '${widget.currentSteps} / ${widget.goalSteps} 걸음',
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
             ),
 
             if (isGoalReached)

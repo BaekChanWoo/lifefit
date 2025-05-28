@@ -461,14 +461,14 @@ class _HomeContentState extends State<HomeContent> {
                     children: [
                       const Text("일일 챌린지",
                         style: TextStyle(
-                          fontSize: 15.0,
+                          fontSize: 15.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 5.0),
+                      const SizedBox(height: 6.0),
                       const Text("10000 걸음 목표!",
                         style: TextStyle(
-                          fontSize: 12.0,
+                          fontSize: 13.0,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
