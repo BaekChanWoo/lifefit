@@ -271,7 +271,7 @@ class _SleepScreenState extends State<SleepScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 15),
+          const SizedBox(height: 13),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -292,7 +292,7 @@ class _SleepScreenState extends State<SleepScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 16),
           Stack(
             alignment: Alignment.center,
             children: [
@@ -323,7 +323,7 @@ class _SleepScreenState extends State<SleepScreen> {
                     ),
                   ),
                   onChange: (value) {
-                    double rounded = (value * 12).round() / 12.0;  // 1시간 = 12단계 → 5분 단위
+                    double rounded = (value * 12).round() / 12.0;
                     setState(() {
                       sleepHours = rounded;
                       sleepData[selectedDay] = rounded;
@@ -357,14 +357,14 @@ class _SleepScreenState extends State<SleepScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
 
                 ],
               ),
             ],
           ),
           // 평균 수면 시간 메시지 출력
-          const SizedBox(height: 19),
+          const SizedBox(height: 13),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 4),
             child: Column(
@@ -374,7 +374,7 @@ class _SleepScreenState extends State<SleepScreen> {
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   sleepAdvice,
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -385,7 +385,7 @@ class _SleepScreenState extends State<SleepScreen> {
             ),
           ),
 
-          const SizedBox(height: 19),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(days.length, (index) {
@@ -409,7 +409,7 @@ class _SleepScreenState extends State<SleepScreen> {
           ),
           //const SizedBox(height: 18),
           SizedBox(
-            height: 170,
+            height: 160,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(7, (index) {
