@@ -13,6 +13,8 @@ import 'dart:developer';
 import 'package:lifefit/controller/home_controller.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:get_storage/get_storage.dart';
+
 
 
 
@@ -20,6 +22,7 @@ import 'package:timeago/timeago.dart' as timeago;
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비
+  await GetStorage.init();
 
   MobileAds.instance.initialize();
 

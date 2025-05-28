@@ -186,8 +186,8 @@ class _SleepScreenState extends State<SleepScreen> {
           color: Colors.white,
           child: Column(
             children: [
-              const SizedBox(height: 10),
-              const Text('수면 시간', style: TextStyle(fontSize: 22,fontFamily: 'NanumSquareRound', fontWeight: FontWeight.w100)),
+              const SizedBox(height: 15),
+              const Text('수면 시간', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -232,7 +232,7 @@ class _SleepScreenState extends State<SleepScreen> {
                     const SnackBar(content: Text('수면 데이터가 저장되었습니다')),
                   );
                 },
-                child: const Text('확인', style: TextStyle(fontSize: 16)),
+                child: const Text('확인', style: TextStyle(fontSize: 18)),
               ),
             ],
           ),
@@ -251,7 +251,7 @@ class _SleepScreenState extends State<SleepScreen> {
     String averageMessage = '수면 데이터가 없습니다.';
     String sleepAdvice = '';
     if (dayCount > 0) {
-      averageMessage = '평균 수면 시간은 ${averageSleep.toStringAsFixed(1)}시간입니다.';
+      averageMessage = '평균 수면 시간은 ${averageSleep.floor()}시간 ${((averageSleep - averageSleep.floor()) * 60).round()}분입니다.';
       if (averageSleep < 6) {
         sleepAdvice = '수면이 부족해요 😴';
       } else if (averageSleep <= 8) {
@@ -271,7 +271,7 @@ class _SleepScreenState extends State<SleepScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(height: 13),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -281,9 +281,9 @@ class _SleepScreenState extends State<SleepScreen> {
               ),
               Column(
                 children: [
-                  Text(dateText, style: const TextStyle(fontSize: 15)),
+                  Text(dateText, style: const TextStyle(fontSize: 18)),
                   const SizedBox(height: 3),
-                  Text(dayText, style: const TextStyle(fontSize: 20)),
+                  Text(dayText, style: const TextStyle(fontSize: 23)),
                 ],
               ),
               IconButton(
@@ -292,13 +292,13 @@ class _SleepScreenState extends State<SleepScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Stack(
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 190,
-                height: 190,
+                width: 230,
+                height: 230,
                 child: SleekCircularSlider(
                   min: 0,
                   max: 12,
@@ -308,7 +308,7 @@ class _SleepScreenState extends State<SleepScreen> {
                     startAngle: 270,
                     size: 180,
                     customWidths: CustomSliderWidths(
-                      trackWidth: 14,
+                      trackWidth: 20,
                       progressBarWidth: 16,
                       handlerSize: 5,
                     ),
@@ -318,12 +318,12 @@ class _SleepScreenState extends State<SleepScreen> {
                       dotColor: Colors.white,
                     ),
                     infoProperties: InfoProperties(
-                      mainLabelStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      mainLabelStyle: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                       modifier: (value) => '',
                     ),
                   ),
                   onChange: (value) {
-                    double rounded = (value * 12).round() / 12.0;  // 1시간 = 12단계 → 5분 단위
+                    double rounded = (value * 12).round() / 12.0;
                     setState(() {
                       sleepHours = rounded;
                       sleepData[selectedDay] = rounded;
@@ -352,39 +352,40 @@ class _SleepScreenState extends State<SleepScreen> {
                         const Icon(Icons.access_time, color: Colors.grey),
                         Text(
                           '${sleepHours.floor()}시간 ${((sleepHours - sleepHours.floor()) * 60).round()}분',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
 
                 ],
               ),
             ],
           ),
           // 평균 수면 시간 메시지 출력
+          const SizedBox(height: 13),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 4),
             child: Column(
               children: [
                 Text(
                   averageMessage,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  sleepAdvice,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 3),
+                Text(
+                  sleepAdvice,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                //const SizedBox(height: 3),
               ],
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(days.length, (index) {
@@ -406,13 +407,13 @@ class _SleepScreenState extends State<SleepScreen> {
               );
             }),
           ),
-          const SizedBox(height: 14),
+          //const SizedBox(height: 18),
           SizedBox(
-            height: 120,
+            height: 160,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(7, (index) {
-                final double maxBarHeight = 80;
+                final double maxBarHeight = 100;
                 final double barHeight = (sleepData[index] / 12) * maxBarHeight;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -420,7 +421,7 @@ class _SleepScreenState extends State<SleepScreen> {
                     Text('${sleepData[index].toStringAsFixed(1)}.', style: const TextStyle(fontSize: 11)),
                     const SizedBox(height: 3),
                     Container(
-                      width: 18,
+                      width: 22,
                       height: barHeight,
                       decoration: BoxDecoration(
                         color: index == selectedDay ? PRIMARY_COLOR : Colors.grey.shade400,
@@ -455,19 +456,19 @@ class DayBox extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 35,
-        height: 35,
+        width: 39,
+        height: 39,
         alignment: Alignment.center,
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: selected ? PRIMARY_COLOR : Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           label,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 17,
             color: Colors.black,
           ),
         ),

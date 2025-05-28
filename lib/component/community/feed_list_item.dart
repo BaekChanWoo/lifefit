@@ -100,6 +100,7 @@ class FeedListItem extends StatelessWidget {
                 bottom: 0,
                 child: Row(
                   children: [
+                    /*
                     Icon(
                       Icons.message_outlined,
                       color: Colors.grey,
@@ -110,6 +111,8 @@ class FeedListItem extends StatelessWidget {
                       '1',
                       style: TextStyle(color: Colors.grey),
                     ),
+
+                     */
                     SizedBox(width: 4,),
                     Icon(
                       Icons.favorite_border,

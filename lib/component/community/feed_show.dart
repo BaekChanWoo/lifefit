@@ -53,8 +53,15 @@ class _FeedShowState extends State<FeedShow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('게시물 상세'),
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text(
+            '게시물 상세',
+        style: TextStyle(color: Colors.black,),
+        ),
         actions: [
           // 본인 게시물인 경우 수정/삭제 버튼 표시
           Obx(() {
@@ -66,13 +73,13 @@ class _FeedShowState extends State<FeedShow> {
               return Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit),
+                    icon: const Icon(Icons.edit , color: Colors.black87),
                     onPressed: () {
                       Get.to(() => FeedEdit(feed));
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(Icons.delete , color: Colors.black87),
                     onPressed: () async {
                       final confirm = await Get.dialog<bool>(
                         AlertDialog(
@@ -119,18 +126,19 @@ class _FeedShowState extends State<FeedShow> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: Colors.grey.withOpacity(0.1),
+              //     blurRadius: 8,
+              //     offset: const Offset(0, 4),
+              //   ),
+              // ],
             ),
             padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header: avatar, name, category & time
               // 이미지
               if (feed.imageId != null)
                 ClipRRect(
@@ -205,7 +213,7 @@ class _FeedShowState extends State<FeedShow> {
               // 카테고리 및 작성 시간
               Row(
                 children: [
-                  Chip(label: Text(feed.category)),
+                  Text(feed.category),
                   const SizedBox(width: 8),
                   Text(
                     timeago.format(
@@ -239,9 +247,9 @@ class _FeedShowState extends State<FeedShow> {
                   const SizedBox(width: 4),
                   const Text('1', style: TextStyle(color: Colors.grey)),
                   const SizedBox(width: 16),
-                  const Icon(Icons.message_outlined, color: Colors.grey, size: 20),
+                  // const Icon(Icons.message_outlined, color: Colors.grey, size: 20),
                   const SizedBox(width: 4),
-                  const Text('1', style: TextStyle(color: Colors.grey)),
+                  // const Text('1', style: TextStyle(color: Colors.grey)),
                 ],
               ),
 
