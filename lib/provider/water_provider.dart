@@ -234,7 +234,7 @@ class WaterProvider with ChangeNotifier {
       return;
     }
 
-    // 목표량 _dailyWaterGoal을 초과하지 않도록 제한
+    // 목표량 _dailyWaterGoal을 초과하지 않도록 제한..
     int actualAmountToAdd = amountChange;
     if (_currentDailyIntake + amountChange > _dailyWaterGoal) {
       actualAmountToAdd = _dailyWaterGoal - _currentDailyIntake;
