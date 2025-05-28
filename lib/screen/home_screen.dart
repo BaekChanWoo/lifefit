@@ -23,7 +23,7 @@ import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:lifefit/component/yrin_water/water_box.dart';
-import 'package:lifefit/provider/water_provider.dart';
+
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
@@ -379,6 +379,8 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent> {
   final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
+  final GlobalKey<WaterBoxState> waterBoxKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
 
@@ -585,52 +587,16 @@ class _HomeContentState extends State<HomeContent> {
           ),
         ),
 
-        // 수면 시간
-
+        // 수면 시간..
 
         Positioned(
           top: 395,
-          child: GestureDetector(
-            onTap: (){
+          left: 0,
+          child: WaterBox(
+            key: waterBoxKey,  // key를 만들어서 refreshData 호출 가능하게
+            onContainerTapped: () {
               widget.onContainerTapped();
-              Navigator.of(context).pushNamed('water');
             },
-            child: Container(
-              height: 120,
-              width: MediaQuery.of(context).size.width-240,
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                         Text( "물",
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                         Icon(Icons.water_drop,
-                          color: Colors.blue,
-                          size: 20.0,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
         ),
         // 물

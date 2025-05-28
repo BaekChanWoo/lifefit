@@ -3,9 +3,8 @@ import 'package:lifefit/component/yrin_water/achievement.dart';
 import 'package:lifefit/component/yrin_water/time_display.dart';
 import 'package:lifefit/component/yrin_water/water_intake.dart';
 import 'package:lifefit/component/yrin_water/water_graph.dart';
-import 'package:lifefit/provider/water_provider.dart';
-import 'dart:developer';
-import 'package:provider/provider.dart';
+import 'package:lifefit/component/yrin_water/water_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class WaterHome extends StatefulWidget {
   const WaterHome({super.key});
@@ -15,91 +14,105 @@ class WaterHome extends StatefulWidget {
 }
 
 class _WaterHomeState extends State<WaterHome> {
+  final WaterService _waterService = WaterService();
+  int _currentDailyIntake = 0;
+  int _dailyWaterGoal = 2000; // 목표치 설정 (예시 값)
   bool _hasShownAchievement = false;
-  late WaterProvider _waterProvider;
+  // weeklyIntake 데이터 타입 변경: Map<int, double>
+  Map<int, double> _weeklyIntake = {};
 
   @override
   void initState() {
     super.initState();
-    _waterProvider = Provider.of<WaterProvider>(context, listen: false);
-    log('WaterHome initState: Starting WaterProvider streams.', name: 'WaterHome');
-    _waterProvider.startListeningToWaterData();
+    _loadAllData(); // 모든 데이터를 한 번에 로드하도록 통합
   }
 
-  @override
-  void dispose() {
-    log('WaterHome dispose: Stopping WaterProvider streams.', name: 'WaterHome');
-    _waterProvider.stopListeningToWaterData();
-    super.dispose();
+  Future<void> _loadAllData() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      // 사용자 ID가 없으면 로그인 페이지로 리다이렉트하거나 오류 처리
+      print("Error: User not logged in.");
+      return;
+    }
+
+    // 오늘 데이터 로드
+    final todayData = await _waterService.getTodayIntake();
+    // 주간 데이터 로드
+    final weeklyData = await _waterService.getWeeklyIntake();
+    // 달성 오버레이 표시 여부 로드
+    final hasShown = await _waterService.hasShownAchievementToday(userId);
+
+
+    if (!mounted) return; // 위젯이 마운트 해제되었다면 setState 호출 방지
+
+    setState(() {
+      _currentDailyIntake = todayData?.totalAmount ?? 0;
+      _weeklyIntake = weeklyData;
+      _hasShownAchievement = hasShown;
+    });
+  }
+
+  Future<void> _handleAddWater(int amount) async {
+    await _waterService.addWaterIntake(amount);
+    // 데이터 추가 후 모든 데이터 재로드하여 UI 갱신
+    await _loadAllData();
+  }
+
+  // 달성 오버레이가 보여졌음을 기록
+  void _onAchievementShown() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    setState(() {
+      _hasShownAchievement = true; // UI 상태 먼저 업데이트
+    });
+    await _waterService.markAchievementAsShown(userId); // Firestore에 기록
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WaterProvider>(
-      builder: (context, manager, child) {
-        final bool shouldShowAchievementOverlay =
-            manager.currentDailyIntake >= manager.dailyWaterGoal && !_hasShownAchievement;
+    // 목표 달성 여부 확인 로직
+    final bool shouldShowAchievementOverlay =
+        _currentDailyIntake >= _dailyWaterGoal && !_hasShownAchievement;
 
-        // 물 목표량 미달 시 _hasShownAchievement 리셋 (팝업이 다시 뜰 수 있도록)
-        if (manager.currentDailyIntake < manager.dailyWaterGoal && _hasShownAchievement) {
-          setState(() {
-            _hasShownAchievement = false;
-          });
-        }
-
-        return Scaffold(
-          // WaterHome에서는 AppBar가 필요 없다는 요청을 반영하여, 여기에 AppBar를 추가하지 않습니다.
-          // WaterIntake 위젯에 AppBar 대체 UI가 있으므로 중복을 피합니다.
-          body: Stack(
-            children: [
-              // WaterIntake 위젯
-              // initialWaterAmount 대신 currentTotalAmount를 사용합니다.
-              WaterIntake(
-                onAmountChanged: (amount) {
-                  manager.addWater(amount); // WaterProvider의 addWater 호출
-                },
-                currentTotalAmount: manager.currentDailyIntake, // WaterProvider의 현재 섭취량 전달
-                dailyWaterGoal: manager.dailyWaterGoal, // WaterProvider의 목표량 전달
-              ),
-
-              // TimeDisplay 위젯
-              // Stack 내부의 Positioned로 배치
-              Positioned(
-                top: 320, // WaterIntake 위젯 하단에 오도록 위치 조정 (조절 필요)
-                left: 0,
-                right: 0,
-                child: const Center(child: TimeDisplay()), // TimeDisplay도 Center로 감싸면 보기 좋습니다.
-              ),
-
-              // WaterGraph 위젯
-              // Stack 내부의 Positioned로 배치
-              Positioned(
-                bottom: 125,
-                left: 28,
-                right: 28,
-                height: 200,
-                child: WaterGraph(
-                  weeklyIntake: manager.weeklyIntake, // WaterProvider의 주간 섭취량 전달
-                  maxY: manager.dailyWaterGoal.toDouble(), // 그래프 스케일링 등을 위해 목표량 전달
-                ),
-              ),
-
-              // Achievement 위젯 (목표 달성 오버레이)
-              if (shouldShowAchievementOverlay)
-                Achievement(
-                  waterAmount: manager.currentDailyIntake, // WaterProvider의 현재 섭취량 전달
-                  dailyWaterGoal: manager.dailyWaterGoal, // Achievement 위젯에 목표량 전달
-                  hasShown: _hasShownAchievement, // WaterHome의 상태 전달
-                  onAchievementShown: () {
-                    setState(() {
-                      _hasShownAchievement = true;
-                    });
-                  },
-                ),
-            ],
+    return Scaffold(
+      body: Stack(
+        children: [
+          // 물 섭취 UI
+          WaterIntake(
+            onAmountChanged: _handleAddWater,
+            currentTotalAmount: _currentDailyIntake,
+            dailyWaterGoal: _dailyWaterGoal,
           ),
-        );
-      },
+
+          // 시간 표시
+          Positioned(
+            top: 320, // 위치 조정 필요시 변경
+            left: 0,
+            right: 0,
+            child: const Center(child: TimeDisplay()),
+          ),
+
+          // 그래프
+          Positioned(
+            bottom: 125, // 위치 조정 필요시 변경
+            left: 28,
+            right: 28,
+            height: 200, // 높이 조정 필요시 변경
+            child: WaterGraph(
+              weeklyIntake: _weeklyIntake, // Map<int, double> 타입으로 전달
+              maxY: _dailyWaterGoal.toDouble(), // Y축 최대값은 목표치로 설정
+            ),
+          ),
+
+          // 목표 달성 오버레이 (조건부 표시)
+          if (shouldShowAchievementOverlay)
+            Achievement(
+              waterAmount: _currentDailyIntake,
+              dailyWaterGoal: _dailyWaterGoal,
+            ),
+        ],
+      ),
     );
   }
 }
