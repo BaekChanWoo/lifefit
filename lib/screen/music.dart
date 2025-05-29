@@ -29,7 +29,7 @@ class _MusicState extends State< Music> {
         children: [
           MusicTop(),
           Positioned(
-            top: 160,
+            top: 185,
             left: 13,
             right: 10,
             child: ChangeCategory( // CategorySelector 위젯 추가
@@ -40,7 +40,7 @@ class _MusicState extends State< Music> {
           ),
 
           Positioned(
-            top: 210, //assets/img/musicno.png 배치
+            top: 220, //assets/img/musicno.png 배치
             left: 20,
             right: 20,
             bottom: 10,

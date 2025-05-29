@@ -7,7 +7,7 @@ import 'package:lifefit/const/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../controller/home_controller.dart'; // ✅ 추가
+import '../../controller/home_controller.dart';
 
 
 //모집글 작성 및 수정 위젯
@@ -27,7 +27,6 @@ class _CreatePostState extends State<CreatePost> {
     '러닝', '헬스', '요가', '필라테스', '사이클', '클라이밍', '농구'
   ];
 
-  // 입력값들
   String title = '';
   String? selectedCategory;
   String location = '';
@@ -119,13 +118,18 @@ class _CreatePostState extends State<CreatePost> {
   //시간 선택 호출
   Future<void> _showCupertinoTimePicker(BuildContext context) async {
     final now = DateTime.now();
-   // final nowTrimmed = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    final minute = now.minute;
+    final roundedMinute = (minute / 5).round() * 5;
+    final adjustedMinute = roundedMinute == 60 ? 55 : roundedMinute;
+
     DateTime tempPicked = DateTime(
       now.year,
       now.month,
       now.day,
       selectedTime?.hour ?? now.hour,
-      selectedTime?.minute ?? now.minute,
+      selectedTime?.minute != null
+          ? ((selectedTime!.minute / 5).round() * 5) % 60
+          : adjustedMinute,
     );
 
     await showModalBottomSheet(
@@ -135,7 +139,7 @@ class _CreatePostState extends State<CreatePost> {
           height: 250,
           child: Column(
             children: [
-              //상단 완료 버튼
+              // 상단 완료 버튼
               SizedBox(
                 height: 50,
                 child: Align(
@@ -157,6 +161,7 @@ class _CreatePostState extends State<CreatePost> {
                   initialDateTime: tempPicked,
                   mode: CupertinoDatePickerMode.time,
                   use24hFormat: true,
+                  minuteInterval: 5,
                   onDateTimeChanged: (DateTime newTime) {
                     tempPicked = newTime;
                   },
@@ -169,10 +174,11 @@ class _CreatePostState extends State<CreatePost> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      // 다이얼로그 제목: 작성과 수정 구분
+      // 다이얼로그 제목
       title: Text(widget.existingPost == null ? '운동메이트 찾기' : '게시글 수정', textAlign: TextAlign.center),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       content: Form(
@@ -333,7 +339,7 @@ class _CreatePostState extends State<CreatePost> {
                 category: selectedCategory!,
                 location: location,
                 dateTime: dateTimeString,
-                currentPeople: widget.existingPost?.currentPeople ?? 1,
+                currentPeople: widget.existingPost?.currentPeople ?? 0,
                 maxPeople: maxPeople,
                 isMine: true,
                 applicants: widget.existingPost?.applicants ?? [],

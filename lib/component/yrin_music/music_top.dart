@@ -33,7 +33,7 @@ class _MusicTopState extends State<MusicTop> {
                 style: TextStyle(
                   fontSize: 22,
                   fontFamily: 'NanumSquareRound',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
               ), // 왼쪽 여백 추가,
@@ -44,7 +44,7 @@ class _MusicTopState extends State<MusicTop> {
             children: [
               const SizedBox(height: 28),
               Container(
-                  margin: const EdgeInsets.only(left: 25),
+                  margin: const EdgeInsets.only(left: 20),
                   padding: const EdgeInsets.only(left: 8),
                   width: 290, // 상자 너비 설정
                   height: 36,

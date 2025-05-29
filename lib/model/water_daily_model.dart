@@ -1,9 +1,10 @@
 //물 그래프용 일별 총량
 import 'package:lifefit/model/water_intake_detail.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DailyIntake {
   final String userId;
-  final DateTime date;
+  final DateTime date; // 순수 날짜 (YYYY-MM-DD)
   final int totalAmount;
   final List<WaterIntakeDetail> intakeDetails;
 
@@ -17,12 +18,16 @@ class DailyIntake {
   factory DailyIntake.fromJson(Map<String, dynamic> json) {
     List<dynamic> detailsList = json['intakeDetails'] ?? [];
     List<WaterIntakeDetail> parsedDetails =
-    detailsList.map((item) => WaterIntakeDetail.fromJson(item as Map<String, dynamic>)).toList();
+    detailsList.map((item) =>
+        WaterIntakeDetail.fromJson(item as Map<String, dynamic>)).toList();
+
+    final DateTime parsedDate = (json['date'] as Timestamp).toDate();
+
 
     return DailyIntake(
       userId: json['userId'] as String,
-      date: DateTime.parse(json['date'] as String),
-      totalAmount: json['totalAmount'] as int,
+      date: DateTime(parsedDate.year, parsedDate.month, parsedDate.day),
+      totalAmount: (json['totalAmount'] as num).toInt(),
       intakeDetails: parsedDetails,
     );
   }
@@ -33,7 +38,7 @@ class DailyIntake {
 
     return {
       'userId': userId,
-      'date': '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+      'date': Timestamp.fromDate(date),
       'totalAmount': totalAmount,
       'intakeDetails': detailsJsonList,
     };

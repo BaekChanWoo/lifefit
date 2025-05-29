@@ -22,7 +22,7 @@ import '../component/pedometer/daily_challenge.dart';
 import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
+import 'package:lifefit/component/yrin_water/water_box.dart';
 
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
@@ -370,10 +370,8 @@ class HomeContentWithNavigation extends StatelessWidget {
 
 // 컨테이너 5개는 다 세부페이지
 class HomeContent extends StatefulWidget {
-
   final VoidCallback onContainerTapped;
   const HomeContent({super.key , required this.onContainerTapped});
-
 
   @override
   State<HomeContent> createState() => _HomeContentState();
@@ -381,6 +379,7 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent> {
   final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
+  final GlobalKey<WaterBoxState> waterBoxKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -392,15 +391,12 @@ class _HomeContentState extends State<HomeContent> {
           right: 0,
           left: 0,
           child: Container(
-            height: 345,
+            height: 305,
             decoration: BoxDecoration(
                 color: PRIMARY_COLOR
             ),
             child: Container(
-              padding: EdgeInsets.only(
-                  top: 35 ,
-                  left: 25
-              ),
+              padding: EdgeInsets.only(top: 25 , left: 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -436,14 +432,14 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 안녕하세요 SKHU님
         Positioned(
-            top: 100,
+            top: 80,
             child: GestureDetector(
               onTap: (){
                 widget.onContainerTapped();
                 Navigator.of(context).pushNamed('daily_challenge');
               },
               child: Container(
-                height: 130,
+                height: 120,
                 width: MediaQuery.of(context).size.width-60,
                 margin: const EdgeInsets.symmetric(horizontal: 30),
                 decoration: BoxDecoration(
@@ -461,15 +457,15 @@ class _HomeContentState extends State<HomeContent> {
                     children: [
                       const Text("일일 챌린지",
                         style: TextStyle(
-                          fontSize: 15.5,
+                          fontSize: 15.0,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 6.0),
+                      const SizedBox(height: 5.0),
                       const Text("10000 걸음 목표!",
                         style: TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const DailyChallenge(),
@@ -482,7 +478,7 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 일일 챌린지
         Positioned(
-          top: 240,
+          top: 210,
           child: GestureDetector(
             onTap: (){
               widget.onContainerTapped();
@@ -535,7 +531,7 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 건강 정보 기사
         Positioned(
-          top: 240,
+          top: 210,
           right: 0,
           child: GestureDetector(
             onTap: (){
@@ -583,7 +579,7 @@ class _HomeContentState extends State<HomeContent> {
         ),
         // 미세먼지/
         Positioned(
-          top: 425,
+          top: 395,
           right: 0,
           child: SleepCard(
             key: sleepCardKey, // key 추가!
@@ -596,50 +592,17 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
         ),
-        // 수면 시간
+
+        // 수면 시간..
+
         Positioned(
-          top: 425,
-          child: GestureDetector(
-            onTap: (){
+          top: 395,
+          left: 0,
+          child: WaterBox(
+            key: waterBoxKey,  //
+            onContainerTapped: () {
               widget.onContainerTapped();
-              Navigator.of(context).pushNamed('water');
             },
-            child: Container(
-              height: 145,
-              width: MediaQuery.of(context).size.width-240,
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                         Text( "물",
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                         Icon(Icons.water_drop,
-                          color: Colors.blue,
-                          size: 20.0,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
         ),
         // 물
