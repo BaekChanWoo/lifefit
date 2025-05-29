@@ -45,7 +45,7 @@ class WaterBoxState extends State<WaterBox> {
         });
       },
       child: Container(
-        height: 200,
+        height: 180,
         width: MediaQuery.of(context).size.width - 240,
         margin: const EdgeInsets.symmetric(horizontal: 30),
         decoration: BoxDecoration(
