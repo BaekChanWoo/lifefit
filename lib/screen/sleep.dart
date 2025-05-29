@@ -257,7 +257,7 @@ class _SleepScreenState extends State<SleepScreen> {
       } else if (averageSleep <= 8) {
         sleepAdvice = '적절한 수면을 취했어요 😌';
       } else {
-        sleepAdvice = '푹 잘 주무셨네요 😄';
+        sleepAdvice = '푹 주무셨네요 😄';
       }
     }
 
@@ -314,7 +314,11 @@ class _SleepScreenState extends State<SleepScreen> {
                     ),
                     customColors: CustomSliderColors(
                       trackColor: Colors.grey.shade300,
-                      progressBarColor: PRIMARY_COLOR,
+                      progressBarColors: [
+                        PRIMARY_COLOR,
+                        //SERVE_COLOR,
+                        Color(0xFF5DB15D),
+                      ],
                       dotColor: Colors.white,
                     ),
                     infoProperties: InfoProperties(

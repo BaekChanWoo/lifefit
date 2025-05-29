@@ -6,12 +6,16 @@ import 'package:lifefit/shared/global.dart';
 
 
 
+
 class AuthController extends GetxController {
 
   final authProvider = Get.put(AuthProvider()); // lifefit의 AuthProvider 참조
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance; // 별칭 사용
   final RxInt _userId = 0.obs; // 서버의 user.id를 저장
 
+
+  // 추가: 서버에서 내려주는 프로필 이미지 URL을 저장할 Rx 변수
+  final Rxn<String> profileImage = Rxn<String>();
 
   @override
   void onInit() {
@@ -29,6 +33,7 @@ class AuthController extends GetxController {
       } else {
         log('No user authenticated', name: 'AuthController');
         _userId.value = 0;
+        profileImage.value = null; // 로그아웃 시 초기화
       }
     });
   }
@@ -47,6 +52,8 @@ class AuthController extends GetxController {
       final response = await authProvider.getUserProfile();
       if (response['result'] == 'ok' && response['data']?['id'] != null) {
         _userId.value = response['data']['id'];
+        // 서버에서 'profile_image' 키로 URL을 내려준다고 가정
+        profileImage.value = response['data']['profile_image'] as String?;
         log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
       } else {
         log('Failed to sync user profile: ${response['message']}', name: 'AuthController');

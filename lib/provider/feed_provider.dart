@@ -99,4 +99,31 @@ class FeedProvider extends Provider{
 
   }
 
+  // 좋아요 토글
+  Future<Map<String, dynamic>> like(int feedId) async {
+    final response = await post('$_baseFeedPath/$feedId/like', {});
+    return response.body is Map<String, dynamic>
+        ? response.body
+        : <String, dynamic>{};
+  }
+
+  // 댓글 목록 조회
+  Future<Map<String,dynamic>> getComments(int feedId) async {
+    final response = await get('$_baseFeedPath/$feedId/comments');
+    return response.body is Map<String, dynamic>
+        ? response.body
+        : <String, dynamic>{};
+  }
+
+  // 댓글 작성
+  Future<Map<String, dynamic>> addComment(int feedId, String content) async {
+    final response = await post(
+      '$_baseFeedPath/$feedId/comments',
+      {'content': content},
+    );
+    return response.body is Map<String, dynamic>
+        ? response.body
+        : <String, dynamic>{};
+  }
+
 }

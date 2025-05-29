@@ -6,6 +6,7 @@ import 'package:lifefit/component/community/feed_edit.dart';
 import 'package:lifefit/controller/auth_controller.dart';
 import 'dart:developer' as developer;
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:lifefit/const/colors.dart';
 
 
 class FeedShow extends StatefulWidget {
@@ -19,6 +20,7 @@ class FeedShow extends StatefulWidget {
 class _FeedShowState extends State<FeedShow> {
   final FeedController feedController = Get.find<FeedController>();
   final AuthController authController = Get.find<AuthController>();
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -51,6 +53,12 @@ class _FeedShowState extends State<FeedShow> {
   }
 
   @override
+  void dispose(){
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -58,53 +66,60 @@ class _FeedShowState extends State<FeedShow> {
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-            '게시물 상세',
-        style: TextStyle(color: Colors.black,),
-        ),
+        title: const Text('게시물 상세', style: TextStyle(color: Colors.black)),
         actions: [
-          // 본인 게시물인 경우 수정/삭제 버튼 표시
           Obx(() {
             final feed = feedController.currentFeed.value;
-            final isAuthor = feed != null && isCurrentUserAuthor();
-
-            // 작성자 ID와 로그인한 사용자 ID가 일치할 때만 수정/삭제 버튼이 표시
+            final isAuthor = feed != null && feed.writer?.id == authController.currentUserId;
             if (isAuthor) {
               return Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit , color: Colors.black87),
-                    onPressed: () {
-                      Get.to(() => FeedEdit(feed));
-                    },
+                    icon: const Icon(Icons.edit, color: Colors.black87),
+                    onPressed: () => Get.to(() => FeedEdit(feed!)),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete , color: Colors.black87),
+                    icon: const Icon(Icons.delete, color: Colors.black87),
                     onPressed: () async {
-                      final confirm = await Get.dialog<bool>(
+                      final confirm = await Get.dialog(
                         AlertDialog(
                           title: const Text('삭제 확인'),
                           content: const Text('정말로 이 게시물을 삭제하시겠습니까?'),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Colors.white,
                           actions: [
-                            TextButton(
-                              onPressed: () => Get.back(result: false),
-                              child: const Text('취소'),
+                            ElevatedButton(
+                                onPressed: () => Get.back(result: false),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: PRIMARY_COLOR,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+                              ),
+                                child: const Text('취소'),
                             ),
-                            TextButton(
-                              onPressed: () => Get.back(result: true),
-                              child: const Text('삭제'),
+                            ElevatedButton(
+                                onPressed: () => Get.back(result: true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: PRIMARY_COLOR,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+                                ),
+                                child: const Text('삭제'),
                             ),
                           ],
                         ),
                       );
                       if (confirm == true) {
                         final success = await feedController.feedDelete(widget.feedId);
-                        if (success) {
-                          // HomeScreen으로 이동, Community 탭(인덱스 3) 활성화
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            Get.offAllNamed('/', arguments: {'selectedTab': 3});
-                          });
-                        }
+                        if (success) Get.offAllNamed('/', arguments: {'selectedTab': 3});
                       }
                     },
                   ),
@@ -121,144 +136,174 @@ class _FeedShowState extends State<FeedShow> {
           return const Center(child: CircularProgressIndicator());
         }
         return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.grey.withOpacity(0.1),
-              //     blurRadius: 8,
-              //     offset: const Offset(0, 4),
-              //   ),
-              // ],
-            ),
-            padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header: avatar, name, category & time
-              // 이미지
-              if (feed.imageId != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Image.network(
-                    'http://10.0.2.2:3000${feed.imagePath}', // 실제 서버 URL
-                    width: double.infinity,
-                   // height: 250,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/img/mypageimg.jpg',
-                      width: double.infinity,
-                    //  height: 250,
-                      fit: BoxFit.cover,
+// Post Card
+              Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+// Header
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: feed.imagePath != null
+                                ? NetworkImage('http://10.0.2.2${feed.imagePath}')
+                                : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(feed.writer?.name ?? '익명', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(feed.category, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                                    const SizedBox(width: 8),
+                                    Text(timeago.format(feed.createdAt!), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              )
-              else
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6.0),
-                  child: Image.asset(
-                    'assets/img/mypageimg.jpg',
-                    width: double.infinity,
-                    height: 250,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              const SizedBox(height: 16),
-              // 사용자 프로필 정보 (사진과 이름)
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: feed.imagePath != null
-                        ? NetworkImage('http://10.0.2.2:3000${feed.imagePath}')
-                        : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
-                    onBackgroundImageError: feed.imagePath != null
-                        ? (exception, stackTrace) {
-                      developer.log('Profile image load failed: $exception', name: 'FeedShow');
-                    }
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    feed.writer?.name ?? '익명',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
+// Image
+                    if (feed.imageId != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.zero,
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Image.network(
+                            'http://10.0.2.2${feed.imagePath}',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            errorBuilder: (_, __, ___) => Image.asset('assets/img/mypageimg.jpg', fit: BoxFit.cover),
+                          ),
+                        ),
+                      )
+                    else
+                      ClipRRect(
+                        borderRadius: BorderRadius.zero,
+                        child: Image.asset('assets/img/mypageimg.jpg', width: double.infinity, height: 250, fit: BoxFit.cover),
+                      ),
+// Title & Content
+                    if (feed.title.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: Text(feed.title, style: Theme.of(context).textTheme.titleLarge),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                      child: Text(feed.content, style: const TextStyle(fontSize: 16), textAlign: TextAlign.justify),
                     ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10.0), // 위쪽 여백만 설정
-                child: Divider(
-                  color: Colors.grey[300],
-                  thickness: 1.0,
+// Actions
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          Obx(() => IconButton(
+                            icon: Icon(
+                              feedController.isLiked.value ? Icons.favorite : Icons.favorite_border,
+                              color: feedController.isLiked.value ? Colors.red : Colors.black,
+                            ),
+                            onPressed: feedController.toggleLike,
+                          )),
+                          Obx(() => Text('${feedController.likeCount.value}', style: const TextStyle(fontWeight: FontWeight.w600))),
+                          const SizedBox(width: 24),
+                          const Icon(Icons.mode_comment_outlined, size: 24),
+                          const SizedBox(width: 8),
+                          Text('${feed.comments.length}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
-              // 제목
-              Text(
-                feed.title,
-                style:
-                Theme.of(context).textTheme.headlineSmall
-                //TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              const Divider(),  // 포스트와 댓글 구분선
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text('댓글', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(height: 8),
-              // 카테고리 및 작성 시간
-              Row(
-                children: [
-                  Text(feed.category),
-                  const SizedBox(width: 8),
-                  Text(
-                    timeago.format(
-                        feed.createdAt!
-                    ), // 시간ago 패키지 활용 추천
-                    //'${(DateTime.now().difference(feed.createdAt!).inMinutes)}분 전',
-                    style: const TextStyle(color: Colors.grey, fontSize: 14
-                    ),
-                  ),
-                ],
-              ),
+              Obx(() => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: feedController.comments
+                    .map((c) => ListTile(
+                  dense: true,
+                  horizontalTitleGap: 0,
+                  minVerticalPadding: 4,
+                  title: Text(c.userName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: Text(c.content),
+                  contentPadding: EdgeInsets.zero,
+                ))
+                    .toList(),
+              )),
+// Comment Input UI 개선
               const SizedBox(height: 16),
-              // 별명
-              Text(
-                feed.name,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                ),
+                child: Row(
+                  children: [
+                    Obx(() {
+                      final avatarUrl = authController.profileImage.value;
+                      return CircleAvatar(
+                        radius: 16,
+                        backgroundImage: avatarUrl != null
+                            ? NetworkImage(avatarUrl)
+                            : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
+                      );
+                    }),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _commentController,
+                        decoration: const InputDecoration(
+                          hintText: '댓글 달기...',
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.send, size: 20, color: Colors.grey[600]),
+                      onPressed: () {
+                        final text = _commentController.text.trim();
+                        if (text.isNotEmpty) {
+                          feedController.postComment(text);
+                          _commentController.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 32),
-              // 설명
-              Text(
-                feed.content,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.justify,
-              ),
-              const SizedBox(height: 24),
-              // 좋아요 및 댓글 (더미 데이터)
-
-              Row(
-                children: [
-                  const Icon(Icons.favorite_border, color: Colors.grey, size: 20),
-                  const SizedBox(width: 4),
-                  const Text('1', style: TextStyle(color: Colors.grey)),
-                  const SizedBox(width: 16),
-                  // const Icon(Icons.message_outlined, color: Colors.grey, size: 20),
-                  const SizedBox(width: 4),
-                  // const Text('1', style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-
             ],
-
-          ),
           ),
         );
       }),
     );
   }
 }
+
+
+
+
+
+

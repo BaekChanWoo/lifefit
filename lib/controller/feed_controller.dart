@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lifefit/model/feed_model.dart';
 import 'package:lifefit/provider/feed_provider.dart';
 import 'dart:developer' as developer;
+import 'package:lifefit/model/comment_model.dart';
 
 
 class FeedController extends GetxController{
@@ -14,6 +15,9 @@ class FeedController extends GetxController{
   final RxBool isLoading = false.obs;
   final RxList<FeedModel> searchList = <FeedModel>[].obs;
 
+  RxBool isLiked = false.obs;
+  RxInt likeCount = 0.obs;
+  RxList<CommentModel> comments = <CommentModel>[].obs;
 
 
   @override
@@ -96,6 +100,8 @@ class FeedController extends GetxController{
           'created_at': DateTime.now().toIso8601String(),
           'is_me': true,
           'writer': {'id': userId}, // UserModel에 user_id 반영(게시물 작성자 ID)
+          'like_count': 0, // 새 게시물은 좋아요 0개
+          'liked_by_me': false, // 새 게시물은 내가 좋아요 누르지 않음
         });
 
         // 빌드 완료 후 feedList 업데이트
@@ -157,13 +163,31 @@ class FeedController extends GetxController{
       developer.log('feedShow response: $response', name: 'FeedController');
 
       if (_isSuccessResponse(response)) {
-        currentFeed.value = FeedModel.parse(response['data'] ?? {});
+        // 1) 데이터 파싱
+        final data = response['data'] as Map<String, dynamic>? ?? {};
+        final feed = FeedModel.parse(data);
+
+        // 2) currentFeed 갱신
+        currentFeed.value = feed;
+
+        // 3) 좋아요·댓글 상태 갱신
+        likeCount.value = feed.likeCount;
+        isLiked.value = feed.likedByMe;
+        comments.assignAll(feed.comments);
       } else {
-        Get.snackbar('조회 에러', response['message']?.toString() ?? '피드 정보를 불러오지 못했습니다.', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          '조회 에러',
+          response['message']?.toString() ?? '피드 정보를 불러오지 못했습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
         currentFeed.value = null;
       }
     } catch (e) {
-      Get.snackbar('네트워크 에러', '서버에 연결할 수 없습니다: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        '네트워크 에러',
+        '서버에 연결할 수 없습니다: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       currentFeed.value = null;
     }
   }
@@ -186,6 +210,55 @@ class FeedController extends GetxController{
       return false;
     }
   }
+
+  Future<void> toggleLike() async {
+    final r = await feedProvider.like(currentFeed.value!.id);
+    likeCount.value = r['data']['count'];
+    isLiked.value = r['data']['liked'];
+
+    // feedList에서 해당 피드도 업데이트
+    final feedIndex = feedList.indexWhere((feed) => feed.id == currentFeed.value!.id);
+    if (feedIndex != -1) {
+      feedList[feedIndex] = feedList[feedIndex].copyWith(
+        likeCount: r['data']['count'],
+        likedByMe: r['data']['liked'],
+      );
+      feedList.refresh(); // 리스트 새로고침 트리거
+    }
+
+    // currentFeed도 업데이트
+    if (currentFeed.value != null) {
+      currentFeed.value = currentFeed.value!.copyWith(
+        likeCount: r['data']['count'],
+        likedByMe: r['data']['liked'],
+      );
+    }
+  }
+
+  Future<void> loadComments() async {
+    final r = await feedProvider.getComments(currentFeed.value!.id);
+    comments.assignAll((r['data'] as List).map((m) => CommentModel.fromJson(m)).toList());
+  }
+
+  Future<void> postComment(String content) async {
+    final r = await feedProvider.addComment(currentFeed.value!.id, content);
+    final newComment = CommentModel.fromJson(r['data']);
+    comments.add(newComment);
+
+    // feedList에서 해당 피드의 댓글 수도 업데이트
+    final feedIndex = feedList.indexWhere((feed) =>
+    feed.id == currentFeed.value!.id);
+    if (feedIndex != -1) {
+      final updatedComments = List<CommentModel>.from(
+          feedList[feedIndex].comments)
+        ..add(newComment);
+      feedList[feedIndex] =
+          feedList[feedIndex].copyWith(comments: updatedComments);
+      feedList.refresh();
+    }
+  }
+
+
 
   bool _isSuccessResponse(Map<String, dynamic> response) {
     final result = response['result']?.toString().toLowerCase();
