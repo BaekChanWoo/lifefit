@@ -126,6 +126,7 @@ class _FeedListItemState extends State<FeedListItem> {
                   orElse: () => widget.data,
                 );
 
+
                 return Row(
                   children: [
                     // 댓글 아이콘 + 동적 개수

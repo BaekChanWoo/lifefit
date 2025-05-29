@@ -12,7 +12,6 @@ class PostList extends StatefulWidget {
   final List<Post> posts;
   final VoidCallback onMorePressed;
   final bool hasMore;
-
   final VoidCallback? onRefreshRequested; // 콜백 추가
 
   const PostList({
@@ -26,7 +25,6 @@ class PostList extends StatefulWidget {
   @override
   State<PostList> createState() => _PostListState();
 }
-
 
 class _PostListState extends State<PostList> {
   @override
