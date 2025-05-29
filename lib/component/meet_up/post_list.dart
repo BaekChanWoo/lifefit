@@ -36,8 +36,22 @@ class _PostListState extends State<PostList> {
     final sortedPosts = List<Post>.from(widget.posts)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
+    if (widget.posts.isEmpty) {
+      return const Center(
+        child: Text(
+          '현재 게시글이 없습니다.',
+          style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w700),
+        ),
+      );
+    }
 
-    return ListView.separated(
+    return RefreshIndicator(
+        onRefresh: () async {
+      if (widget.onRefreshRequested != null) {
+        widget.onRefreshRequested!(); // 상위에서 전달된 콜백 실행
+      }
+    },
+    child: ListView.separated(
       itemCount: sortedPosts.length + (widget.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index < sortedPosts.length) {
@@ -202,6 +216,6 @@ class _PostListState extends State<PostList> {
         indent: 16,
         endIndent: 16,
       ),
-    );
+    ));
   }
 }
