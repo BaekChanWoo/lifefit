@@ -1,4 +1,5 @@
 import 'package:lifefit/model/user_model.dart';
+import 'package:lifefit/model/comment_model.dart';
 
 
 // lage 대신 final 사용 -> 필드의 불변성을 보장
@@ -13,6 +14,9 @@ class FeedModel {
   final String? imagePath;
   final DateTime? createdAt;
   final UserModel? writer;
+  final int likeCount;
+  final bool likedByMe;
+  final List<CommentModel> comments;
 
   FeedModel({
     required this.id,
@@ -25,6 +29,9 @@ class FeedModel {
     this.imagePath,
     this.createdAt,
     this.writer,
+    this.likeCount = 0,
+    this.likedByMe = false,
+    this.comments = const [],
   });
 
   factory FeedModel.parse(Map<String, dynamic> map) {
@@ -39,6 +46,11 @@ class FeedModel {
       imagePath: map['image_path'] as String?,
       createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
       writer: map['writer'] != null ? UserModel.parse(map['writer']) : null,
+      likeCount: map['like_count'] as int? ?? 0,
+      likedByMe: map['liked_by_me'] as bool? ?? false,
+      comments: (map['comments'] as List<dynamic>?)
+          ?.map((c) => CommentModel.fromJson(c))
+          .toList() ?? [],
     );
   }
 
@@ -53,6 +65,9 @@ class FeedModel {
     String? imagePath,
     DateTime? createdAt,
     UserModel? writer,
+    int? likeCount,
+    bool? likedByMe,
+    List<CommentModel>? comments,
   }) {
     return FeedModel(
       id: id ?? this.id,
@@ -65,6 +80,9 @@ class FeedModel {
       imagePath: imagePath ?? this.imagePath,
       createdAt: createdAt ?? this.createdAt,
       writer: writer ?? this.writer,
+      likeCount: likeCount ?? this.likeCount,
+      likedByMe: likedByMe ?? this.likedByMe,
+      comments: comments ?? this.comments,
     );
   }
 }
