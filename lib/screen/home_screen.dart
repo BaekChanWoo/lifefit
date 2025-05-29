@@ -500,12 +500,12 @@ class _HomeContentState extends State<HomeContent> {
                   width: 1.0,
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(12.0),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                          Text( "건강 정보/기사",
@@ -520,7 +520,13 @@ class _HomeContentState extends State<HomeContent> {
                         ),
                       ],
                     ),
-
+                    const SizedBox(height: 10.0),
+                    Image.asset(
+                      'assets/img/topic_icon.png',
+                      height: 110.0,
+                      width: 110.0,
+                      fit: BoxFit.contain,
+                    ),
                   ],
                 ),
               ),
