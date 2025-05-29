@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // json.decode 및 utf8.decode 사용
 import 'package:html_unescape/html_unescape.dart'; // HTML 엔티티 처리를 위해 추가
+import 'package:url_launcher/url_launcher.dart';
 
 // 외부 모델 파일 import (실제 프로젝트 구조에 맞게 경로 수정)
 import '../model/news_model.dart'; // 사용자 정의 NewsArticle 모델 사용
 import '../model/healthvideo_model.dart';
 import '../model/realtimetopic_model.dart'; // Naver News 응답용 모델 포함 가정
-import 'package:url_launcher/url_launcher.dart';
 
 class Healthtopic extends StatefulWidget {
   const Healthtopic({super.key});

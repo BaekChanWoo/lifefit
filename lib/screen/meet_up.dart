@@ -64,11 +64,11 @@ class _MeetUpScreenState extends State<MeetUpScreen> {
         .take(_visiblePostCount)
         .toList();
 
+    // 더 불러올 게시글이 있는지 여부 판단 (수정된 부분)
+    final hasMore = selectedCategory == '전체'
+        ? _allPosts.length > _visiblePostCount
+        : _allPosts.where((post) => post.category == selectedCategory).length > _visiblePostCount;
 
-    // 더 불러올 게시글이 있는지 여부 판단
-    final hasMore = _allPosts
-        .where((post) => post.category == selectedCategory)
-        .length > _visiblePostCount;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),

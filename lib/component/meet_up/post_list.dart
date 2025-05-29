@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/model/meetup_model.dart';
 import 'applicant_list.dart';
 import 'apply_button.dart';
 import 'apply_sheet.dart';
 import 'create_post.dart';
 
-/// 게시글 리스트를 출력
+//게시글 리스트를 출력
 class PostList extends StatefulWidget {
   final List<Post> posts;
   final VoidCallback onMorePressed;
@@ -35,77 +36,74 @@ class _PostListState extends State<PostList> {
     final sortedPosts = List<Post>.from(widget.posts)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
+    if (widget.posts.isEmpty) {
+      return const Center(
+        child: Text(
+          '현재 게시글이 없습니다.',
+          style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w700),
+        ),
+      );
+    }
 
-    return ListView.builder(
+    return RefreshIndicator(
+        onRefresh: () async {
+      if (widget.onRefreshRequested != null) {
+        widget.onRefreshRequested!(); // 상위에서 전달된 콜백 실행
+      }
+    },
+    child: ListView.separated(
       itemCount: sortedPosts.length + (widget.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index < sortedPosts.length) {
-          final post = sortedPosts[index]; // 현재 게시글
+          final post = sortedPosts[index];
 
           return Card(
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
             elevation: 0,
-            margin: const EdgeInsets.symmetric(vertical: 5),
+            margin: const EdgeInsets.symmetric(vertical: 6),
             color: Colors.white,
             child: Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          // 제목
                           Text(
                             post.title,
                             style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-
-                          const SizedBox(width: 10),
-
+                          const SizedBox(width: 12),
                           Text(
                             '작성자: ${post.authorName}',
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
                       ),
-
-
                       const SizedBox(height: 5),
-                      // 설명 표시
-                      //Text(post.description),
-
-                      // 위치 및 시간 표시
                       Row(
                         children: [
                           const Icon(Icons.place, size: 16, color: Colors.grey),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5),
                           Text(post.location, style: const TextStyle(color: Colors.grey)),
                           const SizedBox(width: 16),
                           const Icon(Icons.access_time, size: 16, color: Colors.grey),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5),
                           Text(post.dateTime, style: const TextStyle(color: Colors.grey)),
                         ],
                       ),
-
-                      const SizedBox(height: 3),
-
-                      //인원 수 신청 버튼
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          //정원 표시
-                          Text(
-                            '정원: ${post.currentPeople}명 / ${post.maxPeople}명',
-                          ),
-
-                          // 신청 버튼
+                          Text('정원: ${post.currentPeople}명 / ${post.maxPeople}명'),
                           ApplyButton(
                             isApplied: post.applicants.any((a) => a['uid'] == currentUserId),
                             onPressed: () {
@@ -118,23 +116,17 @@ class _PostListState extends State<PostList> {
                                 builder: (_) => ApplySheet(
                                   post: post,
                                   onApplied: () {
-                                    widget.onRefreshRequested?.call(); // 전체 리스트 새로고침
+                                    widget.onRefreshRequested?.call();
                                   },
                                 ),
                               );
                             },
                           ),
-
-
-
                         ],
                       ),
-
                     ],
                   ),
                 ),
-
-                // 상단 더보기 메뉴 (작성자만)
                 if (post.isMine == true)
                   Positioned(
                     top: 8,
@@ -146,11 +138,9 @@ class _PostListState extends State<PostList> {
                             context: context,
                             builder: (_) => CreatePost(existingPost: post),
                           );
-
                           if (updatedPost != null) {
-                            widget.onRefreshRequested?.call(); //Firestore 새로고침
+                            widget.onRefreshRequested?.call();
                           }
-
                         } else if (value == 'delete') {
                           final confirm = await showDialog<bool>(
                             context: context,
@@ -159,23 +149,21 @@ class _PostListState extends State<PostList> {
                               content: const Text('해당 게시글을 삭제하시겠습니까?'),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(false), // 취소
+                                  onPressed: () => Navigator.of(context).pop(false),
                                   child: const Text('취소'),
                                 ),
                                 ElevatedButton(
-                                  onPressed: () => Navigator.of(context).pop(true),  // 확인
+                                  onPressed: () => Navigator.of(context).pop(true),
                                   child: const Text('삭제'),
                                 ),
                               ],
                             ),
                           );
-
                           if (confirm == true) {
-                            await post.deleteFromFirestore(); //Firestore에서 삭제
-                            widget.onRefreshRequested?.call(); //화면 새로고침
+                            await post.deleteFromFirestore();
+                            widget.onRefreshRequested?.call();
                           }
                         }
-
                         if (value == 'viewApplicants') {
                           showModalBottomSheet(
                             context: context,
@@ -187,7 +175,6 @@ class _PostListState extends State<PostList> {
                           );
                         }
                       },
-
                       itemBuilder: (context) => const [
                         PopupMenuItem(value: 'edit', child: Text('수정')),
                         PopupMenuItem(value: 'delete', child: Text('삭제')),
@@ -200,9 +187,16 @@ class _PostListState extends State<PostList> {
             ),
           );
         } else {
-          // 게시글 끝났을 때 More 버튼 출력
+          // More + 버튼
           return Center(
             child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFFCCFF99),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
               onPressed: widget.onMorePressed,
               child: const Text(
                 'More +',
@@ -215,6 +209,13 @@ class _PostListState extends State<PostList> {
           );
         }
       },
-    );
+      separatorBuilder: (context, index) => const Divider(
+        color: Color(0xFFE0E0E0),
+        thickness: 1,
+        height: 16,
+        indent: 16,
+        endIndent: 16,
+      ),
+    ));
   }
 }
