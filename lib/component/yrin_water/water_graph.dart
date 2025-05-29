@@ -3,6 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/yrin_water/water_service.dart';
 
+const LIGHT_BEIGE = Color(0xFFFFF7E6); // 연한 베이지색
+
 //
 class WaterGraphWithFirebase extends StatefulWidget {
   final double maxY;
@@ -13,7 +15,7 @@ class WaterGraphWithFirebase extends StatefulWidget {
   const WaterGraphWithFirebase({
     super.key,
     this.maxY = 2000,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = LIGHT_BEIGE,
     this.showWeekdayLabels = true,
     this.showYAxisLabels = true,
   });
@@ -76,7 +78,7 @@ class WaterGraph extends StatelessWidget {
     super.key,
     required this.weeklyIntake,
     this.barColorBuilder,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = LIGHT_BEIGE,
     this.showWeekdayLabels = true,
     this.showYAxisLabels = true,
     this.maxY = 2000.0,

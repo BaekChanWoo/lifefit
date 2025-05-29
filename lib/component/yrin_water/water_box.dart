@@ -45,7 +45,7 @@ class WaterBoxState extends State<WaterBox> {
         });
       },
       child: Container(
-        height: 145,
+        height: 200,
         width: MediaQuery.of(context).size.width - 240,
         margin: const EdgeInsets.symmetric(horizontal: 30),
         decoration: BoxDecoration(
@@ -109,59 +109,44 @@ class FlChartWaterGraph extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFDDEEFF),
+        color: Colors.white, // 배경 흰색
         borderRadius: BorderRadius.circular(10),
       ),
       child: BarChart(
         BarChartData(
           maxY: maxY,
-          borderData: FlBorderData(show: false),
+          barTouchData: BarTouchData(enabled: false),
+          titlesData: FlTitlesData(show: false),
           gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  const days = ['월', '화', '수', '목', '금', '토', '일'];
-                  final index = value.toInt();
-                  if (index < 0 || index >= days.length) return const SizedBox.shrink();
-                  return SideTitleWidget(
-                    meta: meta,
-                    child: Text(days[index], style: const TextStyle(fontSize: 10)),
-                  );
-                },
-                reservedSize: 24,
-                interval: 1,
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, reservedSize: 30, interval: maxY / 4),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
+          borderData: FlBorderData(show: false),
           barGroups: List.generate(7, (index) {
             final y = weeklyIntake[index] ?? 0;
             return BarChartGroupData(
               x: index,
+              barsSpace: 1,
               barRods: [
+                // 연한 하늘색 배경
                 BarChartRodData(
-                  toY: y > maxY ? maxY : y,
-                  width: 14,
+                  toY: maxY,
+                  width: 6,
+                  color: const Color(0xFFB3D9FF),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                // 누적된 값만큼 채우는 진한 파란색
+                BarChartRodData(
+                  toY: y.clamp(0, maxY),
+                  width: 6,
                   color: const Color(0xFF003366),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(6),
-                    topRight: Radius.circular(6),
-                  ),
+                  borderRadius: BorderRadius.circular(6),
                 ),
               ],
             );
           }),
+          alignment: BarChartAlignment.spaceAround,
         ),
       ),
     );
   }
 }
-

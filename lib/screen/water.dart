@@ -6,6 +6,8 @@ import 'package:lifefit/component/yrin_water/water_graph.dart';
 import 'package:lifefit/component/yrin_water/water_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
+
 class WaterHome extends StatefulWidget {
   const WaterHome({super.key});
 
@@ -60,20 +62,23 @@ class _WaterHomeState extends State<WaterHome> {
             currentTotalAmount: _currentDailyIntake,
             dailyWaterGoal: _dailyWaterGoal,
           ),
-          Positioned(
-            top: 320,
-            left: 0,
-            right: 0,
-            child: const Center(child: TimeDisplay()),
-          ),
-          Positioned(
-            bottom: 125,
-            left: 28,
-            right: 28,
-            height: 200,
-            child: WaterGraph(
-              weeklyIntake: _weeklyIntake,
-              maxY: _dailyWaterGoal.toDouble(),
+
+          SizedBox(height: 20),
+
+           TimeDisplay(),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 440), // 위쪽 공간 확보
+            child: SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: WaterGraph(
+                  weeklyIntake: _weeklyIntake,
+                  maxY: _dailyWaterGoal.toDouble(),
+                ),
+              ),
             ),
           ),
 

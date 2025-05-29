@@ -13,31 +13,32 @@ class WaterIntake extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
-
     final bool canDecrease = currentTotalAmount > 0;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Text(
-            '물 섭취량',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontFamily: 'NanumSquareRound',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
+    return Scaffold(
+        appBar: AppBar(
+        title: const Text(
+        '물 섭취량',
+        style: TextStyle(
+        fontFamily: 'NanumSquareRound',
+        fontWeight: FontWeight.w600,
+        fontSize: 22,
+        color: Colors.black,
+    ),
+    ), centerTitle: true,
+    backgroundColor: Colors.white,),
+
+    body: Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
         Container(
           width: 500,
           height: 240,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+          margin: const EdgeInsets.all(25),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             color: Colors.white,
@@ -191,6 +192,7 @@ class WaterIntake extends StatelessWidget {
           ),
         ),
       ],
+    )
     );
   }
 }

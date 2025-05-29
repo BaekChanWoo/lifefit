@@ -118,29 +118,43 @@ class WaterService {
     if (userId == null) return {};
 
     final now = DateTime.now();
-    final startDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
-    final endDate = DateTime(now.year, now.month, now.day);
+    final today = DateTime(now.year, now.month, now.day);
+    final startDate = today.subtract(const Duration(days: 6));
+    final endDate = today;
 
-    // 최근 7일간 날짜 리스트 생성
-    final days = List.generate(7, (index) => startDate.add(Duration(days: index)));
+    // 날짜만(시분초 제거) 추출하는 함수
+    DateTime _onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
-    final querySnapshot = await _firestore
+    // 최근 7일 날짜 리스트 생성 (6일 전부터 오늘까지)
+    final days = List.generate(
+        7, (index) => startDate.add(Duration(days: index)));
+
+    // 날짜(DateTime) → 인덱스(0~6) 매핑
+    final Map<DateTime, int> dateIndexMap = {
+      for (int i = 0; i < days.length; i++) _onlyDate(days[i]): i,
+    };
+
+    // 0~6 인덱스별 초기 섭취량 0.0 세팅
+    Map<int, double> intakeMap = {for (int i = 0; i < 7; i++) i: 0.0};
+
+    // Firestore에서 userId와 기간 조건으로 데이터 조회
+    final querySnapshot = await FirebaseFirestore.instance
         .collection('water')
         .where('userId', isEqualTo: userId)
         .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
         .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
         .get();
 
-
-    Map<int, double> intakeMap = { for (var d in days) d.day : 0.0 };
-
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final timestamp = data['date'] as Timestamp;
-      final date = timestamp.toDate();
+      final date = _onlyDate(timestamp.toDate());
       final amount = (data['totalAmount'] ?? 0).toDouble();
 
-      intakeMap[date.day] = amount;
+      final index = dateIndexMap[date];
+      if (index != null) {
+        intakeMap[index] = amount;
+      }
     }
 
     return intakeMap;
