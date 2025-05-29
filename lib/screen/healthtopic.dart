@@ -490,9 +490,8 @@ class _HealthtopicState extends State<Healthtopic> {
   // --- API 호출 함수들 ---
   Future<List<NewsArticle>> _fetchNewsDataIoApi() async {
     _fetchNewsSliderDataCompleted = false;
-    const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05'; // 실제 API 키로 교체!
+    const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05';
     final String query = Uri.encodeComponent('건강 OR 웰빙');
-    // language=ko 파라미터 추가 시도 (API 지원 여부 확인 필요)
     final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey');
 
     try {
@@ -514,8 +513,8 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 
   Future<List<ArticleItem>> _fetchNaverNews() async {
-    const String clientId = 'E8ElLohbjuT1eaH79agX'; // 실제 클라이언트 ID로 교체!
-    const String clientSecret = 'PAqjeoE83U'; // 실제 클라이언트 시크릿으로 교체!
+    const String clientId = 'E8ElLohbjuT1eaH79agX';
+    const String clientSecret = 'PAqjeoE83U';
     final String query = Uri.encodeComponent('건강 뉴스 최신');
     final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5&sort=sim');
 
@@ -543,7 +542,7 @@ class _HealthtopicState extends State<Healthtopic> {
 
   Future<List<SearchResult>> _fetchYoutubeVideos() async {
     _fetchYoutubeVideosCompleted = false;
-    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // 실제 API 키로 교체!
+    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs';
     const int maxResults = 5;
     final String query = Uri.encodeComponent('건강 정보 최신 영상');
     final Uri uri = Uri.parse('https://www.googleapis.com/youtube/v3/search?part=snippet&key=$apiKey&q=$query&maxResults=$maxResults&type=video&order=date&regionCode=KR');
