@@ -116,6 +116,7 @@ class _PostListState extends State<PostList> {
                           // 신청 버튼은 오른쪽에 여유 있게 배치
                           ApplyButton(
                             isApplied: post.applicants.any((a) => a['uid'] == currentUserId),
+                            isFull: post.currentPeople >= post.maxPeople,
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
