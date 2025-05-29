@@ -531,7 +531,7 @@ class _WeatherState extends State<Weather> {
                         const SizedBox(height: 8),
                         Text('${weatherData!.main.temp.round()}°C', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87)),
                         const SizedBox(height: 2),
-                        Text(weatherData!.weather[0].description, style: const TextStyle(fontSize: 13, color: Colors.black87), textAlign: TextAlign.center),
+                        //Text(weatherData!.weather[0].description, style: const TextStyle(fontSize: 13, color: Colors.black87), textAlign: TextAlign.center), 언어 제공 확인후 수정
                       ] else ...[
                         const SizedBox(height: 50 + 8 + 14 + 2 + 13),
                         const Center(child: Text('정보 없음', style: TextStyle(fontSize: 13, color: Colors.grey))),
