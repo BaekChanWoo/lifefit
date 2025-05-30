@@ -111,34 +111,35 @@ class SleepCardState extends State<SleepCard> {
                   )
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 15),
               SizedBox(
-                height: 98,
-                width: 95,
+                height: 90,
+                width: 100,
                 // SleekCircularSlider 위젯
                 child: SleekCircularSlider(
                   min: 0,
                   max: 12,
                   initialValue: sleepHours,
                   appearance: CircularSliderAppearance(
-                    size: 60,
+                    size: 100,
                     customWidths: CustomSliderWidths(trackWidth: 9, progressBarWidth: 10),
                     customColors: CustomSliderColors(
-                      trackColor: Colors.grey.shade100,
+                      trackColor: Colors.grey.shade300,
+                      //trackColor: Colors.grey.shade100,
                       progressBarColor: Colors.blueAccent,
                       dotColor: Colors.transparent,
                     ),
                     infoProperties: InfoProperties(
-                      mainLabelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      mainLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       modifier: (value) => '${value.toStringAsFixed(1)}h',
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 5),
               Text(
                 statusMessage,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ],
           ),
