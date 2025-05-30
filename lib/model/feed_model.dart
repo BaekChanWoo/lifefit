@@ -17,6 +17,8 @@ class FeedModel {
   final int likeCount;
   final bool likedByMe;
   final List<CommentModel> comments;
+  final int commentCount;
+
 
   FeedModel({
     required this.id,
@@ -32,6 +34,7 @@ class FeedModel {
     this.likeCount = 0,
     this.likedByMe = false,
     this.comments = const [],
+    this.commentCount = 0,
   });
 
   factory FeedModel.parse(Map<String, dynamic> map) {
@@ -51,6 +54,7 @@ class FeedModel {
       comments: (map['comments'] as List<dynamic>?)
           ?.map((c) => CommentModel.fromJson(c))
           .toList() ?? [],
+      commentCount: map['comment_count'] as int? ?? 0,
     );
   }
 
