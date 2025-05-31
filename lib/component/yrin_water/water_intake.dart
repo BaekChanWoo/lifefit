@@ -28,7 +28,7 @@ class WaterIntake extends StatelessWidget {
         color: Colors.black,
     ),
     ), centerTitle: true,
-    backgroundColor: Colors.white,),
+   ),
 
     body: Column(
     mainAxisSize: MainAxisSize.min,
