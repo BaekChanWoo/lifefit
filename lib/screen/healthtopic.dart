@@ -491,9 +491,9 @@ class _HealthtopicState extends State<Healthtopic> {
   Future<List<NewsArticle>> _fetchNewsDataIoApi() async {
     _fetchNewsSliderDataCompleted = false;
     const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05';
-    // 수정된 부분: (건강 OR 웰빙) 키워드를 포함하고, '정치' 키워드는 제외합니다.
-    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT 정치');
-    final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey');
+    // 사용자가 제공한 파일(healthtopic.dart (1) of 2)에 따라 '정치' 제외 유지
+    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT 정치'); //
+    final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey'); //
 
     try {
       final response = await http.get(uri);
@@ -516,9 +516,9 @@ class _HealthtopicState extends State<Healthtopic> {
   Future<List<ArticleItem>> _fetchNaverNews() async {
     const String clientId = 'E8ElLohbjuT1eaH79agX';
     const String clientSecret = 'PAqjeoE83U';
-    // 수정된 부분: '건강 뉴스 최신'을 검색하되, '정치' 관련 내용은 제외합니다.
-    final String query = Uri.encodeComponent('건강+운동+웰빙-정치-날씨');
-    final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5&sort=sim');
+    // 사용자가 제공한 파일(healthtopic.dart (1) of 2)에 따라 '정치', '날씨' 제외 및 '운동' 추가 유지
+    final String query = Uri.encodeComponent('건강+운동+웰빙-정치-날씨'); //
+    final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5&sort=sim'); //
 
     try {
       final response = await http.get(
@@ -545,9 +545,13 @@ class _HealthtopicState extends State<Healthtopic> {
   Future<List<SearchResult>> _fetchYoutubeVideos() async {
     _fetchYoutubeVideosCompleted = false;
     const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // 실제 사용시에는 안전하게 관리하세요.
-    const int maxResults = 5;
-    final String query = Uri.encodeComponent('건강 정보 최신 영상');
-    final Uri uri = Uri.parse('https://www.googleapis.com/youtube/v3/search?part=snippet&key=$apiKey&q=$query&maxResults=$maxResults&type=video&order=date&regionCode=KR');
+    const int maxResults = 5; //
+    final String query = Uri.encodeComponent('건강 정보 최신 영상'); //
+    // 수정된 부분: videoDuration=medium 추가하여 4분~20분 사이 영상 필터링
+    final Uri uri = Uri.parse(
+        'https://www.googleapis.com/youtube/v3/search?'
+            'part=snippet&key=$apiKey&q=$query&maxResults=$maxResults&'
+            'type=video&order=date&regionCode=KR&videoDuration=medium'); //
 
     try {
       final response = await http.get(uri);
@@ -592,7 +596,7 @@ class _HealthtopicState extends State<Healthtopic> {
 
   void _launchYoutubeVideo(String videoId) {
     // 유튜브 앱으로 열기를 시도하고, 실패하면 웹 브라우저로 엽니다.
-    // 일반적인 watch URL을 사용하는 것이 다양한 플랫폼에서 안정적입니다.
+    // 실제 videoId를 사용하여 YouTube 시청 URL을 구성합니다.
     final Uri youtubeWatchUrl = Uri.parse('https://www.youtube.com/watch?v=$videoId');
     _launchURL(youtubeWatchUrl); // _launchURL 함수 재사용
   }
