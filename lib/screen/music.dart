@@ -29,7 +29,7 @@ class _MusicState extends State< Music> {
         children: [
           MusicTop(),
           Positioned(
-            top: 185,
+            top: 195, //카테고리 선택
             left: 13,
             right: 10,
             child: ChangeCategory( // CategorySelector 위젯 추가
