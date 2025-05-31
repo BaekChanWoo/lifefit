@@ -12,7 +12,6 @@ class PostList extends StatefulWidget {
   final List<Post> posts;
   final VoidCallback onMorePressed;
   final bool hasMore;
-
   final VoidCallback? onRefreshRequested; // 콜백 추가
 
   const PostList({
@@ -26,7 +25,6 @@ class PostList extends StatefulWidget {
   @override
   State<PostList> createState() => _PostListState();
 }
-
 
 class _PostListState extends State<PostList> {
   @override
@@ -80,11 +78,7 @@ class _PostListState extends State<PostList> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '작성자: ${post.authorName}',
-                            style: const TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
+
                         ],
                       ),
                       const SizedBox(height: 5),
@@ -99,13 +93,28 @@ class _PostListState extends State<PostList> {
                           Text(post.dateTime, style: const TextStyle(color: Colors.grey)),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('정원: ${post.currentPeople}명 / ${post.maxPeople}명'),
+                          // 정원 + 작성자: 하나의 Column에 넣고 왼쪽 정렬
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text('정원: ${post.currentPeople}명 / ${post.maxPeople}명'),
+                                const SizedBox(width: 17),
+                                Text(
+                                  '작성자: ${post.authorName}',
+                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // 신청 버튼은 오른쪽에 여유 있게 배치
                           ApplyButton(
                             isApplied: post.applicants.any((a) => a['uid'] == currentUserId),
+                            isFull: post.currentPeople >= post.maxPeople,
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
@@ -124,6 +133,7 @@ class _PostListState extends State<PostList> {
                           ),
                         ],
                       ),
+
                     ],
                   ),
                 ),

@@ -72,6 +72,7 @@ class _StepProgressBarState extends State<StepProgressBar>
           minHeight: 17,
           backgroundColor: Colors.grey[300],
           color: Colors.green,
+          borderRadius: BorderRadius.circular(4.5),
         ),
 
         const SizedBox(height: 7),

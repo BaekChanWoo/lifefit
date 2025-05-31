@@ -112,6 +112,8 @@ class WaterService {
     }
   }
 
+
+//일주일 그래프 인덱스 바꾸기 
   // 최근 7일간의 물 섭취량 Map
   Future<Map<int, double>> getWeeklyIntake() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;

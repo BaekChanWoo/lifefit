@@ -31,9 +31,7 @@ class _FeedListItemState extends State<FeedListItem> {
         padding: const EdgeInsets.all(12.0),
         child: Stack(
           children: [
-            // ───────────────────────────────────────────────────
             // 기존 UI: 이미지 + 텍스트 부분
-            // ───────────────────────────────────────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -116,10 +114,7 @@ class _FeedListItemState extends State<FeedListItem> {
                 ),
               ],
             ),
-
-            // ───────────────────────────────────────────────────
             // (4) 댓글 수 · 좋아요 수 부분 (항상 최신값을 Obx로 읽어옴)
-            // ───────────────────────────────────────────────────
             Positioned(
               right: 10,
               bottom: 0,
@@ -131,18 +126,17 @@ class _FeedListItemState extends State<FeedListItem> {
                   orElse: () => widget.data,
                 );
 
+
                 return Row(
                   children: [
                     // 댓글 아이콘 + 동적 개수
                     const Icon(Icons.mode_comment_outlined, color: Colors.grey, size: 16),
                     const SizedBox(width: 2),
                     Text(
-                      '${displayFeed.comments.length}',
+                      '${displayFeed.commentCount}',
                       style: const TextStyle(fontSize: 14),
                     ),
-
                     const SizedBox(width: 12),
-
                     // 좋아요 아이콘 + 동적 개수
                     Icon(
                       displayFeed.likedByMe ? Icons.favorite : Icons.favorite_border,

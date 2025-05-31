@@ -9,15 +9,13 @@ import 'package:lifefit/screen/meet_up.dart';
 import 'package:lifefit/screen/healthtopic.dart';
 import 'package:lifefit/screen/weather.dart';
 import 'package:lifefit/screen/water.dart';
-import 'package:lifefit/screen/pedometer.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/screen/my/mypage.dart';
 import 'package:lifefit/screen/music.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-
+import 'package:lifefit/screen/pedometer.dart';
 import 'package:lifefit/controller/auth_controller.dart';
 import 'package:lifefit/controller/home_controller.dart';
-
 import '../component/pedometer/daily_challenge.dart';
 import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
@@ -171,18 +169,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   otherAccountsPictures: [
                     Obx(() {
-                          final last = Get.find<HomeScreenController>().lastLoginTime.value;
-                          return Column(
-                             mainAxisAlignment: MainAxisAlignment.center,
-                             children: [
-                               const Icon(Icons.access_time, color: Colors.black, size: 23),
-                               Text(
-                                 timeago.format(last),
-                                 style: const TextStyle(fontSize: 10, color: Colors.black),
-                               ),
-                             ],
-                           );
-                         }),
+                      final last = Get.find<HomeScreenController>().lastLoginTime.value;
+                      return FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.access_time, size: 23),
+                            Text(
+                              timeago.format(last),
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                   decoration: BoxDecoration(
                     color: PRIMARY_COLOR,
@@ -592,9 +594,7 @@ class _HomeContentState extends State<HomeContent> {
             },
           ),
         ),
-
         // 수면 시간..
-
         Positioned(
           top: 395,
           left: 0,
