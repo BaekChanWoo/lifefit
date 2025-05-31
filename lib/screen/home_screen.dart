@@ -520,7 +520,7 @@ class _HomeContentState extends State<HomeContent> {
                     Image.asset(
                       'assets/img/topic_icon.png',
                       height: 110.0,
-                      width: 110.0,
+                      width: 130.0,
                       fit: BoxFit.contain,
                     ),
                   ],
@@ -569,8 +569,8 @@ class _HomeContentState extends State<HomeContent> {
                           size: 20.0,
                         ),
                       ],
-                    )
-
+                    ),
+                    Column()//여기에 위젯 작성
                   ],
                 ),
               ),
