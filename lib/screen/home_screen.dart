@@ -21,6 +21,7 @@ import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:lifefit/component/yrin_water/water_box.dart';
+import '../component/weather/home_weather.dart'; // HomeWeatherWidget
 
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
@@ -572,7 +573,9 @@ class _HomeContentState extends State<HomeContent> {
                         ),
                       ],
                     ),
-                    Column()//여기에 위젯 작성
+                    SizedBox(height: 8),
+                    // HomeWeatherWidget이 이제 스스로 데이터를 가져옵니다.
+                    HomeWeatherWidget(),
                   ],
                 ),
               ),
