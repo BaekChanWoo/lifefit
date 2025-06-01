@@ -75,11 +75,13 @@ class CategoryImages extends StatelessWidget {
     return Column(
       children: [
         Expanded(
+    child: Padding(
+    padding: const EdgeInsets.only(top: 20),
           child: GridView.count(
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
-            crossAxisSpacing: 25,
-            mainAxisSpacing: 20,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 30,
             children: displayedImageData.map((data) {
               return GestureDetector(
                 onTap: () {
@@ -108,8 +110,8 @@ class CategoryImages extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10.0),
                   child: SizedBox(
-                    width: 18,
-                    height: 15,
+                    width: 25,
+                    height: 40,
                     child: Image.asset(
                       data['path']!,
                       fit: BoxFit.cover,
@@ -120,7 +122,7 @@ class CategoryImages extends StatelessWidget {
             }).toList(),
           ),
         ),
-        const SizedBox(height: 30),
+        )
       ],
     );
   }
