@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class WaterService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // 한국 기준 0시의 UTC 시간으로 변환
+  // 한국 기준 0시의 UTC 시간 변환
   DateTime getKoreaMidnightUtc(DateTime dateTime) {
     final koreaTime = dateTime.toUtc().add(const Duration(hours: 9));
     final koreaMidnight = DateTime(
@@ -128,44 +128,48 @@ class WaterService {
     if (userId == null) return {};
 
     final now = DateTime.now();
-    final koreaNow = now.toUtc().add(const Duration(hours: 9));
-    final weekday = koreaNow.weekday;
-    final monday = koreaNow.subtract(Duration(days: weekday - 1));
-    final startDateUtc = monday.subtract(const Duration(hours: 9)); //
 
-    // 7일 날짜 리스트
+    // 현재 시간 한국 시간 변환
+    final koreaNow = now.toUtc().add(const Duration(hours: 9));
+
+    // 한국 시간 기준 이번 주 월요일 0시 계산
+    final weekday = koreaNow.weekday;
+    final mondayKorea = DateTime(koreaNow.year, koreaNow.month, koreaNow.day)
+        .subtract(Duration(days: weekday - 1));
+
+    // 한국 날짜 리스트
     final List<DateTime> koreaDates = List.generate(7, (index) {
-      final d = monday.add(Duration(days: index));
-      return DateTime(d.year, d.month, d.day);
+      return mondayKorea.add(Duration(days: index));
     });
 
+    // 각 날짜를 UTC 기준으로 바꿔서 Firestore의 date
     final Map<DateTime, int> dateIndexMap = {
-      for (int i = 0; i < koreaDates.length; i++) koreaDates[i]: i,
+      for (int i = 0; i < koreaDates.length; i++)
+        getKoreaMidnightUtc(koreaDates[i]): i,
     };
 
+    // 결과 Map 초기화
     Map<int, double> intakeMap = {for (int i = 0; i < 7; i++) i: 0.0};
+
+    // 쿼리: 이번 주 월요일 0시 ~ 오늘
+    final startDateUtc = getKoreaMidnightUtc(koreaDates.first);
+    final endDateUtc = getKoreaMidnightUtc(koreaDates.last);
 
     final querySnapshot = await _firestore
         .collection('water')
         .where('userId', isEqualTo: userId)
         .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDateUtc))
-        .where('date',
-        isLessThanOrEqualTo: Timestamp.fromDate(getKoreaMidnightUtc(now)))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDateUtc))
         .get();
 
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final timestamp = data['date'] as Timestamp;
+      final docDateUtc = timestamp.toDate();
 
-      final koreaDateTime = timestamp.toDate().toUtc().add(
-          const Duration(hours: 9));
-      final onlyDateKorea = DateTime(
-          koreaDateTime.year, koreaDateTime.month, koreaDateTime.day);
-
-      final amount = (data['totalAmount'] ?? 0).toDouble();
-
-      final index = dateIndexMap[onlyDateKorea];
+      final index = dateIndexMap[docDateUtc];
       if (index != null) {
+        final amount = (data['totalAmount'] ?? 0).toDouble();
         intakeMap[index] = amount;
       }
     }
