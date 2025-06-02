@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:lifefit/component/community/feed_show.dart';
 import 'package:lifefit/model/feed_model.dart';
 import 'package:lifefit/controller/feed_controller.dart';
-
+import 'package:timeago/timeago.dart' as timeago;
 
 
 const double _imageSize = 100;
@@ -83,7 +83,7 @@ class _FeedListItemState extends State<FeedListItem> {
                             const SizedBox(width: 8),
                             Text(
                               widget.data.createdAt != null
-                                  ? '${DateTime.now().difference(widget.data.createdAt!).inMinutes}분전'
+                                  ? timeago.format(widget.data.createdAt!)
                                   : '알 수 없음',
                               style: const TextStyle(color: Colors.grey),
                             ),
@@ -114,7 +114,7 @@ class _FeedListItemState extends State<FeedListItem> {
                 ),
               ],
             ),
-            // (4) 댓글 수 · 좋아요 수 부분 (항상 최신값을 Obx로 읽어옴)
+            // (4) 댓글 수 , 좋아요 수 부분 (항상 최신값을 Obx로 읽어옴)
             Positioned(
               right: 10,
               bottom: 0,
@@ -125,8 +125,6 @@ class _FeedListItemState extends State<FeedListItem> {
                       (f) => f.id == widget.data.id,
                   orElse: () => widget.data,
                 );
-
-
                 return Row(
                   children: [
                     // 댓글 아이콘 + 동적 개수
