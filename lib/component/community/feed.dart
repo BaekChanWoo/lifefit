@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:lifefit/component/community/feed_list_item.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/const/categories.dart';
-import 'dart:developer' as developer; // developer log 사용
 
 // 피드 페이지(index.dart)
 class Feed extends StatefulWidget {

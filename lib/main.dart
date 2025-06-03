@@ -18,7 +18,6 @@ import 'package:get_storage/get_storage.dart';
 
 
 
-
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화 준비

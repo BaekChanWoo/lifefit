@@ -9,7 +9,6 @@ import 'package:lifefit/screen/my/my_edit.dart';
 import 'package:lifefit/controller/home_controller.dart';
 
 
-
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
 
@@ -19,7 +18,6 @@ class MyPage extends StatefulWidget {
 
 class _MyPage extends State<MyPage> {
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +26,7 @@ class _MyPage extends State<MyPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 프로필
-              UserMypage(UserModel(id: 1 , name: "백찬우")),
+              UserMypage(UserModel(id: 1 , name: Get.find<HomeScreenController>().userName.value)),
               // 기타 메뉴
               Padding(
                   padding: const EdgeInsets.all(12.0),

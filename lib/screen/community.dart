@@ -83,7 +83,8 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
           ],
           ),
           actions: [
-            Padding(padding: const EdgeInsets.all(14.0),
+            Padding(
+              padding: const EdgeInsets.all(14.0),
               child: IconButton(
                 onPressed: (){
                   Get.to(() => const FeedSearchForm());
@@ -91,9 +92,12 @@ class _CommunityState extends State<Community> with SingleTickerProviderStateMix
                 icon : const Icon(CupertinoIcons.search , size: 25,),
               ),
             ),
-            Padding(padding: const EdgeInsets.all(14.0),
+            /*
+            Padding(
+              padding: const EdgeInsets.all(14.0),
               child: Icon(Icons.favorite , size: 25,),
             ),
+             */
           ],
           bottom: TabBar(
             controller: _tabController,

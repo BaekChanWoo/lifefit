@@ -3,7 +3,6 @@ import 'package:lifefit/const/colors.dart';
 import 'package:get/get.dart';
 import 'package:lifefit/controller/feed_controller.dart';
 import 'package:lifefit/controller/auth_controller.dart';
-import 'dart:developer' as developer;
 
 class MyPageFeedNumber extends StatelessWidget {
   const MyPageFeedNumber({super.key});
