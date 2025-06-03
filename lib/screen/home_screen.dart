@@ -390,7 +390,6 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
-    // 중요: main.dart에서 MobileAds.instance.initialize() 호출이 되었는지 확인하세요.
     _weatherAdManager.loadAd(); // 광고 로드
   }
   @override
@@ -552,9 +551,8 @@ class _HomeContentState extends State<HomeContent> {
           top: 210,
           right: 0,
           child: GestureDetector(
-            // ▼▼▼ [수정된 부분] onTap 콜백 로직 ▼▼▼
             onTap: () {
-              widget.onContainerTapped(); // 기존 _isContainerPage 상태 변경 로직 호출
+              widget.onContainerTapped();
               _weatherAdManager.showAd(
                 context: context,
                 onAdDismissedOrFailed: () {
@@ -598,7 +596,6 @@ class _HomeContentState extends State<HomeContent> {
                       ],
                     ),
                     SizedBox(height: 8),
-                    // HomeWeatherWidget이 이제 스스로 데이터를 가져옵니다.
                     HomeWeatherWidget(),
                   ],
                 ),
