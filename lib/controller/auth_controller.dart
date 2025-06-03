@@ -17,6 +17,9 @@ class AuthController extends GetxController {
   // 추가: 서버에서 내려주는 프로필 이미지 URL을 저장할 Rx 변수
   final Rxn<String> profileImage = Rxn<String>();
 
+  final Rxn<String> userUid = Rxn<String>(); // 추가: 로그인 시 입력된 uid 저장
+
+
   @override
   void onInit() {
     super.onInit();
@@ -151,6 +154,7 @@ class AuthController extends GetxController {
         // user_id 저장
         if (body['user_id'] != null) {
           _userId.value = body['user_id'];
+          userUid.value = uid; // 추가: 로그인 시 입력된 uid 저장
           log('Stored user_id: ${_userId.value}', name: 'AuthController');
         }
 

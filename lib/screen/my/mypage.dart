@@ -9,7 +9,6 @@ import 'package:lifefit/screen/my/my_edit.dart';
 import 'package:lifefit/controller/home_controller.dart';
 
 
-
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
 

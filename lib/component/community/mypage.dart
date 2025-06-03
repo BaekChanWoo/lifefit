@@ -175,7 +175,7 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
               Expanded(
                 child: MyPageButton(
                   onTap: () {},
-                  label: '게시물 수정',
+                  label: '게시물 숨김',
                 ),
               ),
             ],

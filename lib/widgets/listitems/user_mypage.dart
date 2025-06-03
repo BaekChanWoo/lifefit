@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lifefit/model/user_model.dart';
+import 'package:lifefit/screen/my/profile_detail.dart';
+import 'package:get/get.dart';
+
 
 class UserMypage extends StatelessWidget {
   final UserModel user;
@@ -8,7 +11,9 @@ class UserMypage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: null,
+      onTap: (){
+        Get.to(() => const ProfileDetail());
+      },
       child: Padding(
           padding: const EdgeInsets.all(12.0),
         child: Row(
