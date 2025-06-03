@@ -22,6 +22,7 @@ import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:lifefit/component/yrin_water/water_box.dart';
 import '../component/weather/home_weather.dart'; // HomeWeatherWidget
+import 'package:lifefit/component/interstitial/interstitial_ad_widget.dart';
 
 
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>();
   // Navigator 키 추가
   // 홈 화면 내 중첩 Navigator를 제어하기 위한 키
+
 
   @override
   void initState(){
@@ -383,6 +385,19 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
   final GlobalKey<WaterBoxState> waterBoxKey = GlobalKey();
+  final InterstitialAdManager _weatherAdManager = InterstitialAdManager();
+
+  @override
+  void initState() {
+    super.initState();
+    // 중요: main.dart에서 MobileAds.instance.initialize() 호출이 되었는지 확인하세요.
+    _weatherAdManager.loadAd(); // 광고 로드
+  }
+  @override
+  void dispose() {
+    _weatherAdManager.dispose(); // 광고 리소스 해제
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -537,9 +552,18 @@ class _HomeContentState extends State<HomeContent> {
           top: 210,
           right: 0,
           child: GestureDetector(
-            onTap: (){
-              widget.onContainerTapped();
-              Navigator.of(context).pushNamed('weather');
+            // ▼▼▼ [수정된 부분] onTap 콜백 로직 ▼▼▼
+            onTap: () {
+              widget.onContainerTapped(); // 기존 _isContainerPage 상태 변경 로직 호출
+              _weatherAdManager.showAd(
+                context: context,
+                onAdDismissedOrFailed: () {
+                  // 광고가 닫히거나 로드 실패 시 'weather' 페이지로 이동
+                  if (mounted) { // 위젯이 여전히 화면에 있는지 확인
+                    Navigator.of(context).pushNamed('weather');
+                  }
+                },
+              );
             },
             child: Container(
               height: 175,
