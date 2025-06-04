@@ -21,7 +21,7 @@ import '../component/pedometer/step_progress_bar.dart';
 import '../component/sleep/sleep_card.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:lifefit/component/yrin_water/water_box.dart';
-import '../component/weather/home_weather.dart'; // HomeWeatherWidget
+import '../component/weather/home_weather.dart';
 import 'package:lifefit/component/interstitial/interstitial_ad_widget.dart';
 
 
@@ -385,16 +385,16 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   final GlobalKey<SleepCardState> sleepCardKey = GlobalKey();
   final GlobalKey<WaterBoxState> waterBoxKey = GlobalKey();
-  final InterstitialAdManager _weatherAdManager = InterstitialAdManager();
+  final InterstitialAdManager _InterstitialAdManager = InterstitialAdManager();
 
   @override
   void initState() {
     super.initState();
-    _weatherAdManager.loadAd(); // 광고 로드
+    _InterstitialAdManager.loadAd(); // 광고 로드
   }
   @override
   void dispose() {
-    _weatherAdManager.dispose(); // 광고 리소스 해제
+    _InterstitialAdManager.dispose(); // 광고 리소스 해제
     super.dispose();
   }
 
@@ -553,7 +553,7 @@ class _HomeContentState extends State<HomeContent> {
           child: GestureDetector(
             onTap: () {
               widget.onContainerTapped();
-              _weatherAdManager.showAd(
+              _InterstitialAdManager.showAd(
                 context: context,
                 onAdDismissedOrFailed: () {
                   // 광고가 닫히거나 로드 실패 시 'weather' 페이지로 이동
