@@ -25,6 +25,8 @@ class _HealthtopicState extends State<Healthtopic> {
   // 최상단 이미지 슬라이더/인디케ATOR 요소
   final PageController controller = PageController(initialPage: 0); // 카드 페이지 컨트롤러
   int curruntPage = 0; // 현재 카드 페이지 인덱스
+  Timer? _sliderTimer; // 슬라이더 자동 넘김 타이머 객체
+  bool _isUserInteracting = false; // 사용자가 슬라이더와 상호작용 중인지 여부
 
   // 실시간 토픽 데이터를 위한 Future 상태 변수
   Future<List<ArticleItem>>? _naverNewsFuture;
@@ -32,30 +34,32 @@ class _HealthtopicState extends State<Healthtopic> {
   // HTML 엔티티 변환기 인스턴스 (클래스 멤버로 한 번만 생성)
   final HtmlUnescape _unescape = HtmlUnescape();
 
+  // API 호출 완료 여부 플래그 (로딩 인디케이터 표시용 - 추후 별도 상태 변수로 관리 권장)
+  bool _fetchNewsSliderDataCompleted = false;
+  bool _fetchYoutubeVideosCompleted = false;
+  // 각 데이터 유형별 로딩 상태 (개선된 방식)
+  bool _isLoadingNewsSlider = true;
+  bool _isLoadingYoutubeVideos = true;
+
+
   @override
   void initState() {
     super.initState();
-
-    // 뉴스 슬라이더 자동 넘김 타이머
-    Timer.periodic(Duration(seconds: 7), (Timer timer) {
-      if (controller.hasClients && controller.page != null && _newsSliderArticles.isNotEmpty) {
-        final int itemCount = _newsSliderArticles.length > 4 ? 4 : _newsSliderArticles.length;
-        if (itemCount == 0) return; // 아이템이 없으면 동작 안 함
-        final int nextPage = (controller.page!.round() + 1) % itemCount;
-        controller.animateToPage(
-          nextPage,
-          duration: Duration(milliseconds: 350),
-          curve: Curves.easeIn,
-        );
-      }
-    });
+    _startSliderTimer(); // 타이머 시작 함수 호출
 
     _fetchNewsSliderData(); // 카드 슬라이더 뉴스 데이터 가져오기
     _naverNewsFuture = _fetchNaverNews(); // 실시간 토픽 데이터 Future 초기화
     _fetchYoutubeVideos().then((videos) {
-      if (mounted) { // 위젯이 여전히 마운트된 상태인지 확인
+      if (mounted) {
         setState(() {
           _youtubeVideos = videos;
+          _isLoadingYoutubeVideos = false; // 유튜브 영상 로딩 완료
+        });
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingYoutubeVideos = false; // 유튜브 영상 로딩 실패 시에도 완료 처리
         });
       }
     });
@@ -63,51 +67,85 @@ class _HealthtopicState extends State<Healthtopic> {
 
   @override
   void dispose() {
+    _sliderTimer?.cancel(); // 위젯 dispose 시 타이머 취소
     controller.dispose();
     super.dispose();
   }
 
+  // 슬라이더를 다음 페이지로 넘기는 로직
+  void _goToNextPage() {
+    if (controller.hasClients && controller.page != null && _newsSliderArticles.isNotEmpty) {
+      final int itemCount = _newsSliderArticles.length > 4 ? 4 : _newsSliderArticles.length;
+      if (itemCount == 0) return;
+      final int currentPage = controller.page!.round(); // 현재 페이지 반올림
+      final int nextPage = (currentPage + 1) % itemCount;
+      controller.animateToPage(
+        nextPage,
+        duration: Duration(milliseconds: 350),
+        curve: Curves.easeIn,
+      );
+    }
+  }
+
+  // 슬라이더 자동 넘김 타이머 시작 함수
+  void _startSliderTimer() {
+    _sliderTimer?.cancel(); // 기존 타이머가 있다면 취소
+    _sliderTimer = Timer.periodic(Duration(seconds: 7), (Timer timer) {
+      if (!_isUserInteracting && mounted) { // 사용자가 상호작용 중이 아니고, 위젯이 마운트된 상태일 때만 실행
+        _goToNextPage();
+      }
+    });
+  }
+
+  // 슬라이더 자동 넘김 타이머 중지 함수
+  void _stopSliderTimer() {
+    _sliderTimer?.cancel();
+  }
+
+
   // HTML 엔티티 변환 및 태그 제거를 위한 함수
   String cleanHtmlString(String? htmlText) {
     if (htmlText == null || htmlText.isEmpty) return '';
-
-    // 1. HTML 엔티티를 일반 문자로 변환 (예: " -> ")
     var textWithoutEntities = _unescape.convert(htmlText);
-    // 2. 남아있는 HTML 태그 제거 (예: <b>, <i> 등)
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
-    return textWithoutEntities.replaceAll(exp, ''); // String 객체의 replaceAll 사용
+    return textWithoutEntities.replaceAll(exp, '');
   }
 
   // 카드 슬라이더 뉴스 데이터 가져오기 (Newsdata.io)
   Future<void> _fetchNewsSliderData() async {
+    if(mounted) { // setState 호출 전 mounted 확인
+      setState(() {
+        _isLoadingNewsSlider = true;
+      });
+    }
     try {
       final newsDataIo = await _fetchNewsDataIoApi();
       if (mounted) {
         setState(() {
           _newsSliderArticles.clear();
           _newsSliderArticles.addAll(newsDataIo);
-
-          // pubDate (String)를 DateTime으로 파싱하여 정렬 (최신순)
           _newsSliderArticles.sort((a, b) {
-            // DateTime.tryParse를 사용하여 안전하게 파싱
-            // a.pubDate와 b.pubDate는 모델에 따라 String 타입
             DateTime? dateA = DateTime.tryParse(a.pubDate);
             DateTime? dateB = DateTime.tryParse(b.pubDate);
-
-            // 파싱 실패 또는 null일 경우를 대비한 기본값 설정
             DateTime fallbackDate = DateTime.fromMillisecondsSinceEpoch(0);
-
-            // dateB와 dateA를 비교하여 내림차순 (최신 날짜가 먼저 오도록)
             return (dateB ?? fallbackDate).compareTo(dateA ?? fallbackDate);
           });
+          _isLoadingNewsSlider = false; // 뉴스 슬라이더 로딩 완료
         });
       }
     } catch (e) {
       print('Error fetching news slider data: $e');
       if (mounted) {
+        setState(() {
+          _isLoadingNewsSlider = false; // 뉴스 슬라이더 로딩 실패 시에도 완료 처리
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('슬라이더 뉴스를 불러오는데 실패했습니다.')),
         );
+      }
+    } finally {
+      if (mounted) {
+        // _fetchNewsSliderDataCompleted = true; // 이 플래그는 _isLoadingNewsSlider로 대체 가능
       }
     }
   }
@@ -134,24 +172,26 @@ class _HealthtopicState extends State<Healthtopic> {
                   _launchURL(url);
                 } else {
                   print('Invalid URL format for realTimeTopic: $link');
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('잘못된 URL 형식입니다.')));
                 }
               } else {
                 print('Empty or null URL for realTimeTopic');
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('URL 정보가 없습니다.')));
               }
             },
             child: Row(
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.white, // 배경색은 Card와 동일하게 또는 다르게 설정 가능
+                    borderRadius: BorderRadius.circular(10.0), // 필요시 디자인 조정
                   ),
                   width: 70.0,
                   height: 70.0,
                   child: Center(
                     child: Text(
                       '${index + 1}',
-                      style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor), // 테마 색상 사용 등
                     ),
                   ),
                 ),
@@ -159,6 +199,7 @@ class _HealthtopicState extends State<Healthtopic> {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center, // 수직 중앙 정렬
                     children: [
                       Text(
                         title.isNotEmpty ? title : '제목 없음',
@@ -183,7 +224,7 @@ class _HealthtopicState extends State<Healthtopic> {
           shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
-          elevation: 0.0,
+          elevation: 0.0, // 카드 자체 그림자 제거 (디자인에 따라)
           color: Colors.white,
           child: InkWell(
             onTap: () {
@@ -191,6 +232,7 @@ class _HealthtopicState extends State<Healthtopic> {
                 _launchYoutubeVideo(videoId);
               } else {
                 print('Video ID is null or empty');
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('영상을 재생할 수 없습니다.')));
               }
             },
             child: Column(
@@ -200,20 +242,24 @@ class _HealthtopicState extends State<Healthtopic> {
                   alignment: Alignment.center,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(4.0),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(4.0)), // 카드 상단 모서리에만 적용
                       child: thumbnailUrl != null && thumbnailUrl.isNotEmpty
                           ? Image.network(
                         thumbnailUrl,
-                        width: 290.0,
+                        width: 290.0, // 카드 너비에 맞게 조정 가능
                         height: 164.0,
                         fit: BoxFit.cover,
                         loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                  : null,
+                          return Container( // 로딩 중 플레이스홀더 크기 명시
+                            width: 290.0,
+                            height: 164.0,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
                             ),
                           );
                         },
@@ -239,15 +285,16 @@ class _HealthtopicState extends State<Healthtopic> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
-                    width: 274.0,
+                    width: 274.0, // 썸네일 너비에 맞게 조정
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(title.isNotEmpty ? title : '제목 없음',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15), // 폰트 크기 등 조정
                             overflow: TextOverflow.ellipsis, maxLines: 2),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 4.0), // 간격 조정
                         Text(channelTitle.isNotEmpty ? channelTitle : '채널 정보 없음',
+                            style: TextStyle(fontSize: 13, color: Colors.grey[700]), // 스타일 조정
                             overflow: TextOverflow.ellipsis, maxLines: 1),
                       ],
                     ),
@@ -264,7 +311,6 @@ class _HealthtopicState extends State<Healthtopic> {
 
   @override
   Widget build(BuildContext context) {
-    // 슬라이더에 표시할 아이템 수 (최대 4개 또는 실제 아이템 수)
     final int sliderItemCount = _newsSliderArticles.isEmpty ? 0 : (_newsSliderArticles.length > 4 ? 4 : _newsSliderArticles.length);
 
     return Scaffold(
@@ -278,7 +324,7 @@ class _HealthtopicState extends State<Healthtopic> {
           ),
         ),
         backgroundColor: Colors.white,
-        elevation: 0.5, // 약간의 그림자 효과
+        elevation: 0.5,
         actions: [
           IconButton(icon: Icon(Icons.menu, color: Colors.black54), onPressed: () { /* 메뉴 기능 구현 */ }),
         ],
@@ -289,98 +335,135 @@ class _HealthtopicState extends State<Healthtopic> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 최상단 이미지 슬라이드 뉴스
-            if (sliderItemCount > 0) // 데이터가 있을 때만 슬라이더와 인디케이터 표시
+            if (_isLoadingNewsSlider) // 로딩 상태 변수 사용
+              Container(
+                height: 320, // 슬라이더 높이와 동일하게 설정
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (sliderItemCount > 0)
               Column(
                 children: [
                   Container(
                     width: double.infinity,
                     height: 320,
-                    child: PageView.builder(
-                      controller: controller,
-                      itemCount: sliderItemCount,
-                      onPageChanged: (page) {
-                        if (mounted) {
-                          setState(() {
-                            curruntPage = page;
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification notification) {
+                        if (notification is ScrollStartNotification) {
+                          if (notification.dragDetails != null) {
+                            if (mounted) {
+                              setState(() {
+                                _isUserInteracting = true;
+                              });
+                            }
+                            _stopSliderTimer();
+                          }
+                        } else if (notification is ScrollEndNotification) {
+                          Future.delayed(Duration(seconds: 3), () { // 사용자가 손을 뗀 후 3초 뒤 타이머 재시작
+                            if (mounted && _isUserInteracting) { // 사용자가 실제로 인터랙션 했을때만 상태 변경 및 타이머 재시작
+                              setState(() {
+                                _isUserInteracting = false;
+                              });
+                              _startSliderTimer();
+                            } else if (mounted && !_isUserInteracting) { // 스크롤만 하고 인터랙션 상태가 아니었다면 (프로그래밍적 스크롤 등) 바로 타이머 시작
+                              _startSliderTimer();
+                            }
                           });
                         }
+                        return false;
                       },
-                      itemBuilder: (context, index) {
-                        final article = _newsSliderArticles[index];
-                        final title = cleanHtmlString(article.title); // HTML 클리닝 적용
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6.0),
-                          child: InkWell(
-                            onTap: () async {
-                              if (article.link.isNotEmpty) { // 모델에서 link는 non-nullable String
-                                final Uri? url = Uri.tryParse(article.link);
-                                if (url != null) {
-                                  _launchURL(url);
+                      child: PageView.builder(
+                        controller: controller,
+                        itemCount: sliderItemCount,
+                        onPageChanged: (page) {
+                          if (mounted) {
+                            setState(() {
+                              curruntPage = page;
+                            });
+                          }
+                        },
+                        itemBuilder: (context, index) {
+                          final article = _newsSliderArticles[index];
+                          final title = cleanHtmlString(article.title);
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
+                            child: InkWell(
+                              onTap: () async {
+                                // _stopSliderTimer(); // 탭 시 타이머 중지 (선택적)
+                                // if(mounted) setState(() => _isUserInteracting = true);
+
+                                if (article.link.isNotEmpty) {
+                                  final Uri? url = Uri.tryParse(article.link);
+                                  if (url != null) {
+                                    await _launchURL(url); // await 추가
+                                  } else {
+                                    print('Invalid URL format for news slider: ${article.link}');
+                                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('잘못된 URL 형식입니다.')));
+                                  }
                                 } else {
-                                  print('Invalid URL format for news slider: ${article.link}');
+                                  print('Empty URL for news slider article');
+                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('URL 정보가 없습니다.')));
                                 }
-                              } else {
-                                print('Empty URL for news slider article');
-                              }
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16.0),
-                              ),
-                              elevation: 4.0,
-                              clipBehavior: Clip.antiAlias, // 이미지 잘림 방지
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  if (article.imageUrl != null && article.imageUrl!.isNotEmpty)
-                                    Image.network(
-                                      article.imageUrl!,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                        if (loadingProgress == null) return child;
-                                        return Center(child: CircularProgressIndicator());
-                                      },
-                                      errorBuilder: (context, object, stackTrace) {
-                                        return Container(color: Colors.grey[300], child: Center(child: Icon(Icons.error_outline, color: Colors.grey[600])));
-                                      },
-                                    )
-                                  else
-                                    Container(color: Colors.grey[300], child: Center(child: Icon(Icons.image_not_supported, color: Colors.grey[600]))),
-                                  Positioned(
-                                    left: 0,
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [Colors.black.withOpacity(0.7), Colors.transparent],
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
+                                // 외부 앱에서 돌아왔을 때 타이머를 자동으로 재시작하려면 AppLifecycleState를 관찰해야 함.
+                                // 여기서는 사용자가 다시 화면과 상호작용할 때 NotificationListener에 의해 타이머가 재시작될 수 있음.
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16.0),
+                                ),
+                                elevation: 4.0,
+                                clipBehavior: Clip.antiAlias,
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    if (article.imageUrl != null && article.imageUrl!.isNotEmpty)
+                                      Image.network(
+                                        article.imageUrl!,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Center(child: CircularProgressIndicator());
+                                        },
+                                        errorBuilder: (context, object, stackTrace) {
+                                          return Container(color: Colors.grey[300], child: Center(child: Icon(Icons.error_outline, color: Colors.grey[600])));
+                                        },
+                                      )
+                                    else
+                                      Container(color: Colors.grey[300], child: Center(child: Icon(Icons.image_not_supported, color: Colors.grey[600]))),
+                                    Positioned(
+                                      left: 0,
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+                                            begin: Alignment.bottomCenter,
+                                            end: Alignment.topCenter,
+                                          ),
                                         ),
-                                      ),
-                                      child: Text(
-                                        title.isNotEmpty ? title : '제목 없음',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
+                                        child: Text(
+                                          title.isNotEmpty ? title : '제목 없음',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
-                  // 인디케이터
-                  if (sliderItemCount > 1) // 아이템이 2개 이상일 때만 인디케이터 표시
+                  if (sliderItemCount > 1)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(sliderItemCount, (i) {
@@ -397,10 +480,10 @@ class _HealthtopicState extends State<Healthtopic> {
                     ),
                 ],
               )
-            else // 로딩 중 또는 데이터 없을 때 표시
+            else // 로딩도 끝났고, 아이템도 없을 때
               Container(
                 height: 320,
-                child: Center(child: _newsSliderArticles.isEmpty && !_fetchNewsSliderDataCompleted ? CircularProgressIndicator() : Text('뉴스가 없습니다.')),
+                child: Center(child: Text('뉴스가 없습니다.')),
               ),
             SizedBox(height: 48.0),
 
@@ -410,7 +493,7 @@ class _HealthtopicState extends State<Healthtopic> {
               child: Text('실시간 토픽', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 432.0,
+              height: 432.0, // 자식 위젯들의 높이 합에 따라 조절 필요, 또는 Flexible/Expanded 사용 고려
               child: FutureBuilder<List<ArticleItem>>(
                 future: _naverNewsFuture,
                 builder: (context, snapshot) {
@@ -421,15 +504,17 @@ class _HealthtopicState extends State<Healthtopic> {
                     return Center(child: Text('토픽을 불러오는데 실패했습니다.'));
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final naverArticles = snapshot.data!;
+                    // ListView의 높이가 고정되어 있고, 자식들이 Card이므로, 스크롤 없이 모든 아이템을 표시하려면
+                    // itemCount만큼의 높이가 확보되어야 함. 현재는 5개로 제한.
                     return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: NeverScrollableScrollPhysics(), // 부모가 SingleChildScrollView이므로 스크롤 비활성화
                       itemCount: naverArticles.length > 5 ? 5 : naverArticles.length,
                       itemBuilder: (context, index) {
                         final article = naverArticles[index];
                         return _buildContentCard(
                           {
-                            'title': article.title, // ArticleItem 모델의 title (String?)
-                            'link': article.link,   // ArticleItem 모델의 link (String?)
+                            'title': article.title,
+                            'link': article.link,
                           },
                           'realTimeTopic',
                           index,
@@ -450,15 +535,17 @@ class _HealthtopicState extends State<Healthtopic> {
               child: Text('영상으로 보는 건강지식', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 260.0,
-              child: _youtubeVideos.isNotEmpty
+              height: 260.0, // 영상 카드 하나의 높이 + 약간의 여유
+              child: _isLoadingYoutubeVideos // 로딩 상태 변수 사용
+                  ? Center(child: CircularProgressIndicator())
+                  : _youtubeVideos.isNotEmpty
                   ? ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: _youtubeVideos.length,
+                itemCount: _youtubeVideos.length > 5 ? 5 : _youtubeVideos.length, // 최대 5개 영상 표시
                 itemBuilder: (context, index) {
                   final video = _youtubeVideos[index];
                   return Padding(
-                    padding: EdgeInsets.only(right: index == _youtubeVideos.length - 1 ? 0 : 10.0),
+                    padding: EdgeInsets.only(right: index == (_youtubeVideos.length > 5 ? 4 : _youtubeVideos.length -1) ? 0 : 10.0), // 마지막 아이템 오른쪽 패딩 제거
                     child: _buildContentCard(
                       {
                         'videoId': video.id.videoId,
@@ -473,7 +560,7 @@ class _HealthtopicState extends State<Healthtopic> {
                   );
                 },
               )
-                  : Center(child: _youtubeVideos.isEmpty && !_fetchYoutubeVideosCompleted ? CircularProgressIndicator() : Text('현재 영상이 없습니다.')),
+                  : Center(child: Text('현재 영상이 없습니다.')),
             ),
             SizedBox(height: 48.0),
           ],
@@ -482,22 +569,16 @@ class _HealthtopicState extends State<Healthtopic> {
     );
   }
 
-  // API 호출 완료 여부 플래그 (로딩 인디케이터 표시용 )
-  bool _fetchNewsSliderDataCompleted = false;
-  bool _fetchYoutubeVideosCompleted = false;
-
-
   // --- API 호출 함수들 ---
   Future<List<NewsArticle>> _fetchNewsDataIoApi() async {
-    _fetchNewsSliderDataCompleted = false;
-    const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05';
-    // 사용자가 제공한 파일(healthtopic.dart (1) of 2)에 따라 '정치' 제외 유지
-    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT 정치'); //
-    final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey'); //
+    // _fetchNewsSliderDataCompleted = false; // _isLoadingNewsSlider로 대체
+    const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05'; // API 키는 안전하게 관리하세요.
+    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT 정치');
+    final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey');
 
     try {
       final response = await http.get(uri);
-      _fetchNewsSliderDataCompleted = true;
+      // _fetchNewsSliderDataCompleted = true; // _isLoadingNewsSlider로 대체
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedJson = json.decode(utf8.decode(response.bodyBytes));
         final List<dynamic> results = decodedJson['results'] as List<dynamic>? ?? [];
@@ -507,18 +588,17 @@ class _HealthtopicState extends State<Healthtopic> {
         throw Exception('Failed to load news from newsdata.io');
       }
     } catch (e) {
-      _fetchNewsSliderDataCompleted = true;
+      // _fetchNewsSliderDataCompleted = true; // _isLoadingNewsSlider로 대체
       print('Error in _fetchNewsDataIoApi: $e');
-      rethrow; // 에러를 다시 던져서 호출한 쪽에서 처리할 수 있도록 함
+      rethrow;
     }
   }
 
   Future<List<ArticleItem>> _fetchNaverNews() async {
-    const String clientId = 'E8ElLohbjuT1eaH79agX';
-    const String clientSecret = 'PAqjeoE83U';
-    // 사용자가 제공한 파일(healthtopic.dart (1) of 2)에 따라 '정치', '날씨' 제외 및 '운동' 추가 유지
-    final String query = Uri.encodeComponent('건강+운동+웰빙-정치-날씨'); //
-    final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5&sort=sim'); //
+    const String clientId = 'E8ElLohbjuT1eaH79agX'; // API 키는 안전하게 관리하세요.
+    const String clientSecret = 'PAqjeoE83U'; // API 키는 안전하게 관리하세요.
+    final String query = Uri.encodeComponent('건강+운동+웰빙-정치-날씨');
+    final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5&sort=sim');
 
     try {
       final response = await http.get(
@@ -543,19 +623,23 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 
   Future<List<SearchResult>> _fetchYoutubeVideos() async {
-    _fetchYoutubeVideosCompleted = false;
-    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // 실제 사용시에는 안전하게 관리하세요.
-    const int maxResults = 5; //
-    final String query = Uri.encodeComponent('건강 정보 최신 영상'); //
-    // 수정된 부분: videoDuration=medium 추가하여 4분~20분 사이 영상 필터링
+    // _fetchYoutubeVideosCompleted = false; // _isLoadingYoutubeVideos로 대체
+    if (mounted) { // setState 호출 전 mounted 확인
+      setState(() {
+        _isLoadingYoutubeVideos = true;
+      });
+    }
+    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // API 키는 안전하게 관리하세요.
+    const int maxResults = 5;
+    final String query = Uri.encodeComponent('건강 정보 최신 영상');
     final Uri uri = Uri.parse(
         'https://www.googleapis.com/youtube/v3/search?'
             'part=snippet&key=$apiKey&q=$query&maxResults=$maxResults&'
-            'type=video&order=date&regionCode=KR&videoDuration=medium'); //
+            'type=video&order=date&regionCode=KR&videoDuration=medium');
 
     try {
       final response = await http.get(uri);
-      _fetchYoutubeVideosCompleted = true;
+      // _fetchYoutubeVideosCompleted = true; // _isLoadingYoutubeVideos로 대체
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
         final SearchListResponse searchListResponse = SearchListResponse.fromJson(jsonResponse);
@@ -565,7 +649,7 @@ class _HealthtopicState extends State<Healthtopic> {
         throw Exception('Failed to load YouTube videos');
       }
     } catch (e) {
-      _fetchYoutubeVideosCompleted = true;
+      // _fetchYoutubeVideosCompleted = true; // _isLoadingYoutubeVideos로 대체
       print('Error in _fetchYoutubeVideos: $e');
       rethrow;
     }
@@ -595,10 +679,15 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 
   void _launchYoutubeVideo(String videoId) {
-    // 유튜브 앱으로 열기를 시도하고, 실패하면 웹 브라우저로 엽니다.
-    // 실제 videoId를 사용하여 YouTube 시청 URL을 구성합니다.
-    final Uri youtubeWatchUrl = Uri.parse('https://www.youtube.com/watch?v=$videoId');
-    _launchURL(youtubeWatchUrl); // _launchURL 함수 재사용
-  }
+    // 우선 앱으로 시도
+    final Uri youtubeAppUrl = Uri.parse('youtube://watch?v=$videoId'); // <--- 이 부분!
+    // 웹 URL (앱 실패 시 대체)
+    final Uri youtubeWebUrl = Uri.parse('https://www.youtube.com/watch?v=$videoId'); // <--- 이 부분은 문제가 없습니다.
 
+    _launchURL(youtubeAppUrl).catchError((e) {
+      print('Could not launch YouTube app for video ID $videoId: $e'); // <--- 이 부분도!
+      // 앱 실행 실패 시 웹 URL로 시도
+      _launchURL(youtubeWebUrl);
+    });
+  }
 }
