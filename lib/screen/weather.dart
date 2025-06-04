@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/weather_model.dart'; // 사용자 정의 모델 파일
+import '../model/weather_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -16,7 +16,7 @@ class _WeatherState extends State<Weather> {
   WeatherDataModel? weatherData;
   AirPollutionDataModel? airPollutionData;
   FiveDayForecastModel? fiveDayForecastData;
-  final String weatherApiKey = '661900b7652cefedb11f6e2ddd2b0daa'; // << 중요: 본인의 OpenWeatherMap API 키를 입력하세요!
+  final String weatherApiKey = '661900b7652cefedb11f6e2ddd2b0daa';
   final String baseUrl = 'http://api.openweathermap.org/data/2.5';
   bool isLoading = true;
   String? _displayedLocationName; // UI에 표시될 최종 지역 이름
@@ -87,8 +87,6 @@ class _WeatherState extends State<Weather> {
     }
     setState(() {
       isLoading = true;
-      // 위치를 가져오기 전이므로, 이전 _displayedLocationName을 유지하거나 초기 메시지 설정
-      // _displayedLocationName = "현재 위치 확인 중..."; // 필요하다면
       print("[DEBUG] _loadWeatherDataForCurrentLocation: isLoading set to true");
     });
 
@@ -143,7 +141,7 @@ class _WeatherState extends State<Weather> {
             print("[DEBUG] _loadWeatherDataForCurrentLocation: API weatherData.name is empty. _displayedLocationName set to '$_displayedLocationName' using coordinates.");
           }
           else {
-            _displayedLocationName = '위치 정보 없음'; // 이것도 position이 null일 때와 구분 필요
+            _displayedLocationName = '위치 정보 없음';
             print("[DEBUG] _loadWeatherDataForCurrentLocation: No specific location name from API. _displayedLocationName set to '위치 정보 없음'.");
           }
           isLoading = false;
@@ -429,9 +427,17 @@ class _WeatherState extends State<Weather> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.location_on),
+                Text('현 위치', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),),
+              ]
+            ),
+            const SizedBox(height: 4),
             Text(
               _displayedLocationName ?? '위치 분석 중...',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 15),
@@ -548,7 +554,6 @@ class _WeatherState extends State<Weather> {
   }
 
   Widget _buildWeatherCard2() {
-    // print("[DEBUG] _buildWeatherCard2 called. fiveDayForecastData is null: ${fiveDayForecastData == null}");
     if (fiveDayForecastData == null || fiveDayForecastData!.list.isEmpty) {
       return Card(
         elevation: 4.0,
@@ -563,54 +568,43 @@ class _WeatherState extends State<Weather> {
 
     DateTime now = DateTime.now();
     List<ForecastItem> hourlyDisplayForecasts = [];
-    int currentHour = now.hour;
-    int slotStartHour = (currentHour ~/ 3) * 3;
-    int targetHourForFiltering;
-    DateTime targetDate = DateTime(now.year, now.month, now.day);
 
-    if (currentHour == slotStartHour + 2) {
-      targetHourForFiltering = slotStartHour + 3;
-    } else {
-      targetHourForFiltering = slotStartHour;
-    }
+    DateTime startOfToday = DateTime(now.year, now.month, now.day);
+    DateTime startOfTomorrow = DateTime(now.year, now.month, now.day + 1);
 
-    if (targetHourForFiltering >= 24) {
-      targetHourForFiltering -= 24;
-      targetDate = targetDate.add(const Duration(days: 1));
-    }
-
-    DateTime targetDateTimeForFilteringStart = DateTime(
-      targetDate.year,
-      targetDate.month,
-      targetDate.day,
-      targetHourForFiltering,
-    );
+    int currentHourSlotStartForFiltering = (now.hour ~/ 3) * 3;
+    DateTime currentValidForecastSlotStart = DateTime(now.year, now.month, now.day, currentHourSlotStartForFiltering);
 
     for (var item in fiveDayForecastData!.list) {
       DateTime itemTimeLocal = DateTime.fromMillisecondsSinceEpoch(item.dt * 1000).toLocal();
-      if (!itemTimeLocal.isBefore(targetDateTimeForFilteringStart)) {
-        if (hourlyDisplayForecasts.length < 5) {
+
+      bool isToday = !itemTimeLocal.isBefore(startOfToday) && itemTimeLocal.isBefore(startOfTomorrow);
+
+      if (isToday) {
+        if (!itemTimeLocal.isBefore(currentValidForecastSlotStart)) {
           hourlyDisplayForecasts.add(item);
-        } else {
-          break;
         }
       }
     }
 
-    String todayDateString = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    Map<String, List<ForecastItem>> subsequentForecasts = {};
+    String todayDateString = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 로컬 시간 기준 오늘
+    Map<String, List<ForecastItem>> subsequentForecastsByDay = {};
 
     for (var item in fiveDayForecastData!.list) {
-      String itemDateStr = DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(item.dt * 1000));
+      DateTime itemLocalDateTime = DateTime.fromMillisecondsSinceEpoch(item.dt * 1000).toLocal();
+      String itemDateStr = DateFormat('yyyy-MM-dd').format(itemLocalDateTime);
+
       if (itemDateStr != todayDateString) {
-        if (!subsequentForecasts.containsKey(itemDateStr)) {
-          subsequentForecasts[itemDateStr] = [];
+        if (!subsequentForecastsByDay.containsKey(itemDateStr)) {
+          subsequentForecastsByDay[itemDateStr] = [];
         }
-        if (subsequentForecasts[itemDateStr]!.length < 4) {
-          subsequentForecasts[itemDateStr]!.add(item);
-        }
+        subsequentForecastsByDay[itemDateStr]!.add(item);
       }
     }
+
+    //이후 예보에 표시할 날짜 선택 (최대 4일)
+    List<String> sortedDates = subsequentForecastsByDay.keys.toList()..sort();
+    List<String> datesToDisplay = sortedDates.take(4).toList();
 
     return Card(
       elevation: 4.0,
@@ -624,18 +618,18 @@ class _WeatherState extends State<Weather> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '시간별 예보',
+              '오늘의 시간별 예보', // 제목 변경
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 10),
             hourlyDisplayForecasts.isEmpty
                 ? const Center(child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0),
-              child: Text('시간별 예보 정보가 없습니다.', style: TextStyle(fontSize: 14, color: Colors.grey)),
+              child: Text('오늘의 시간별 예보 정보가 없습니다.', style: TextStyle(fontSize: 14, color: Colors.grey)), // 메시지 변경
             ))
                 : SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
+              child: Row( // 여기서 hourlyDisplayForecasts는 이미 필터링된 오늘의 예보 리스트
                 children: hourlyDisplayForecasts.map((item) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
@@ -657,49 +651,62 @@ class _WeatherState extends State<Weather> {
                 }).toList(),
               ),
             ),
+
             const SizedBox(height: 20),
+
             const Text(
               '이후 예보',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 10),
-            subsequentForecasts.isEmpty
+            datesToDisplay.isEmpty
                 ? const Center(child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               child: Text('이후 예보 정보가 없습니다.', style: TextStyle(fontSize: 14, color: Colors.grey)),
             ))
-                : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: subsequentForecasts.entries.map((entry) {
-                  String date = entry.key;
-                  List<ForecastItem> dailyForecasts = entry.value;
-                  ForecastItem representativeForecast = dailyForecasts.first;
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
+                : Column(
+              children: datesToDisplay.map((date) {
+                List<ForecastItem> dailyForecasts = subsequentForecastsByDay[date] ?? [];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
                           DateFormat('MM/dd(E)', 'ko_KR').format(DateTime.parse(date)),
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
-                        Image.network(
-                          'https://openweathermap.org/img/wn/${representativeForecast.weather[0].icon}@2x.png',
-                          width: 45,
-                          height: 45,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.cloud_off, size: 45, color: Colors.grey),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: dailyForecasts.map((item) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                      DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(item.dt * 1000).toLocal()),
+                                      style: const TextStyle(fontSize: 13)),
+                                  Image.network(
+                                    'https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png',
+                                    width: 45,
+                                    height: 45,
+                                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.cloud_off, size: 45, color: Colors.grey),
+                                  ),
+                                  Text('${item.main.temp.round()}°C', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ),
-                        const SizedBox(height: 5),
-                        Text('${representativeForecast.main.temp.round()}°C', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
