@@ -85,29 +85,30 @@ class _SleepScreenState extends State<SleepScreen> {
   Future<void> loadWeeklySleepData() async {
     final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
     final start = getStartOfWeek(dateOfNow);
-    final end = start.add(const Duration(days: 7));
+    final List<double> weeklyData = List.filled(7, 0);
 
-    print('📆 쿼리 범위: ${start.toIso8601String()} ~ ${end.toIso8601String()}');
+    print('📆 주간 시작: ${start.toIso8601String()}');
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('sleep')
-        .where('userId', isEqualTo: userId)
-        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('date', isLessThan: Timestamp.fromDate(end))
-        .get();
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('sleep')
+          .doc(userId)
+          .get();
 
-    print('📦 가져온 문서 수: ${snapshot.docs.length}');
-
-    List<double> weeklyData = List.filled(7, 0);
-
-    for (var doc in snapshot.docs) {
       final data = doc.data();
-      final DateTime date = (data['date'] as Timestamp).toDate();
-      final double hours = data['sleepHours'];
-      int weekday = date.weekday % 7;
-      weeklyData[weekday] = hours;
-
-      print('🟢 날짜: $date | 수면: $hours시간 | 요일 index: $weekday');
+      if (data != null) {
+        for (int i = 0; i < 7; i++) {
+          final day = start.add(Duration(days: i));
+          final key = DateFormat('yyyy-MM-dd').format(day);
+          final value = data[key];
+          if (value != null) {
+            weeklyData[i] = (value as num).toDouble(); // int or double
+            print('📌 $key: ${weeklyData[i]}시간');
+          }
+        }
+      }
+    } catch (e) {
+      print('❌ 수면 데이터 불러오기 실패: $e');
     }
 
     setState(() {
@@ -134,41 +135,24 @@ class _SleepScreenState extends State<SleepScreen> {
 
   Future<void> saveSleepData() async {
     final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
-    print('🧾 현재 로그인된 userId: $userId');
     final DateTime onlyDate = DateTime(dateOfNow.year, dateOfNow.month, dateOfNow.day);
-    final Timestamp timestampDate = Timestamp.fromDate(onlyDate);
+    final String dateKey = DateFormat('yyyy-MM-dd').format(onlyDate);
 
-    print('📝 저장 시도 날짜: $onlyDate');
+    print('📝 저장 시도 날짜: $dateKey');
 
     try {
-      final query = await FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('sleep')
-          .where('userId', isEqualTo: userId)
-          .where('date', isEqualTo: timestampDate)
-          .get();
-
-      if (query.docs.isNotEmpty) {
-        print('🔄 기존 데이터 업데이트');
-        await FirebaseFirestore.instance
-            .collection('sleep')
-            .doc(query.docs.first.id)
-            .update({'sleepHours': sleepHours});
-      } else {
-        print('새 데이터 저장');
-        await FirebaseFirestore.instance
-            .collection('sleep')
-            .add({
-          'id': const Uuid().v4(),
-          'date': timestampDate,
-          'sleepHours': sleepHours,
-          'userId': userId,
-        });
-      }
-      print('저장 성공');
+          .doc(userId)
+          .set({
+        dateKey: sleepHours,  // 날짜를 key로 사용해 저장
+      }, SetOptions(merge: true)); // 기존 문서와 병합
+      print('✅ 저장 성공');
     } catch (e) {
-      print('저장 실패: $e');
+      print('❌ 저장 실패: $e');
     }
   }
+
 
 
   void _showCupertinoPicker() {

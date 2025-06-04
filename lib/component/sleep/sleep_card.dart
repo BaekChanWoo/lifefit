@@ -38,40 +38,45 @@ class SleepCardState extends State<SleepCard> {
       return;
     }
 
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final today = DateTime.now();
+    final todayKey = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
-    // 오늘 날짜 수면 데이터를 Firestore에서 조회
-    final snapshot = await FirebaseFirestore.instance
-        .collection('sleep')
-        .where('userId', isEqualTo: userId)
-        .where('date', isEqualTo: Timestamp.fromDate(today))
-        .get();
+    try {
+      // 👉 sleep_summary 문서에서 오늘 키 값만 조회
+      final doc = await FirebaseFirestore.instance.collection('sleep').doc(userId).get();
 
-    if (snapshot.docs.isEmpty) {
+      if (!doc.exists || !doc.data()!.containsKey(todayKey)) {
+        setState(() {
+          sleepHours = 0;
+          statusMessage = '수면 기록이 없습니다';
+        });
+        return;
+      }
+
+      final fetchedHours = (doc.data()![todayKey] ?? 0).toDouble();
+
+      String message;
+      if (fetchedHours < 6) {
+        message = '😵 피곤해요';
+      } else if (fetchedHours <= 8) {
+        message = '🙂 괜찮아요';
+      } else {
+        message = '🌞 에너지 충전 완료';
+      }
+
+      setState(() {
+        sleepHours = fetchedHours;
+        statusMessage = message;
+      });
+    } catch (e) {
+      print('❌ 수면 데이터 불러오기 실패: $e');
       setState(() {
         sleepHours = 0;
-        statusMessage = '수면 기록이 없습니다';
+        statusMessage = '데이터 불러오기 오류';
       });
-      return;
     }
-
-    //sleepHours 필드가 null일 경우를 대비해 기본값 0을 사용하고, double로 안전하게 변환
-    final fetchedHours = (snapshot.docs.first['sleepHours'] ?? 0).toDouble();
-    String message;
-    if (fetchedHours < 6) {
-      message = '😵 피곤해요';
-    } else if (fetchedHours <= 8) {
-      message = '🙂 괜찮아요';
-    } else {
-      message = '🌞 에너지 충전 완료';
-    }
-
-    setState(() {
-      sleepHours = fetchedHours;
-      statusMessage = message;
-    });
   }
+
 
   @override
   Widget build(BuildContext context) {
