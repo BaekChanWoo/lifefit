@@ -215,11 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text("설정"),
-              onTap: (){},
-            ),
-            ListTile(
               leading: const Icon(Icons.person),
               title: const Text("프로필"),
               onTap: (){

@@ -5,6 +5,7 @@ import 'package:lifefit/const/colors.dart';
 import 'package:lifefit/component/community/mypage_feed_number.dart';
 import 'package:lifefit/controller/home_controller.dart';
 import 'package:lifefit/screen/my/my_edit.dart';
+import 'package:lifefit/screen/my/profile_detail.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -174,8 +175,12 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
               const SizedBox(width: 16.0),
               Expanded(
                 child: MyPageButton(
-                  onTap: () {},
-                  label: '게시물 숨김',
+                  onTap: () {
+                    // 현재 사용자 이름을 인자로 넘겨서 MyEdit로 이동
+                    Get.to(() => const ProfileDetail(),
+                    );
+                  },
+                  label: '프로필 상세',
                 ),
               ),
             ],

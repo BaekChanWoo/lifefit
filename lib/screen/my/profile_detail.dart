@@ -134,7 +134,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
           '프로필 정보',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 20,
           ),
         ),
         backgroundColor: Colors.white,

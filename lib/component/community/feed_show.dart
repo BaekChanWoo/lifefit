@@ -94,7 +94,7 @@ class _FeedShowState extends State<FeedShow> {
                             // 취소 버튼 - 회색 텍스트
                             TextButton(
                               onPressed: () => Get.back(result: false),
-                              child: Text('취소', style: TextStyle(color: Colors.grey[600])),
+                              child: Text('취소', style: TextStyle(color: Colors.black)),
                             ),
                             // 삭제 버튼 - 빨간 텍스트로 강조
                             TextButton(
