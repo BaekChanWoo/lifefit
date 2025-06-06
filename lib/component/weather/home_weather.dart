@@ -1,16 +1,12 @@
-// home_weather.dart
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart'; // 위치 정보용
-import 'package:http/http.dart' as http; // API 호출용
-import 'dart:convert'; // JSON 디코딩용
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-// 프로젝트 구조에 맞게 이 import 경로를 조정하세요.
 import '../../model/weather_model.dart';
 
 class HomeWeatherWidget extends StatefulWidget {
-  // API 키를 외부에서 주입받고 싶다면 생성자에 추가할 수 있습니다.
-  // final String apiKey;
-  // const HomeWeatherWidget({Key? key, required this.apiKey}) : super(key: key);
+
 
   const HomeWeatherWidget({Key? key}) : super(key: key);
 
@@ -24,7 +20,6 @@ class _HomeWeatherWidgetState extends State<HomeWeatherWidget> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  // 중요: 실제 API 키를 사용하세요. weather.dart 파일에 있던 것을 참조합니다.
   final String _weatherApiKey = '661900b7652cefedb11f6e2ddd2b0daa';
   final String _baseUrl = 'http://api.openweathermap.org/data/2.5';
 
@@ -128,7 +123,7 @@ class _HomeWeatherWidgetState extends State<HomeWeatherWidget> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = '데이터 로딩 중 오류 발생: $e';
+          _errorMessage = '데이터 로딩 중 오류 발생';
           _isLoading = false;
         });
       }
