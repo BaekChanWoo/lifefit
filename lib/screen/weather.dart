@@ -19,13 +19,13 @@ class _WeatherState extends State<Weather> {
   final String weatherApiKey = '661900b7652cefedb11f6e2ddd2b0daa';
   final String baseUrl = 'http://api.openweathermap.org/data/2.5';
   bool isLoading = true;
-  String? _displayedLocationName; // UI에 표시될 최종 지역 이름
+  String? _displayedLocationName;
 
   @override
   void initState() {
     super.initState();
     print("[DEBUG] initState called, starting _loadWeatherDataForCurrentLocation...");
-    _loadWeatherDataForCurrentLocation(); // 함수 이름 변경
+    _loadWeatherDataForCurrentLocation();
   }
 
   Future<Position?> _determinePosition() async {
@@ -316,7 +316,6 @@ class _WeatherState extends State<Weather> {
       default:
         message = '대기 및 날씨 정보를 확인 중입니다.';
     }
-    // print("[DEBUG] _getOverallDisplayInfo: Status - $overallAirQualityStatus, Icon - $iconPath, Message - $message");
     return {
       'status': overallAirQualityStatus,
       'iconPath': iconPath,
@@ -618,7 +617,7 @@ class _WeatherState extends State<Weather> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '오늘의 시간별 예보', // 제목 변경
+              '오늘의 예보',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 10),
