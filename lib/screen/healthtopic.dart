@@ -34,10 +34,6 @@ class _HealthtopicState extends State<Healthtopic> {
   // HTML 엔티티 변환기 인스턴스 (클래스 멤버로 한 번만 생성)
   final HtmlUnescape _unescape = HtmlUnescape();
 
-  // API 호출 완료 여부 플래그 (로딩 인디케이터 표시용 - 추후 별도 상태 변수로 관리 권장)
-  bool _fetchNewsSliderDataCompleted = false;
-  bool _fetchYoutubeVideosCompleted = false;
-  // 각 데이터 유형별 로딩 상태 (개선된 방식)
   bool _isLoadingNewsSlider = true;
   bool _isLoadingYoutubeVideos = true;
 
@@ -333,9 +329,9 @@ class _HealthtopicState extends State<Healthtopic> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 최상단 이미지 슬라이드 뉴스
-            if (_isLoadingNewsSlider) // 로딩 상태 변수 사용
+            if (_isLoadingNewsSlider)
               Container(
-                height: 320, // 슬라이더 높이와 동일하게 설정
+                height: 320,
                 child: Center(child: CircularProgressIndicator()),
               )
             else if (sliderItemCount > 0)
@@ -478,7 +474,7 @@ class _HealthtopicState extends State<Healthtopic> {
                     ),
                 ],
               )
-            else // 로딩도 끝났고, 아이템도 없을 때
+            else
               Container(
                 height: 320,
                 child: Center(child: Text('뉴스가 없습니다.')),
@@ -491,7 +487,7 @@ class _HealthtopicState extends State<Healthtopic> {
               child: Text('실시간 토픽', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 432.0, // 자식 위젯들의 높이 합에 따라 조절 필요, 또는 Flexible/Expanded 사용 고려
+              height: 432.0,
               child: FutureBuilder<List<ArticleItem>>(
                 future: _naverNewsFuture,
                 builder: (context, snapshot) {
@@ -502,8 +498,7 @@ class _HealthtopicState extends State<Healthtopic> {
                     return Center(child: Text('토픽을 불러오는데 실패했습니다.'));
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final naverArticles = snapshot.data!;
-                    // ListView의 높이가 고정되어 있고, 자식들이 Card이므로, 스크롤 없이 모든 아이템을 표시하려면
-                    // itemCount만큼의 높이가 확보되어야 함. 현재는 5개로 제한.
+                    // itemCount만큼의 높이 확보 5개로 제한
                     return ListView.builder(
                       physics: NeverScrollableScrollPhysics(), // 부모가 SingleChildScrollView이므로 스크롤 비활성화
                       itemCount: naverArticles.length > 5 ? 5 : naverArticles.length,
@@ -533,8 +528,8 @@ class _HealthtopicState extends State<Healthtopic> {
               child: Text('영상으로 보는 건강지식', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 260.0, // 영상 카드 하나의 높이 + 약간의 여유
-              child: _isLoadingYoutubeVideos // 로딩 상태 변수 사용
+              height: 260.0,
+              child: _isLoadingYoutubeVideos
                   ? Center(child: CircularProgressIndicator())
                   : _youtubeVideos.isNotEmpty
                   ? ListView.builder(
@@ -570,12 +565,11 @@ class _HealthtopicState extends State<Healthtopic> {
   // --- API 호출 함수들 ---
   Future<List<NewsArticle>> _fetchNewsDataIoApi() async {
     const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05';
-    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT (정치 or 날씨)'); //키워드 쿼리
+    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT (정치 or 날씨)');
     final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey');
 
     try {
       final response = await http.get(uri);
-      // _fetchNewsSliderDataCompleted = true; // _isLoadingNewsSlider로 대체
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedJson = json.decode(utf8.decode(response.bodyBytes));
         final List<dynamic> results = decodedJson['results'] as List<dynamic>? ?? [];
@@ -624,7 +618,7 @@ class _HealthtopicState extends State<Healthtopic> {
         _isLoadingYoutubeVideos = true;
       });
     }
-    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // API 키는 안전하게 관리하세요.
+    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs';
     const int maxResults = 5;
     final String query = Uri.encodeComponent('건강 정보 최신 영상');
     final Uri uri = Uri.parse(
@@ -649,7 +643,6 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 
   // --- 수정된 유틸리티 함수 ---
-// 성공 여부를 bool 값으로 반환하도록 변경
   Future<bool> _launchURL(Uri url) async {
     try {
       if (await canLaunchUrl(url)) {
