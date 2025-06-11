@@ -40,7 +40,7 @@ class _FeedListItemState extends State<FeedListItem> {
                   borderRadius: BorderRadius.circular(10.0),
                   child: widget.data.imageId != null && widget.data.imagePath != null
                       ? Image.network(
-                    'http://10.0.2.2:3000${widget.data.imagePath}',
+                    'http://10.0.2.2:3000/${widget.data.imagePath}',
                     width: _imageSize,
                     height: _imageSize,
                     fit: BoxFit.cover,

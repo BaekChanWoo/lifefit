@@ -147,7 +147,7 @@ class _FeedShowState extends State<FeedShow> {
                               radius: 22,
                               backgroundColor: Colors.grey[200], // 로딩 시 배경색
                               backgroundImage: feed.imagePath != null
-                                  ? NetworkImage('http://10.0.2.2${feed.imagePath}')
+                                  ? NetworkImage('http://10.0.2.2:3000/${feed.imagePath}')
                                   : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
                             ),
                             const SizedBox(width: 12),
@@ -236,7 +236,7 @@ class _FeedShowState extends State<FeedShow> {
                             child: AspectRatio(
                               aspectRatio: 16 / 9,
                               child: Image.network(
-                                'http://10.0.2.2${feed.imagePath}',
+                                'http://10.0.2.2:3000/${feed.imagePath}',
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 // 에러 처리  - 기본 이미지 대신 에러 아이콘

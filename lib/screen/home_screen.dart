@@ -25,6 +25,7 @@ import '../component/weather/home_weather.dart';
 import 'package:lifefit/component/interstitial/interstitial_ad_widget.dart';
 
 
+
 // 다른 화면에서 홈페이지로 이동하려면 HomeScreen 클래스 호출
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -13,6 +13,8 @@ import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:lifefit/const/categories.dart';
 import '../../controller/auth_controller.dart';
+import 'package:lifefit/shared/global.dart';
+
 
 // 피드 생성 화면
 class FeedCreate extends StatefulWidget {
@@ -85,12 +87,23 @@ class _FeedCreateState extends State<FeedCreate> {
       var uri = Uri.parse('http://10.0.2.2:3000/file');
       var request = http.MultipartRequest('POST', uri);
 
+      // 2. 인증 헤더 추가
+      final token = Global.accessToken;
+      if(token != null){
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+
+
+      // 3. 파일 첨부
       request.files.add(await http.MultipartFile.fromPath(
         'file',
         image.path,
         contentType: MediaType('image', 'jpeg'),
       ));
 
+
+
+      // 4. 전송
       var response = await request.send();
       if (response.statusCode == 200) {
         var responseData = await http.Response.fromStream(response);

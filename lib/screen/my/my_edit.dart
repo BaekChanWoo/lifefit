@@ -8,8 +8,6 @@ import 'package:lifefit/shared/global.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:lifefit/provider/provider.dart';
-
 
 // 사용자 프로필 정보를 수정 ( 이름 , 사용자 소개(커뮤니티에 쓰일부분)
 
