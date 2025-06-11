@@ -62,7 +62,7 @@ void main() async {
     try {
       // Firebase ID 토큰을 갱신하고 Global.accessToken에 저장
       await Global.updateAccessToken();
-      log('Initial Firebase ID Token: ${Global.accessToken}');
+      // log('Initial Firebase ID Token: ${Global.accessToken}');
     } catch (e) {
       log('Initial updateAccessToken error: $e');
       // 토큰 갱신 실패 시 로그아웃 처리

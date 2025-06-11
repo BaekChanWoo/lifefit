@@ -74,10 +74,12 @@ class _MainMyPageState extends State<MainMyPage> {
               : feedController.feedList.where((feed) {
             return feed.writer?.id == currentUserId;
           }).toList();
-
+          /*
           developer.log(
               'Current User ID: $currentUserId, Total Feeds in Controller: ${feedController.feedList.length}, MyFeeds on MyPage: ${myFeeds.length}',
               name: 'MainMyPage');
+
+           */
           if (feedController.feedList.isNotEmpty && myFeeds.isEmpty && currentUserId != null) {
             developer.log('No posts found for user $currentUserId even though feedList is not empty. Check writer IDs.', name: 'MainMyPage');
             feedController.feedList.forEach((feed) {

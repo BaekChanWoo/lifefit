@@ -44,7 +44,7 @@ class Provider extends GetConnect{
         Progress? uploadProgress,
         int retryCount = 1, // 재시도 횟수 제한
       }) async {
-    print('Sending POST request to: $url, body: $body');
+    // print('Sending POST request to: $url, body: $body');
     try {
       final response = await super.post(
         url,
@@ -55,7 +55,7 @@ class Provider extends GetConnect{
         decoder: decoder,
         uploadProgress: uploadProgress,
       );
-      print('Response status: ${response.statusCode}, body: ${response.body}'); // 응답 디버깅
+      // print('Response status: ${response.statusCode}, body: ${response.body}'); // 응답 디버깅
       // 401/403 에러 처리
       if ((response.statusCode == 401 || response.statusCode == 403) && retryCount > 0) {
         // 토큰 갱신

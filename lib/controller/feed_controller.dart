@@ -160,7 +160,7 @@ class FeedController extends GetxController{
   Future<void> feedShow(int id) async {
     try {
       final response = await feedProvider.show(id);
-      developer.log('feedShow response: $response', name: 'FeedController');
+      // developer.log('feedShow response: $response', name: 'FeedController');
 
       if (_isSuccessResponse(response)) {
         // 1) 데이터 파싱

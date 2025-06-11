@@ -23,7 +23,7 @@ class Global {
         throw Exception('Failed to retrieve ID token');
       }
     } catch (e) {
-      print('updateAccessToken error: $e');
+      // print('updateAccessToken error: $e');
       _accessToken = null;
       rethrow;
     }

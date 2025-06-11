@@ -31,7 +31,6 @@ class _MyPageState extends State<MyPage> with SingleTickerProviderStateMixin {
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _controller!, curve: Curves.easeInOut),
     );
-    print('초기화: ${_scaleAnimation != null}'); // 초기화 확인
   }
 
   @override

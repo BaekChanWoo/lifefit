@@ -26,13 +26,13 @@ class AuthController extends GetxController {
     // 앱 시작 시 사용자 정보 동기화
     _auth.authStateChanges().listen((firebase_auth.User? user) async {
       if (user != null) {
-        log('Auth state restored: UID=${user.uid}', name: 'AuthController');
+        // log('Auth state restored: UID=${user.uid}', name: 'AuthController');
         if (Global.accessToken == null) {
           await Global.updateAccessToken();
           // log('Restored accessToken: ${Global.accessToken}', name: 'AuthController');
         }
         await _syncUserProfile();
-        log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
+        // log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
       } else {
         log('No user authenticated', name: 'AuthController');
         _userId.value = 0;
@@ -57,7 +57,7 @@ class AuthController extends GetxController {
         _userId.value = response['data']['id'];
         // 서버에서 'profile_image' 키로 URL을 내려준다고 가정
         profileImage.value = response['data']['profile_image'] as String?;
-        log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
+        // log('User profile synced: user_id=${_userId.value}', name: 'AuthController');
       } else {
         log('Failed to sync user profile: ${response['message']}', name: 'AuthController');
       }
@@ -149,7 +149,7 @@ class AuthController extends GetxController {
           return false;
         }
         String customToken = body['custom_token'];
-        log("token : $customToken");
+        // log("token : $customToken");
 
         // user_id 저장
         if (body['user_id'] != null) {
@@ -180,7 +180,7 @@ class AuthController extends GetxController {
         // Firebase ID 토큰 캐싱
         try {
           await Global.updateAccessToken();
-          log('Firebase ID Token: ${Global.accessToken}');
+          // log('Firebase ID Token: ${Global.accessToken}');
           if (Global.accessToken == null) {
             log('Access token is null');
             Get.snackbar('오류', 'ID 토큰 획득 실패', snackPosition: SnackPosition.TOP);
@@ -248,7 +248,7 @@ class AuthController extends GetxController {
           return false;
         }
         String customToken = body['custom_token'];
-        log("token : $customToken");
+        // log("token : $customToken");
 
         // user_id 저장
         if (body['user_id'] != null) {
