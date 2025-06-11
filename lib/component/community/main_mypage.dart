@@ -112,7 +112,7 @@ class _MainMyPageState extends State<MainMyPage> {
                           ),
                           child: feed.imagePath != null && feed.imagePath!.isNotEmpty
                               ? Image.network(
-                            'http://10.0.2.2:3000${feed.imagePath}', // 실제 서버 URL 및 이미지 경로
+                            'http://10.0.2.2:3000/${feed.imagePath}', // 실제 서버 URL 및 이미지 경로
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               developer.log('Error loading image: ${feed.imagePath}, Error: $error', name: 'MainMyPage');
