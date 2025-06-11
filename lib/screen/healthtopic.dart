@@ -34,10 +34,6 @@ class _HealthtopicState extends State<Healthtopic> {
   // HTML 엔티티 변환기 인스턴스 (클래스 멤버로 한 번만 생성)
   final HtmlUnescape _unescape = HtmlUnescape();
 
-  // API 호출 완료 여부 플래그 (로딩 인디케이터 표시용 - 추후 별도 상태 변수로 관리 권장)
-  bool _fetchNewsSliderDataCompleted = false;
-  bool _fetchYoutubeVideosCompleted = false;
-  // 각 데이터 유형별 로딩 상태 (개선된 방식)
   bool _isLoadingNewsSlider = true;
   bool _isLoadingYoutubeVideos = true;
 
@@ -316,18 +312,16 @@ class _HealthtopicState extends State<Healthtopic> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            '건강토픽',
-            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600, color: Colors.black),
-            textAlign: TextAlign.center,
+        centerTitle: true,
+        title: Text(
+          '건강토픽',
+          style: TextStyle(
+            fontSize: 22.0,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
           ),
         ),
         backgroundColor: Colors.white,
-        elevation: 0.5,
-        actions: [
-          IconButton(icon: Icon(Icons.menu, color: Colors.black54), onPressed: () { /* 메뉴 기능 구현 */ }),
-        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -335,9 +329,9 @@ class _HealthtopicState extends State<Healthtopic> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 최상단 이미지 슬라이드 뉴스
-            if (_isLoadingNewsSlider) // 로딩 상태 변수 사용
+            if (_isLoadingNewsSlider)
               Container(
-                height: 320, // 슬라이더 높이와 동일하게 설정
+                height: 320,
                 child: Center(child: CircularProgressIndicator()),
               )
             else if (sliderItemCount > 0)
@@ -480,7 +474,7 @@ class _HealthtopicState extends State<Healthtopic> {
                     ),
                 ],
               )
-            else // 로딩도 끝났고, 아이템도 없을 때
+            else
               Container(
                 height: 320,
                 child: Center(child: Text('뉴스가 없습니다.')),
@@ -493,7 +487,7 @@ class _HealthtopicState extends State<Healthtopic> {
               child: Text('실시간 토픽', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 432.0, // 자식 위젯들의 높이 합에 따라 조절 필요, 또는 Flexible/Expanded 사용 고려
+              height: 432.0,
               child: FutureBuilder<List<ArticleItem>>(
                 future: _naverNewsFuture,
                 builder: (context, snapshot) {
@@ -504,8 +498,7 @@ class _HealthtopicState extends State<Healthtopic> {
                     return Center(child: Text('토픽을 불러오는데 실패했습니다.'));
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final naverArticles = snapshot.data!;
-                    // ListView의 높이가 고정되어 있고, 자식들이 Card이므로, 스크롤 없이 모든 아이템을 표시하려면
-                    // itemCount만큼의 높이가 확보되어야 함. 현재는 5개로 제한.
+                    // itemCount만큼의 높이 확보 5개로 제한
                     return ListView.builder(
                       physics: NeverScrollableScrollPhysics(), // 부모가 SingleChildScrollView이므로 스크롤 비활성화
                       itemCount: naverArticles.length > 5 ? 5 : naverArticles.length,
@@ -535,8 +528,8 @@ class _HealthtopicState extends State<Healthtopic> {
               child: Text('영상으로 보는 건강지식', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 260.0, // 영상 카드 하나의 높이 + 약간의 여유
-              child: _isLoadingYoutubeVideos // 로딩 상태 변수 사용
+              height: 260.0,
+              child: _isLoadingYoutubeVideos
                   ? Center(child: CircularProgressIndicator())
                   : _youtubeVideos.isNotEmpty
                   ? ListView.builder(
@@ -571,14 +564,12 @@ class _HealthtopicState extends State<Healthtopic> {
 
   // --- API 호출 함수들 ---
   Future<List<NewsArticle>> _fetchNewsDataIoApi() async {
-    // _fetchNewsSliderDataCompleted = false; // _isLoadingNewsSlider로 대체
-    const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05'; // API 키는 안전하게 관리하세요.
-    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT 정치');
+    const String apiKey = 'pub_8514684c9e5ae1f3e898c8550491c72eebe05';
+    final String query = Uri.encodeComponent('(건강 OR 웰빙) NOT (정치 or 날씨)');
     final Uri uri = Uri.parse('https://newsdata.io/api/1/news?country=kr&q=$query&language=ko&apikey=$apiKey');
 
     try {
       final response = await http.get(uri);
-      // _fetchNewsSliderDataCompleted = true; // _isLoadingNewsSlider로 대체
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedJson = json.decode(utf8.decode(response.bodyBytes));
         final List<dynamic> results = decodedJson['results'] as List<dynamic>? ?? [];
@@ -588,16 +579,15 @@ class _HealthtopicState extends State<Healthtopic> {
         throw Exception('Failed to load news from newsdata.io');
       }
     } catch (e) {
-      // _fetchNewsSliderDataCompleted = true; // _isLoadingNewsSlider로 대체
       print('Error in _fetchNewsDataIoApi: $e');
       rethrow;
     }
   }
 
   Future<List<ArticleItem>> _fetchNaverNews() async {
-    const String clientId = 'E8ElLohbjuT1eaH79agX'; // API 키는 안전하게 관리하세요.
-    const String clientSecret = 'PAqjeoE83U'; // API 키는 안전하게 관리하세요.
-    final String query = Uri.encodeComponent('건강+운동+웰빙-정치-날씨');
+    const String clientId = 'E8ElLohbjuT1eaH79agX';
+    const String clientSecret = 'PAqjeoE83U';
+    final String query = Uri.encodeComponent('건강+운동+웰빙');
     final Uri uri = Uri.parse('https://openapi.naver.com/v1/search/news.json?query=$query&display=5&sort=sim');
 
     try {
@@ -623,13 +613,12 @@ class _HealthtopicState extends State<Healthtopic> {
   }
 
   Future<List<SearchResult>> _fetchYoutubeVideos() async {
-    // _fetchYoutubeVideosCompleted = false; // _isLoadingYoutubeVideos로 대체
     if (mounted) { // setState 호출 전 mounted 확인
       setState(() {
         _isLoadingYoutubeVideos = true;
       });
     }
-    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs'; // API 키는 안전하게 관리하세요.
+    const String apiKey = 'AIzaSyBNFUaREtKTnkHmLNz7-tv2L9nv-E_PQxs';
     const int maxResults = 5;
     final String query = Uri.encodeComponent('건강 정보 최신 영상');
     final Uri uri = Uri.parse(
@@ -639,7 +628,6 @@ class _HealthtopicState extends State<Healthtopic> {
 
     try {
       final response = await http.get(uri);
-      // _fetchYoutubeVideosCompleted = true; // _isLoadingYoutubeVideos로 대체
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
         final SearchListResponse searchListResponse = SearchListResponse.fromJson(jsonResponse);
@@ -649,24 +637,25 @@ class _HealthtopicState extends State<Healthtopic> {
         throw Exception('Failed to load YouTube videos');
       }
     } catch (e) {
-      // _fetchYoutubeVideosCompleted = true; // _isLoadingYoutubeVideos로 대체
       print('Error in _fetchYoutubeVideos: $e');
       rethrow;
     }
   }
 
-  // --- 유틸리티 함수 ---
-  Future<void> _launchURL(Uri url) async {
+  // --- 수정된 유틸리티 함수 ---
+  Future<bool> _launchURL(Uri url) async {
     try {
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
+        return true; // 성공 시 true 반환
       } else {
         print('Could not launch $url');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('연결할 수 없습니다: ${url.toString()}')),
+            SnackBar(content: Text('연결할 수 없습니다')),
           );
         }
+        return false; // 실패 시 false 반환
       }
     } catch(e) {
       print('Error launching URL: $e');
@@ -675,19 +664,21 @@ class _HealthtopicState extends State<Healthtopic> {
           SnackBar(content: Text('URL 실행 중 오류가 발생했습니다.')),
         );
       }
+      return false; // 예외 발생 시 false 반환
     }
   }
 
-  void _launchYoutubeVideo(String videoId) {
-    // 우선 앱으로 시도
-    final Uri youtubeAppUrl = Uri.parse('youtube://watch?v=$videoId'); // <--- 이 부분!
-    // 웹 URL (앱 실패 시 대체)
-    final Uri youtubeWebUrl = Uri.parse('https://www.youtube.com/watch?v=$videoId'); // <--- 이 부분은 문제가 없습니다.
+  void _launchYoutubeVideo(String videoId) async { // async 키워드 추가
+    final Uri youtubeAppUrl = Uri.parse('youtube://watch?v=$videoId');
+    final Uri youtubeWebUrl = Uri.parse('https://www.youtube.com/watch?v=$videoId');
 
-    _launchURL(youtubeAppUrl).catchError((e) {
-      print('Could not launch YouTube app for video ID $videoId: $e'); // <--- 이 부분도!
-      // 앱 실행 실패 시 웹 URL로 시도
-      _launchURL(youtubeWebUrl);
-    });
+  // 1. 앱으로 실행 시도하고 결과를 기다림
+  final bool launchedInApp = await _launchURL(youtubeAppUrl);
+
+  // 2. 앱 실행이 실패했다면(!launchedInApp), 웹으로 실행
+  if (!launchedInApp) {
+  print('Could not launch YouTube app, trying web URL...');
+  await _launchURL(youtubeWebUrl);
+    }
   }
 }
