@@ -147,8 +147,10 @@ class _FeedShowState extends State<FeedShow> {
                               radius: 22,
                               backgroundColor: Colors.grey[200], // 로딩 시 배경색
                               backgroundImage: feed.imagePath != null
-                                  ? NetworkImage('http://10.0.2.2:3000/${feed.imagePath}')
-                                  : const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
+                                  ? const AssetImage('assets/img/mypageimg.jpg') as ImageProvider
+                              // NetworkImage('http://10.0.2.2:3000/${feed.imagePath}')
+                                  : NetworkImage('http://10.0.2.2:3000/${feed.imagePath}')
+                              // const AssetImage('assets/img/mypageimg.jpg') as ImageProvider,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
