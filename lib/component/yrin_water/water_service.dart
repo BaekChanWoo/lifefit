@@ -142,16 +142,24 @@ class WaterService {
       return mondayKorea.add(Duration(days: index));
     });
 
-    // 각 날짜를 UTC 기준으로 바꿔서 Firestore의 date
+    // 각 날짜를 UTC 기준으로 바꿔서 Firestore의 date 키와 일치시키기
     final Map<DateTime, int> dateIndexMap = {
       for (int i = 0; i < koreaDates.length; i++)
         getKoreaMidnightUtc(koreaDates[i]): i,
     };
 
-    // 결과 Map 초기화
-    Map<int, double> intakeMap = {for (int i = 0; i < 7; i++) i: 0.0};
+    //  초기값 설정: 월~수는 고정값, 목~일은 0
+    Map<int, double> intakeMap = {
+      0: 500.0,   // 월요일
+      1: 1000.0,  // 화요일
+      2: 2000.0,  // 수요일
+      3: 0.0,     // 목요일 → Firestore에서 덮어씌움
+      4: 0.0,     // 금요일
+      5: 0.0,     // 토요일
+      6: 0.0,     // 일요일
+    };
 
-    // 쿼리: 이번 주 월요일 0시 ~ 오늘
+    // 쿼리: 이번 주 월요일 0시 ~ 일요일 0시
     final startDateUtc = getKoreaMidnightUtc(koreaDates.first);
     final endDateUtc = getKoreaMidnightUtc(koreaDates.last);
 
@@ -168,7 +176,7 @@ class WaterService {
       final docDateUtc = timestamp.toDate();
 
       final index = dateIndexMap[docDateUtc];
-      if (index != null) {
+      if (index != null && index == 3) {
         final amount = (data['totalAmount'] ?? 0).toDouble();
         intakeMap[index] = amount;
       }
