@@ -176,7 +176,9 @@ class WaterService {
       final docDateUtc = timestamp.toDate();
 
       final index = dateIndexMap[docDateUtc];
-      if (index != null && index == 3) {
+
+      // 목요일(3) ~ 일요일(6)(가변
+      if (index != null && index >= 3) {
         final amount = (data['totalAmount'] ?? 0).toDouble();
         intakeMap[index] = amount;
       }
