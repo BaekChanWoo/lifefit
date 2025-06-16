@@ -1,4 +1,4 @@
-라이프핏 (헬스 케어 애플리케이션)
+![image](https://github.com/user-attachments/assets/f1507512-b1e7-42cd-af76-13e49f90111d)라이프핏 (헬스 케어 애플리케이션)
 컴퓨터공학과 캡스톤디자인
 2025년 1학기 
 
@@ -39,6 +39,7 @@
 3.1.테스트 목적	13
 4.	결론 및 향후 과제	15
 
+![image](https://github.com/user-attachments/assets/9cfeac0c-8afd-4cc3-a442-4d7b8c2371e7)
 
 1.	프로젝트 개요 및 문제 정의
 1.1.	기획 배경
