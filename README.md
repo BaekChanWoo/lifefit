@@ -3,6 +3,8 @@
 2025년 1학기 
 
 
+![image](https://github.com/user-attachments/assets/9cfeac0c-8afd-4cc3-a442-4d7b8c2371e7)
+
 
 
 
@@ -41,10 +43,6 @@
 
 
 
-
-
-
-![image](https://github.com/user-attachments/assets/9cfeac0c-8afd-4cc3-a442-4d7b8c2371e7)
 
 1.	프로젝트 개요 및 문제 정의
 1.1.	기획 배경
@@ -194,13 +192,14 @@
 → 해당 리스트는 신청자의 이름을 기반으로 표시되며, Firestore에서 applicants 필드를 통해 조회한다. 
 
 2.6.	광고(수익화)
-프로젝트에서는 앱의 수익화를 위해 Google AdMob을 연동해 배너 광고와 전면 광고 기능을 구현했다. 사용자는 앱 사용 중 자연스럽게 광고를 접하게 되고, 개발자는 광고 노출을 통해 수익을 얻을 수 있는 구조이다. ![image](https://github.com/user-attachments/assets/96984ee1-dad2-4b00-b45f-bdd6f1872bef)
-
+프로젝트에서는 앱의 수익화를 위해 Google AdMob을 연동해 배너 광고와 전면 광고 기능을 구현했다. 사용자는 앱 사용 중 자연스럽게 광고를 접하게 되고, 개발자는 광고 노출을 통해 수익을 얻을 수 있는 구조이다. ![image]
 
 2.6.1.	배너 광고 (Banner Ad)
 - 앱 하단 또는 리스트 상단에 고정적으로 노출되는 광고이다.
 - 사용자의 흐름을 방해하지 않으면서도 자연스럽게 노출된다.
 - Flutter에서는 BannerAd 위젯을 삽입하고, 광고가 로드되면 자동으로 표시되도록 구성했다.
+
+ (https://github.com/user-attachments/assets/96984ee1-dad2-4b00-b45f-bdd6f1872bef)
 
 2.6.2.	전면 광고 (Interstitial Ad)
 - 특정 액션(예: 페이지 전환, 게시물 작성 완료 등) 후 전체 화면을 덮는 광고이다.
