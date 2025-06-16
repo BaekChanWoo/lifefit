@@ -3,9 +3,9 @@
 2025년 1학기 
 
 
+
+
 ![image](https://github.com/user-attachments/assets/9cfeac0c-8afd-4cc3-a442-4d7b8c2371e7)
-
-
 
 
 
@@ -21,7 +21,6 @@
 
 
 목차 
-
 
 1.	프로젝트 개요 및 문제 정의	2
 1.1.기획 배경	2
@@ -199,7 +198,8 @@
 - 사용자의 흐름을 방해하지 않으면서도 자연스럽게 노출된다.
 - Flutter에서는 BannerAd 위젯을 삽입하고, 광고가 로드되면 자동으로 표시되도록 구성했다.
 
- (https://github.com/user-attachments/assets/96984ee1-dad2-4b00-b45f-bdd6f1872bef)
+ ![image](https://github.com/user-attachments/assets/c4639c21-d1ab-4f4b-89d5-878cdf694216)
+
 
 2.6.2.	전면 광고 (Interstitial Ad)
 - 특정 액션(예: 페이지 전환, 게시물 작성 완료 등) 후 전체 화면을 덮는 광고이다.
