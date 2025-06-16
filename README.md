@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/f1507512-b1e7-42cd-af76-13e49f90111d)라이프핏 (헬스 케어 애플리케이션)
+라이프핏 (헬스 케어 애플리케이션)
 컴퓨터공학과 캡스톤디자인
 2025년 1학기 
 
@@ -189,7 +189,8 @@
 → 해당 리스트는 신청자의 이름을 기반으로 표시되며, Firestore에서 applicants 필드를 통해 조회한다. 
 
 2.6.	광고(수익화)
-프로젝트에서는 앱의 수익화를 위해 Google AdMob을 연동해 배너 광고와 전면 광고 기능을 구현했다. 사용자는 앱 사용 중 자연스럽게 광고를 접하게 되고, 개발자는 광고 노출을 통해 수익을 얻을 수 있는 구조이다.
+프로젝트에서는 앱의 수익화를 위해 Google AdMob을 연동해 배너 광고와 전면 광고 기능을 구현했다. 사용자는 앱 사용 중 자연스럽게 광고를 접하게 되고, 개발자는 광고 노출을 통해 수익을 얻을 수 있는 구조이다. ![image](https://github.com/user-attachments/assets/96984ee1-dad2-4b00-b45f-bdd6f1872bef)
+
 
 2.6.1.	배너 광고 (Banner Ad)
 - 앱 하단 또는 리스트 상단에 고정적으로 노출되는 광고이다.
@@ -199,6 +200,9 @@
 2.6.2.	전면 광고 (Interstitial Ad)
 - 특정 액션(예: 페이지 전환, 게시물 작성 완료 등) 후 전체 화면을 덮는 광고이다.
 - 광고가 끝나야 다음 동작이 진행되도록 설계해 사용자 주의를 끌 수 있는 구조이다.
+
+  ![image](https://github.com/user-attachments/assets/5594c85a-3189-400b-9f2c-8939817fda3b)
+
 
 	사용 기술
 -	Flutter (Google Mobile Ads 플러그인 사용)
@@ -253,20 +257,28 @@ Flutter 프론트엔드, Node.js 백엔드, Firebase 및 MySQL 기반의 데이�
 시스템의 주요 기능이 의도한 대로 작동하는지 확인하고, 사용성과 성능 측면에서의 개선점을 도출하기 위해 테스트를 진행하였다. 본 테스트는 사용자 인터랙션 이후 입력된 데이터가 올바르게 저장되는지를 중심으로 수행되었다.
 
 -	메인페이지 예상 결과와 완성된 메인페이지 
-	 
+	 ![image](https://github.com/user-attachments/assets/5bac7c5f-71c4-470c-856e-53ab2294e55f) ![image](https://github.com/user-attachments/assets/5102fbd3-39e0-4b9e-9ffc-5e807dbc5d69) ![image](https://github.com/user-attachments/assets/9409379e-d69e-47af-921a-7ea58bf7ea7d)
 
--	회원가입 유저 아이디, 이름 저장 
- 
+
+
+
+-	회원가입 유저 아이디, 이름 저장
+
+  ![image](https://github.com/user-attachments/assets/94fda317-d449-46bc-b51f-13d8499cb53d)
+
 
 -	커뮤니티 게시글 및 댓글 저장 
- 
- 
+
+![image](https://github.com/user-attachments/assets/a35e2181-6fdd-4a2d-84d7-ba408faff374)
+![image](https://github.com/user-attachments/assets/e55b8938-f0d9-4184-9b81-50cefd90a348)
+
 
 -	번개 게시글 및 신청자 저장
- 
+ ![image](https://github.com/user-attachments/assets/b43a0881-716f-4596-92d4-cd22ec0a4b86)
 
 -	물 데이터 저장 
- 
+ ![image](https://github.com/user-attachments/assets/9fdc4789-0c71-496f-a158-a5d00f6bcdf7)
+
 
 
 테스트를 통해 주요 기능들이 전반적으로 의도한 대로 구현되었으며, 특히 데이터 저장 및 각 기능의 동작이 정상적으로 수행됨을 확인할 수 있었다. 전체적으로 시스템은 안정적으로 작동하였고 충분한 완성도를 갖추었다고 평가된다.
