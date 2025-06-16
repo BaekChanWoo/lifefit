@@ -39,6 +39,11 @@
 3.1.테스트 목적	13
 4.	결론 및 향후 과제	15
 
+
+
+
+
+
 ![image](https://github.com/user-attachments/assets/9cfeac0c-8afd-4cc3-a442-4d7b8c2371e7)
 
 1.	프로젝트 개요 및 문제 정의
@@ -256,10 +261,11 @@ Flutter 프론트엔드, Node.js 백엔드, Firebase 및 MySQL 기반의 데이�
 3.1.	테스트 목적
 시스템의 주요 기능이 의도한 대로 작동하는지 확인하고, 사용성과 성능 측면에서의 개선점을 도출하기 위해 테스트를 진행하였다. 본 테스트는 사용자 인터랙션 이후 입력된 데이터가 올바르게 저장되는지를 중심으로 수행되었다.
 
--	메인페이지 예상 결과와 완성된 메인페이지 
-	 ![image](https://github.com/user-attachments/assets/5bac7c5f-71c4-470c-856e-53ab2294e55f) ![image](https://github.com/user-attachments/assets/5102fbd3-39e0-4b9e-9ffc-5e807dbc5d69) ![image](https://github.com/user-attachments/assets/9409379e-d69e-47af-921a-7ea58bf7ea7d)
-
-
+-	메인페이지 예상 결과와 완성된 메인페이지
+   
+	 ![image](https://github.com/user-attachments/assets/5bac7c5f-71c4-470c-856e-53ab2294e55f)
+ 	 ![image](https://github.com/user-attachments/assets/5102fbd3-39e0-4b9e-9ffc-5e807dbc5d69)
+ 	 ![image](https://github.com/user-attachments/assets/9409379e-d69e-47af-921a-7ea58bf7ea7d)
 
 
 -	회원가입 유저 아이디, 이름 저장
